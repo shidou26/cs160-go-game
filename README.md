@@ -1,3 +1,6 @@
-# This project is about Go game
+# CS160 Project: Go game
+--- 
 
-# Funny game
+## Authors
+By Đoàn Nhật Anh and Lê Hồng Anh
+--- 
