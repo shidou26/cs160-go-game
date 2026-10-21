@@ -2,6 +2,7 @@
 --- 
 
 Repository: https://github.com/shidou26/cs160-go-game
+
 Go Game Final Project for CS160 Course
 
 ## Introduction

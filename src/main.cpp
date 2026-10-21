@@ -2,13 +2,15 @@
 
 int main() {
     // init app
-    InitWindow(800, 600, "The Game of Go");
-
+    SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT);
+    InitWindow(1280, 700, "The Game of Go");
+    SetTargetFPS(60);
+    
     // run app
     while(!WindowShouldClose()) {
         BeginDrawing();
         
-        
+
 
         EndDrawing();
     }
