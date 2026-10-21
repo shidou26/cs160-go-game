@@ -10,7 +10,7 @@ int main() {
     while(!WindowShouldClose()) {
         BeginDrawing();
         
-
+        ClearBackground(BLUE);
 
         EndDrawing();
     }
