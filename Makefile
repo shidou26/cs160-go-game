@@ -1,4 +1,4 @@
-# AI-assisted
+# AI-assisted: AI01
 
 CXX ?= g++
 SRC = src/main.cpp src/ui.cpp
