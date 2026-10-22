@@ -1,8 +1,8 @@
 # AI-assisted
 
-CXX = g++
-SRC = src/main.cpp
-CXXFLAGS = -Iinclude
+CXX ?= g++
+SRC = src/main.cpp src/ui.cpp
+CXXFLAGS = -Iinclude -std=c++17
 
 ifeq ($(OS),Windows_NT)
 default: windows
