@@ -1,6 +1,7 @@
 #pragma once
 
 #define BOARD_SIZE 19
+#define KOMI 6.5
 
 enum StoneType {
     EMPTY = '.',
@@ -16,7 +17,7 @@ bool in_board(const int &pos_x, const int &pos_y) {
            0 <= pos_y && pos_y < BOARD_SIZE;
 }
 
-char opposite_stone(const char &stone) {
-    return (stone == 'X' ? 'O' : 'X');
+StoneType opposite_stone(const StoneType &stone) {
+    return (stone == StoneType::WHITE ? StoneType::BLACK : StoneType::WHITE);
 }
 

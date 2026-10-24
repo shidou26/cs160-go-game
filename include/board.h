@@ -19,16 +19,11 @@ class Board {
 private:
     bool turn;
     int pass;
-    ZobristHash hash_value;
+    ZobristHash hash_table;
     std::array<int, 2> captured;
     std::vector<Move> move_list;
     std::vector<Move> undo_list;
     StoneType board[BOARD_SIZE][BOARD_SIZE];
-
-    Board() {
-        turn = 0;
-        pass = 0;
-    }
 
 public:
     Board();
@@ -43,6 +38,14 @@ public:
     StoneType get_state(const int &pos_x, const int &pos_y) const;
 
     /**
+     * @brief Return the captured pieces: 0 for black pieces that died and 1 for white
+     * 
+     * @param type
+     * @return int
+     */
+    int get_captured(const int &type) const;
+
+    /**
      * @brief Return the turn of the game
      * 
      * @return true/1 for white
@@ -53,14 +56,36 @@ public:
     /**
      * @brief Toggle the turn of the game
      */
-    void toggle_turn() const;
+    void toggle_turn();
+    
+    /**
+     * @brief Update the cell with new_stone_type
+     * 
+     * @param pos_x 
+     * @param pos_y 
+     * @param prev_stone_type 
+     * @param new_stone_type 
+     */
+    void update_cell(const int &pos_x, const int &pos_y, const StoneType &prev_stone_type, const StoneType &new_stone_type);
 
-    void update_cell(const int &pos_x, const int &pos_y, const char &prev_stone_type, const char &new_stone_type);
-
+    /**
+     * @brief Make an virtual move
+     * 
+     * @param new_move 
+     */
     void play_move(Move new_move);
 
+    /**
+     * @brief Undo a move
+     * 
+     * @param by_player 
+     */
     void undo_move(bool by_player);
 
+    /**
+     * @brief Redo a move
+     * 
+     */
     void redo_move();
 
     /**
@@ -68,5 +93,5 @@ public:
      */
     void clear_undo_list();
 
-    bool check_existed_state();
+    bool check_existed_state() const;
 };

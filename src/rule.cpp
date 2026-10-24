@@ -14,8 +14,7 @@ Board current_board;
 std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const int &start_x, const int &start_y) {
     std::queue<std::pair<int, int>> heap;
     std::array<std::vector<std::pair<int, int>>, 2> captured_stones;
-    bool visited[BOARD_SIZE][BOARD_SIZE];
-    memset(visited, false, sizeof(visited));
+    bool visited[BOARD_SIZE][BOARD_SIZE]{};
 
     for(int k = 0; k <= 4; k++) {
         int i = start_x, j = start_y;
@@ -69,7 +68,7 @@ int add_move(Move new_move) {
 
     current_board.play_move(new_move);
 
-    // Get capture stones
+    // Get captured stones
     std::array<std::vector<std::pair<int, int>>, 2> captured_stones = get_captured_stones(new_move.pos_x, new_move.pos_y);
     char current_stone_state = current_board.get_state(new_move.pos_x, new_move.pos_y);
 
@@ -120,8 +119,8 @@ bool check_ko_threat(Move new_move) {
     if(!check_ko_rule()) return false;
     if(!add_move(new_move)) return false;
     
-    bool visited[BOARD_SIZE][BOARD_SIZE];
-    char opponent = opposite_stone(new_move.stone_type);
+    bool visited[BOARD_SIZE][BOARD_SIZE]{};
+    StoneType opponent = opposite_stone(new_move.stone_type);
 
     for(int k = 0; k < 4; k++) {
         int i = new_move.pos_x + direction_x[k];

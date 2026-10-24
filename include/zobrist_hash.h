@@ -19,5 +19,5 @@ public:
     /**
      * @brief Update hash value after a move
      */
-    void update_hash(const int &pos_x, const int &pos_y, const char &stone_type);
+    void update_hash(const int &pos_x, const int &pos_y, const StoneType &stone_type);
 };
