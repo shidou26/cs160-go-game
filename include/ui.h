@@ -1,33 +1,51 @@
 #pragma once
 #include <raylib.h>
+#include "board.h"
 
-// Các hằng số kích thước giữ nguyên từ code gốc của bạn
-const int BOARD_SIZE = 9;
-const int CELL_SIZE = 60;
+// Các hằng số kích thước giao diện mặc định
+const int DEFAULT_GRID_WIDTH = 480;
 const int START_X = 160;
 const int START_Y = 160;
 const int PADDING = 50;
 
-class Board {
+struct OptionButton {
+    Rectangle bounds;
+    const char* label;
+};
+
+class UI {
 private:
-    int grid[BOARD_SIZE][BOARD_SIZE];
-    
-    int cellSize;
     int startX;
     int startY;
     int padding;
     int gridWidth;
 
+    Color bgColor;
     Color boardWood;
     Color lineColor;
     Color boardBorder;
 
-public:
-    Board();
+    // Các nút chọn Option trên giao diện
+    OptionButton btnSize9;
+    OptionButton btnSize13;
+    OptionButton btnSize19;
+    OptionButton btnUndo;
+    OptionButton btnReset;
 
-    void Reset();
-    void Draw();
-    bool PlaceStone(int row, int col, int player);
-    bool ScreenToGrid(Vector2 mousePos, int &row, int &col);
-    int GetCell(int row, int col) const;
+    int GetCellSize(const Board &board) const;
+    void DrawButton(const OptionButton &btn, Vector2 mousePos, bool isActive = false) const;
+
+public:
+    UI();
+
+    Color GetBackgroundColor() const;
+
+    // Chỉ làm nhiệm vụ vẽ bàn cờ, quân cờ và các nút Option dựa trên dữ liệu từ Board
+    void Draw(const Board &board, int currentPlayer) const;
+
+    // Chuyển đổi tọa độ click chuột trên màn hình sang vị trí (row, col) của Board
+    bool ScreenToGrid(Vector2 mousePos, const Board &board, int &row, int &col) const;
+
+    // Xử lý khi người chơi nháy chuột vào các nút Option trên giao diện
+    bool HandleOptionClick(Vector2 mousePos, Board &board, int &currentPlayer);
 };

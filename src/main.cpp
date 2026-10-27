@@ -1,47 +1,42 @@
 #include <raylib.h>
+#include "board.h"
 #include "ui.h"
 
 int currentPlayer = 1;
 
 int main() {
-    InitWindow(800, 800, "Go Game - 9x9");
+    InitWindow(1280, 960, "Go Game");
     SetTargetFPS(60);
 
-    // 1. Tạo đối tượng bàn cờ
-    Board board;
-
-    Color BG_COLOR = { 20, 24, 35, 255 };
+    // 1. Tạo đối tượng bàn cờ (quản lý grid[i][j] & logic) và đối tượng giao diện (UI)
+    Board board(9);
+    UI ui;
 
     while (!WindowShouldClose()) {
-        // --- CẬP NHẬT LOGIC (Sau này chúng ta sẽ bắt click chuột ở đây) ---
-
-        // --- VẼ GIAO DIỆN ---
-
+        // --- CẬP NHẬT LOGIC & BẮT CLICK CHUỘT ---
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             Vector2 mousePos = GetMousePosition();
             int row, col;
 
-            // 1. Kiểm tra xem click chuột có trúng bàn cờ không
-            if (board.ScreenToGrid(mousePos, row, col)) {
-                // 2. Thử đặt quân cờ vào vị trí đó
-                if (board.PlaceStone(row, col, currentPlayer)) {
-                    // 3. Nếu đặt thành công, đổi lượt chơi cho người kia
-                    currentPlayer = (currentPlayer == 1) ? 2 : 1;
+            // 1. Kiểm tra xem người chơi có nháy chuột vào các nút Option trên UI không
+            if (!ui.HandleOptionClick(mousePos, board, currentPlayer)) {
+                // 2. Kiểm tra xem click chuột có trúng bàn cờ không
+                if (ui.ScreenToGrid(mousePos, board, row, col)) {
+                    // 3. Thử đặt quân cờ vào vị trí đó trong Board
+                    if (board.PlaceStone(row, col, currentPlayer)) {
+                        // 4. Nếu đặt thành công, đổi lượt chơi cho người kia
+                        currentPlayer = (currentPlayer == 1) ? 2 : 1;
+                    }
                 }
-            }
-
-            if (currentPlayer == 1) {
-                DrawText("Turn: BLACK", 20, 20, 20, RAYWHITE);
-            } else {
-                DrawText("Turn: WHITE", 20, 20, 20, RAYWHITE);
             }
         }
 
+        // --- VẼ GIAO DIỆN ---
         BeginDrawing();
-        ClearBackground(BG_COLOR);
+        ClearBackground(ui.GetBackgroundColor());
 
-        // Gọi hàm vẽ của class Board
-        board.Draw();
+        // Gọi hàm vẽ của class UI (đọc trạng thái từ đối tượng board)
+        ui.Draw(board, currentPlayer);
 
         EndDrawing();
     }

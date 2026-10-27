@@ -17,23 +17,44 @@ struct Move {
 
 class Board {
 private:
+    int current_size;
     bool turn;
     int pass;
     ZobristHash hash_table;
     std::array<int, 2> captured;
     std::vector<Move> move_list;
     std::vector<Move> undo_list;
-    StoneType board[BOARD_SIZE][BOARD_SIZE];
+    StoneType grid[BOARD_SIZE][BOARD_SIZE];
 
 public:
-    Board();
+    Board(int size = 9);
+
+    /**
+     * @brief Reset bàn cờ về trạng thái ban đầu (có thể truyền kích thước mới: 9, 13, 19)
+     */
+    void Reset(int new_size = -1);
+
+    /**
+     * @brief Lấy kích thước bàn cờ hiện tại (9, 13, hoặc 19)
+     */
+    int GetSize() const;
+
+    /**
+     * @brief Đặt quân cờ lên vị trí (row, col) cho người chơi (1: Đen, 2: Trắng)
+     */
+    bool PlaceStone(int row, int col, int player);
+
+    /**
+     * @brief Lấy giá trị ô cờ dạng số nguyên cho UI (0: Trống, 1: Đen, 2: Trắng)
+     */
+    int GetCell(int row, int col) const;
 
     /**
      * @brief Return the state of cell
      * 
      * @param pos_x 
      * @param pos_y 
-     * @return char 
+     * @return StoneType 
      */
     StoneType get_state(const int &pos_x, const int &pos_y) const;
 
@@ -69,7 +90,7 @@ public:
     void update_cell(const int &pos_x, const int &pos_y, const StoneType &prev_stone_type, const StoneType &new_stone_type);
 
     /**
-     * @brief Make an virtual move
+     * @brief Make a move on the board
      * 
      * @param new_move 
      */
