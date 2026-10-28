@@ -1,4 +1,5 @@
 #include <queue>
+#include <tuple>
 
 #include "../include/score.h"
 #include "../include/helper.h"

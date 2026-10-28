@@ -2,8 +2,6 @@
 #include "board.h"
 #include "ui.h"
 
-int currentPlayer = 1;
-
 int main() {
     InitWindow(1280, 960, "Go Game");
     SetTargetFPS(60);
@@ -11,6 +9,7 @@ int main() {
     // 1. Tạo đối tượng bàn cờ (quản lý grid[i][j] & logic) và đối tượng giao diện (UI)
     Board board(9);
     UI ui;
+    int current_player = 1;
 
     while (!WindowShouldClose()) {
         // --- CẬP NHẬT LOGIC & BẮT CLICK CHUỘT ---
@@ -19,13 +18,13 @@ int main() {
             int row, col;
 
             // 1. Kiểm tra xem người chơi có nháy chuột vào các nút Option trên UI không
-            if (!ui.HandleOptionClick(mousePos, board, currentPlayer)) {
+            if (!ui.handle_option_click(mousePos, board, current_player)) {
                 // 2. Kiểm tra xem click chuột có trúng bàn cờ không
-                if (ui.ScreenToGrid(mousePos, board, row, col)) {
+                if (ui.screen_to_grid(mousePos, board, row, col)) {
                     // 3. Thử đặt quân cờ vào vị trí đó trong Board
-                    if (board.PlaceStone(row, col, currentPlayer)) {
+                    if (board.place_stone(row, col, current_player)) {
                         // 4. Nếu đặt thành công, đổi lượt chơi cho người kia
-                        currentPlayer = (currentPlayer == 1) ? 2 : 1;
+                        current_player = (current_player == 1) ? 2 : 1;
                     }
                 }
             }
@@ -33,10 +32,10 @@ int main() {
 
         // --- VẼ GIAO DIỆN ---
         BeginDrawing();
-        ClearBackground(ui.GetBackgroundColor());
+        ClearBackground(ui.get_background_color());
 
         // Gọi hàm vẽ của class UI (đọc trạng thái từ đối tượng board)
-        ui.Draw(board, currentPlayer);
+        ui.draw(board, current_player);
 
         EndDrawing();
     }

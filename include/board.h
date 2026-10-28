@@ -32,22 +32,22 @@ public:
     /**
      * @brief Reset bàn cờ về trạng thái ban đầu (có thể truyền kích thước mới: 9, 13, 19)
      */
-    void Reset(int new_size = -1);
+    void reset(int new_size = -1);
 
     /**
      * @brief Lấy kích thước bàn cờ hiện tại (9, 13, hoặc 19)
      */
-    int GetSize() const;
+    int get_size() const;
 
     /**
      * @brief Đặt quân cờ lên vị trí (row, col) cho người chơi (1: Đen, 2: Trắng)
      */
-    bool PlaceStone(int row, int col, int player);
+    bool place_stone(int row, int col, int player);
 
     /**
      * @brief Lấy giá trị ô cờ dạng số nguyên cho UI (0: Trống, 1: Đen, 2: Trắng)
      */
-    int GetCell(int row, int col) const;
+    int get_cell(int row, int col) const;
 
     /**
      * @brief Return the state of cell

@@ -1,4 +1,4 @@
-# AI-assisted: AI01
+# AI-assisted: see AI01
 
 CXX ?= g++
 SRC = src/main.cpp src/ui.cpp src/board.cpp src/zobrist_hash.cpp src/rule.cpp src/score.cpp

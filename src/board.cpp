@@ -11,10 +11,10 @@ Move::Move(int pos_x, int pos_y, StoneType stone_type, unsigned long long hash_v
 
 Board::Board(int size) {
     current_size = (size > 0 && size <= BOARD_SIZE) ? size : 9;
-    Reset(current_size);
+    reset(current_size);
 }
 
-void Board::Reset(int new_size) {
+void Board::reset(int new_size) {
     if (new_size > 0 && new_size <= BOARD_SIZE) {
         current_size = new_size;
     }
@@ -32,11 +32,11 @@ void Board::Reset(int new_size) {
     }
 }
 
-int Board::GetSize() const {
+int Board::get_size() const {
     return current_size;
 }
 
-bool Board::PlaceStone(int row, int col, int player) {
+bool Board::place_stone(int row, int col, int player) {
     if (row >= 0 && row < current_size && col >= 0 && col < current_size) {
         if (grid[row][col] == StoneType::EMPTY) {
             StoneType stone = (player == 1) ? StoneType::BLACK : StoneType::WHITE;
@@ -49,7 +49,7 @@ bool Board::PlaceStone(int row, int col, int player) {
     return false;
 }
 
-int Board::GetCell(int row, int col) const {
+int Board::get_cell(int row, int col) const {
     if (row >= 0 && row < current_size && col >= 0 && col < current_size) {
         if (grid[row][col] == StoneType::BLACK) return 1;
         if (grid[row][col] == StoneType::WHITE) return 2;
@@ -140,7 +140,7 @@ void Board::clear_undo_list() {
 bool Board::check_existed_state() const {
     if (move_list.size() < 2) return false;
     unsigned long long current_hash = move_list.back().hash_value;
-    for (size_t i = 0; i + 1 < move_list.size(); i++) {
+    for (int i = 0; i + 1 < move_list.size(); i++) {
         if (move_list[i].hash_value == current_hash) {
             return true;
         }
