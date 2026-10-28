@@ -6,8 +6,9 @@
 #include "board.h"
 
 /**
- * @brief Get the captured stones 
- * 
+ * @brief Get the captured stones: 
+ * captured[0] = all black stones with no liberties 
+ * captured[1] = all white stones with no liberties
  * @param start_x 
  * @param start_y 
  * @return std::array<std::vector<std::pair<int, int>>, 2> 
@@ -23,12 +24,12 @@ std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const Board 
 int add_move(Board &current_board, Move new_move);
 
 /**
- * @brief Check if there exists a way to violate the KO rule
+ * @brief Return the cell that under ko rule
  * 
- * @return true 
- * @return false 
+ * @param current_board 
+ * @return std::pair<int, int> 
  */
-bool check_ko_rule(Board &current_board);
+std::pair<int, int> check_ko_rule(Board &current_board);
 
 /**
  * @brief Check if this move will make a KO threat

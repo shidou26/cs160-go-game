@@ -1,12 +1,5 @@
 #pragma once
 
-#ifdef BLACK
-#undef BLACK
-#endif
-#ifdef WHITE
-#undef WHITE
-#endif
-
 #define BOARD_SIZE 19
 #define KOMI 6.5
 #define DEFAULT_GRID_WIDTH 480
@@ -16,8 +9,8 @@
 
 enum StoneType {
     EMPTY = '.',
-    BLACK = 'X',
-    WHITE = 'O' 
+    BLACKSTONE = 'X',
+    WHITESTONE = 'O' 
 };
 
 constexpr int direction_x[4] = {1, 0, -1, 0},
@@ -29,5 +22,5 @@ inline bool in_board(const int &pos_x, const int &pos_y) {
 }
 
 inline StoneType opposite_stone(const StoneType &stone) {
-    return (stone == StoneType::WHITE ? StoneType::BLACK : StoneType::WHITE);
+    return (stone == StoneType::WHITESTONE ? StoneType::BLACKSTONE : StoneType::WHITESTONE);
 }

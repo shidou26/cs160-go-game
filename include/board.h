@@ -4,8 +4,8 @@
 #include <vector>
 #include <array>
 
-#include "helper.h"
-#include "zobrist_hash.h"
+#include "../include/helper.h"
+#include "../include/zobrist_hash.h"
 
 struct Move {
     int pos_x, pos_y;
@@ -18,7 +18,7 @@ struct Move {
 class Board {
 private:
     int current_size;
-    bool turn;
+    int turn;
     int pass;
     ZobristHash hash_table;
     std::array<int, 2> captured;
@@ -27,7 +27,7 @@ private:
     StoneType grid[BOARD_SIZE][BOARD_SIZE];
 
 public:
-    Board(int size = 9);
+    Board(int size = BOARD_SIZE);
 
     /**
      * @brief Reset bàn cờ về trạng thái ban đầu (có thể truyền kích thước mới: 9, 13, 19)
@@ -42,7 +42,7 @@ public:
     /**
      * @brief Đặt quân cờ lên vị trí (row, col) cho người chơi (1: Đen, 2: Trắng)
      */
-    bool place_stone(int row, int col, int player);
+    bool place_stone(int row, int col);
 
     /**
      * @brief Lấy giá trị ô cờ dạng số nguyên cho UI (0: Trống, 1: Đen, 2: Trắng)
@@ -69,10 +69,17 @@ public:
     /**
      * @brief Return the turn of the game
      * 
-     * @return true/1 for white
-     * @return false/0 for black
+     * @return 2 for white
+     * @return 1 for black
      */
-    bool get_turn() const;
+    int get_turn() const;
+
+    /**
+     * @brief Set the turn 
+     * 
+     * @param player 
+     */
+    void set_turn(int player);
 
     /**
      * @brief Toggle the turn of the game
@@ -114,5 +121,11 @@ public:
      */
     void clear_undo_list();
 
+    /**
+     * @brief 
+     * 
+     * @return true 
+     * @return false 
+     */
     bool check_existed_state() const;
 };

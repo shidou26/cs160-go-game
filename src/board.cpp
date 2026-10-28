@@ -1,5 +1,6 @@
 #include "../include/helper.h"
 #include "../include/board.h"
+#include "../include/rule.h"
 
 Move::Move(int pos_x, int pos_y, StoneType stone_type, unsigned long long hash_value, std::vector<std::pair<int, int>> captured_stones) {
     this->pos_x = pos_x;
@@ -18,7 +19,7 @@ void Board::reset(int new_size) {
     if (new_size > 0 && new_size <= BOARD_SIZE) {
         current_size = new_size;
     }
-    turn = 0;
+    turn = 1;
     pass = 0;
     captured = {0, 0};
     move_list.clear();
@@ -36,12 +37,11 @@ int Board::get_size() const {
     return current_size;
 }
 
-bool Board::place_stone(int row, int col, int player) {
-    if (row >= 0 && row < current_size && col >= 0 && col < current_size) {
+bool Board::place_stone(int row, int col) {
+    if (in_board(row, col)) {
         if (grid[row][col] == StoneType::EMPTY) {
-            StoneType stone = (player == 1) ? StoneType::BLACK : StoneType::WHITE;
-            play_move(Move(row, col, stone));
-            clear_undo_list();
+            StoneType stone = (get_turn() == 1) ? StoneType::BLACKSTONE : StoneType::WHITESTONE;
+            if (add_move(*this, Move(row, col, stone))) return false;
             toggle_turn();
             return true;
         }
@@ -51,8 +51,8 @@ bool Board::place_stone(int row, int col, int player) {
 
 int Board::get_cell(int row, int col) const {
     if (row >= 0 && row < current_size && col >= 0 && col < current_size) {
-        if (grid[row][col] == StoneType::BLACK) return 1;
-        if (grid[row][col] == StoneType::WHITE) return 2;
+        if (grid[row][col] == StoneType::BLACKSTONE) return 1;
+        if (grid[row][col] == StoneType::WHITESTONE) return 2;
     }
     return 0;
 }
@@ -68,12 +68,16 @@ int Board::get_captured(const int &type) const {
     return captured[type];
 }
 
-bool Board::get_turn() const {
+int Board::get_turn() const {
     return turn;
 }
 
+void Board::set_turn(int player) {
+    turn = player;
+}
+
 void Board::toggle_turn() {
-    turn = 1 - turn;
+    turn = 3 - turn;
 }
 
 void Board::update_cell(const int &pos_x, const int &pos_y, const StoneType &prev_stone_type, const StoneType &new_stone_type) {
@@ -85,9 +89,9 @@ void Board::update_cell(const int &pos_x, const int &pos_y, const StoneType &pre
 void Board::play_move(Move new_move) {
     update_cell(new_move.pos_x, new_move.pos_y, StoneType::EMPTY, new_move.stone_type);
     
-    if (new_move.stone_type == StoneType::BLACK) 
+    if (new_move.stone_type == StoneType::BLACKSTONE) 
         captured[1] += (int)new_move.captured_stones.size();
-    else if (new_move.stone_type == StoneType::WHITE)
+    else if (new_move.stone_type == StoneType::WHITESTONE)
         captured[0] += (int)new_move.captured_stones.size();
 
     StoneType opponent = opposite_stone(new_move.stone_type);
@@ -112,9 +116,9 @@ void Board::undo_move(bool by_player) {
         update_cell(pos_x, pos_y, StoneType::EMPTY, opponent);
     }
 
-    if (last_move.stone_type == StoneType::BLACK)
+    if (last_move.stone_type == StoneType::BLACKSTONE)
         captured[1] -= (int)last_move.captured_stones.size();
-    else if (last_move.stone_type == StoneType::WHITE)
+    else if (last_move.stone_type == StoneType::WHITESTONE)
         captured[0] -= (int)last_move.captured_stones.size();
 
     if (by_player) {
@@ -138,12 +142,6 @@ void Board::clear_undo_list() {
 }
 
 bool Board::check_existed_state() const {
-    if (move_list.size() < 2) return false;
-    unsigned long long current_hash = move_list.back().hash_value;
-    for (int i = 0; i + 1 < move_list.size(); i++) {
-        if (move_list[i].hash_value == current_hash) {
-            return true;
-        }
-    }
-    return false;
+    if ((int)move_list.size() < 3) return false;
+    return hash_table.get_hash() == move_list[(int)move_list.size() - 3].hash_value;
 }

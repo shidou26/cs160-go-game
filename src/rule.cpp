@@ -50,7 +50,7 @@ std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const Board 
 
             if(!alive) {
                 while(!stones.empty()) {
-                    captured_stones[current_board.get_state(i, j) == StoneType::WHITE].push_back(stones.back());
+                    captured_stones[current_board.get_state(i, j) == StoneType::WHITESTONE].push_back(stones.back());
                     stones.pop_back();
                 }
             }
@@ -70,8 +70,8 @@ int add_move(Board &current_board, Move new_move) {
     std::array<std::vector<std::pair<int, int>>, 2> captured_stones = get_captured_stones(current_board, new_move.pos_x, new_move.pos_y);
     char current_stone_state = current_board.get_state(new_move.pos_x, new_move.pos_y);
 
-    if(current_stone_state == StoneType::BLACK) {
-        if(captured_stones[0].empty() && !captured_stones[1].empty()) {
+    if (current_stone_state == StoneType::BLACKSTONE) {
+        if (!captured_stones[0].empty() && captured_stones[1].empty()) {
             current_board.undo_move(false);
             return 1;
         } else {
@@ -79,7 +79,7 @@ int add_move(Board &current_board, Move new_move) {
         }
     } 
     else {
-        if(captured_stones[1].empty() && !captured_stones[0].empty()) {
+        if (!captured_stones[1].empty() && captured_stones[0].empty()) {
             current_board.undo_move(false);
             return 1;
         } else {
@@ -100,22 +100,22 @@ int add_move(Board &current_board, Move new_move) {
     return 0;
 }   
 
-bool check_ko_rule(Board &current_board) {
+std::pair<int, int> check_ko_rule(Board &current_board) {
     for(int i = 0; i < BOARD_SIZE; i++) {
         for(int j = 0; j < BOARD_SIZE; j++) {
-            int exit_code = add_move(current_board, Move(i, j, current_board.get_turn() ? StoneType::WHITE : StoneType::BLACK));
+            int exit_code = add_move(current_board, Move(i, j, current_board.get_turn() == 1 ? StoneType::BLACKSTONE : StoneType::WHITESTONE));
             if(exit_code == 0) current_board.undo_move(false);
             else if(exit_code == 2) {
-                return true;
+                return std::make_pair(i, j);
             }
         }
     }
-    return false;
+    return std::make_pair(-1, -1);
 }
 
 bool check_ko_threat(Board &current_board, Move new_move) {
-    if(!check_ko_rule(current_board)) return false;
-    if(!add_move(current_board, new_move)) return false;
+    if(check_ko_rule(current_board) == std::make_pair(-1, -1)) return false;
+    if(add_move(current_board, new_move)) return false;
     
     bool visited[BOARD_SIZE][BOARD_SIZE]{};
     StoneType opponent = opposite_stone(new_move.stone_type);

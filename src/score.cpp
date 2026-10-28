@@ -25,8 +25,8 @@ std::pair<double, double> scoring(const Board &current_board) {
                         int y = j + direction_y[d];
                         
                         if(in_board(x, y)) {
-                            if(current_board.get_state(x, y) == StoneType::BLACK) touch_black = true;
-                            else if(current_board.get_state(x, y) == StoneType::WHITE) touch_white = true;
+                            if(current_board.get_state(x, y) == StoneType::BLACKSTONE) touch_black = true;
+                            else if(current_board.get_state(x, y) == StoneType::WHITESTONE) touch_white = true;
                             else if(!visisted[x][y]) {
                                 visisted[x][y] = true;
                                 q.emplace(x, y);

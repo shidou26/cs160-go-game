@@ -1,5 +1,8 @@
-#include "ui.h"
+#include <iostream>
+
+#include "../include/ui.h"
 #include "../include/helper.h"
+#include "../include/rule.h"
 
 UI::UI() {
     start_x = START_X;
@@ -18,6 +21,7 @@ UI::UI() {
     btn_size19 = { { 440, 25, 85, 36 }, "19x19" };
     btn_undo   = { { 555, 25, 95, 36 }, "Undo" };
     btn_reset  = { { 660, 25, 100, 36 }, "Reset" };
+    btn_pass   = { {770, 25, 105, 36}, "Pass" };
 }
 
 Color UI::get_background_color() const {
@@ -52,14 +56,14 @@ void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active)
     );
 }
 
-void UI::draw(const Board &board, int current_player) const {
+void UI::draw(Board &board) {
     int board_size = board.get_size();
     int cell_size = get_cell_size(board);
     int actual_grid_width = (board_size - 1) * cell_size;
     Vector2 mouse_pos = GetMousePosition();
 
     // 1. Vẽ thông tin lượt chơi và các nút Option
-    if (current_player == 1) {
+    if (board.get_turn() == 1) {
         DrawText("Turn: BLACK", 30, 33, 22, RAYWHITE);
     } else {
         DrawText("Turn: WHITE", 30, 33, 22, RAYWHITE);
@@ -70,6 +74,10 @@ void UI::draw(const Board &board, int current_player) const {
     draw_button(btn_size19, mouse_pos, board_size == 19);
     draw_button(btn_undo,   mouse_pos, false);
     draw_button(btn_reset,  mouse_pos, false);
+    draw_button(btn_pass,   mouse_pos, false);
+
+    DrawText(TextFormat("Black: %i", board.get_captured(1)), 1150, 33, 22, RAYWHITE);
+    DrawText(TextFormat("White: %i", board.get_captured(0)), 1150, 66, 22, RAYWHITE);
 
     // 2. Vẽ mặt bàn cờ gỗ
     Rectangle board_rect = { 
@@ -88,7 +96,7 @@ void UI::draw(const Board &board, int current_player) const {
     }
 
     // 4. Vẽ các quân cờ dựa trên dữ liệu đọc từ Board
-    int radius = (int)(cell_size * 0.4f);
+    float radius = (cell_size * 0.4f);
     Color black_stone_color = { 0, 0, 0, 255 };
 
     for (int r = 0; r < board_size; r++) {
@@ -109,6 +117,20 @@ void UI::draw(const Board &board, int current_player) const {
             }
         }
     }
+
+    std::pair<int, int> ko_cell = check_ko_rule(board);
+    if (in_board(ko_cell.first, ko_cell.second)) {
+        float center_x = (float)(start_x + ko_cell.second * cell_size);
+        float center_y = (float)(start_y + ko_cell.first * cell_size);
+        float square_size = cell_size * 0.45f;
+        Rectangle rect = {
+            center_x - square_size / 2.0f,
+            center_y - square_size / 2.0f,
+            square_size,
+            square_size
+        };
+        DrawRectangleLinesEx(rect, 2.5f, RED);
+    }
 }
 
 bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const {
@@ -121,30 +143,29 @@ bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &co
     return (row >= 0 && row < board_size && col >= 0 && col < board_size);
 }
 
-bool UI::handle_option_click(Vector2 mouse_pos, Board &board, int &current_player) {
+bool UI::handle_option_click(Vector2 mouse_pos, Board &board) {
     if (CheckCollisionPointRec(mouse_pos, btn_size9.bounds)) {
         board.reset(9);
-        current_player = 1;
         return true;
     }
     if (CheckCollisionPointRec(mouse_pos, btn_size13.bounds)) {
         board.reset(13);
-        current_player = 1;
         return true;
     }
     if (CheckCollisionPointRec(mouse_pos, btn_size19.bounds)) {
         board.reset(19);
-        current_player = 1;
         return true;
     }
     if (CheckCollisionPointRec(mouse_pos, btn_undo.bounds)) {
         board.undo_move(true);
-        current_player = board.get_turn() ? 2 : 1;
         return true;
     }
     if (CheckCollisionPointRec(mouse_pos, btn_reset.bounds)) {
         board.reset();
-        current_player = 1;
+        return true;
+    }
+    if(CheckCollisionPointRec(mouse_pos, btn_pass.bounds)) {
+        board.toggle_turn();
         return true;
     }
     return false;

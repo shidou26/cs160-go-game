@@ -1,16 +1,15 @@
 #include <raylib.h>
 
-#include "board.h"
-#include "ui.h"
+#include "../include/board.h"
+#include "../include/ui.h"
+#include "../include/helper.h"
 
 int main() {
-    InitWindow(1280, 960, "Go Game");
+    InitWindow(1280, 960, "The Game of Go");
     SetTargetFPS(60);
 
-    // 1. Tạo đối tượng bàn cờ (quản lý grid[i][j] & logic) và đối tượng giao diện (UI)
-    Board board(9);
+    Board board(BOARD_SIZE);
     UI ui;
-    int current_player = 1;
 
     while (!WindowShouldClose()) {
         // --- CẬP NHẬT LOGIC & BẮT CLICK CHUỘT ---
@@ -19,13 +18,12 @@ int main() {
             int row, col;
 
             // 1. Kiểm tra xem người chơi có nháy chuột vào các nút Option trên UI không
-            if (!ui.handle_option_click(mouse_pos, board, current_player)) {
+            if (!ui.handle_option_click(mouse_pos, board)) {
                 // 2. Kiểm tra xem click chuột có trúng bàn cờ không
                 if (ui.screen_to_grid(mouse_pos, board, row, col)) {
                     // 3. Thử đặt quân cờ vào vị trí đó trong Board
-                    if (board.place_stone(row, col, current_player)) {
-                        // 4. Nếu đặt thành công, đổi lượt chơi cho người kia
-                        current_player = (current_player == 1) ? 2 : 1;
+                    if (board.place_stone(row, col)) {
+
                     }
                 }
             }
@@ -33,9 +31,7 @@ int main() {
 
         BeginDrawing();
         ClearBackground(ui.get_background_color());
-
-        ui.draw(board, current_player);
-        
+        ui.draw(board);
         EndDrawing();
     }
 
