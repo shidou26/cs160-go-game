@@ -4,12 +4,6 @@
 
 #include "board.h"
 
-// Các hằng số kích thước giao diện mặc định
-const int DEFAULT_GRID_WIDTH = 480;
-const int START_X = 160;
-const int START_Y = 160;
-const int PADDING = 50;
-
 struct OptionButton {
     Rectangle bounds;
     const char* label;
@@ -35,7 +29,7 @@ private:
     OptionButton btn_reset;
 
     int get_cell_size(const Board &board) const;
-    void draw_button(const OptionButton &btn, Vector2 mousePos, bool isActive = false) const;
+    void draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active = false) const;
 
 public:
     UI();
@@ -43,11 +37,11 @@ public:
     Color get_background_color() const;
 
     // Chỉ làm nhiệm vụ vẽ bàn cờ, quân cờ và các nút Option dựa trên dữ liệu từ Board
-    void draw(const Board &board, int currentPlayer) const;
+    void draw(const Board &board, int current_player) const;
 
     // Chuyển đổi tọa độ click chuột trên màn hình sang vị trí (row, col) của Board
-    bool screen_to_grid(Vector2 mousePos, const Board &board, int &row, int &col) const;
+    bool screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const;
 
     // Xử lý khi người chơi nháy chuột vào các nút Option trên giao diện
-    bool handle_option_click(Vector2 mousePos, Board &board, int &currentPlayer);
+    bool handle_option_click(Vector2 mouse_pos, Board &board, int &current_player);
 };

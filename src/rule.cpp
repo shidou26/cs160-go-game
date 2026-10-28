@@ -9,9 +9,7 @@
 #include "../include/rule.h"
 #include "../include/helper.h"
 
-Board current_board;
-
-std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const int &start_x, const int &start_y) {
+std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const Board &current_board, const int &start_x, const int &start_y) {
     std::queue<std::pair<int, int>> heap;
     std::array<std::vector<std::pair<int, int>>, 2> captured_stones;
     bool visited[BOARD_SIZE][BOARD_SIZE]{};
@@ -62,14 +60,14 @@ std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const int &s
     return captured_stones;
 }
 
-int add_move(Move new_move) {
+int add_move(Board &current_board, Move new_move) {
     if(!in_board(new_move.pos_x, new_move.pos_y)) return 1;
     if(current_board.get_state(new_move.pos_x, new_move.pos_y) != StoneType::EMPTY) return 1;
 
     current_board.play_move(new_move);
 
     // Get captured stones
-    std::array<std::vector<std::pair<int, int>>, 2> captured_stones = get_captured_stones(new_move.pos_x, new_move.pos_y);
+    std::array<std::vector<std::pair<int, int>>, 2> captured_stones = get_captured_stones(current_board, new_move.pos_x, new_move.pos_y);
     char current_stone_state = current_board.get_state(new_move.pos_x, new_move.pos_y);
 
     if(current_stone_state == StoneType::BLACK) {
@@ -102,10 +100,10 @@ int add_move(Move new_move) {
     return 0;
 }   
 
-bool check_ko_rule() {
+bool check_ko_rule(Board &current_board) {
     for(int i = 0; i < BOARD_SIZE; i++) {
         for(int j = 0; j < BOARD_SIZE; j++) {
-            int exit_code = add_move(Move(i, j, current_board.get_turn() ? StoneType::WHITE : StoneType::BLACK));
+            int exit_code = add_move(current_board, Move(i, j, current_board.get_turn() ? StoneType::WHITE : StoneType::BLACK));
             if(exit_code == 0) current_board.undo_move(false);
             else if(exit_code == 2) {
                 return true;
@@ -115,9 +113,9 @@ bool check_ko_rule() {
     return false;
 }
 
-bool check_ko_threat(Move new_move) {
-    if(!check_ko_rule()) return false;
-    if(!add_move(new_move)) return false;
+bool check_ko_threat(Board &current_board, Move new_move) {
+    if(!check_ko_rule(current_board)) return false;
+    if(!add_move(current_board, new_move)) return false;
     
     bool visited[BOARD_SIZE][BOARD_SIZE]{};
     StoneType opponent = opposite_stone(new_move.stone_type);

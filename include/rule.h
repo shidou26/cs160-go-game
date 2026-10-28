@@ -5,8 +5,6 @@
 #include <utility>
 #include "board.h"
 
-extern Board current_board;
-
 /**
  * @brief Get the captured stones 
  * 
@@ -14,7 +12,7 @@ extern Board current_board;
  * @param start_y 
  * @return std::array<std::vector<std::pair<int, int>>, 2> 
  */
-std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const int &start_x, const int &start_y);
+std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const Board &current_board, const int &start_x, const int &start_y);
 
 /**
  * @brief Make a move, remember to clear the undo list
@@ -22,7 +20,7 @@ std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const int &s
  * @param new_move 
  * @return int 
  */
-int add_move(Move new_move);
+int add_move(Board &current_board, Move new_move);
 
 /**
  * @brief Check if there exists a way to violate the KO rule
@@ -30,7 +28,7 @@ int add_move(Move new_move);
  * @return true 
  * @return false 
  */
-bool check_ko_rule();
+bool check_ko_rule(Board &current_board);
 
 /**
  * @brief Check if this move will make a KO threat
@@ -39,4 +37,4 @@ bool check_ko_rule();
  * @return true 
  * @return false 
  */
-bool check_ko_threat(Move new_move);
+bool check_ko_threat(Board &current_board, Move new_move);
