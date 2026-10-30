@@ -2,10 +2,11 @@
 #include "../include/board.h"
 #include "../include/rule.h"
 
-Move::Move(int pos_x, int pos_y, StoneType stone_type, unsigned long long hash_value, std::vector<std::pair<int, int>> captured_stones) {
+Move::Move(int pos_x, int pos_y, StoneType stone_type, int current_pass, unsigned long long hash_value, std::vector<std::pair<int, int>> captured_stones) {
     this->pos_x = pos_x;
     this->pos_y = pos_y;
     this->stone_type = stone_type;
+    this->current_pass = current_pass; 
     this->hash_value = hash_value;
     this->captured_stones = captured_stones;
 }
@@ -43,6 +44,7 @@ bool Board::place_stone(int row, int col) {
             StoneType stone = (get_turn() == 1) ? StoneType::BLACKSTONE : StoneType::WHITESTONE;
             if (add_move(*this, Move(row, col, stone))) return false;
             toggle_turn();
+            set_pass(0); 
             return true;
         }
     }
@@ -80,6 +82,18 @@ void Board::toggle_turn() {
     turn = 3 - turn;
 }
 
+void Board::pass_turn() {
+    pass++;
+}
+
+void Board::set_pass(int p) {
+    pass = p;
+}
+
+int Board::get_pass() {
+    return pass;
+}
+
 void Board::update_cell(const int &pos_x, const int &pos_y, const StoneType &prev_stone_type, const StoneType &new_stone_type) {
     hash_table.update_hash(pos_x, pos_y, prev_stone_type);
     grid[pos_x][pos_y] = new_stone_type;
@@ -99,6 +113,7 @@ void Board::play_move(Move new_move) {
         update_cell(pos_x, pos_y, opponent, StoneType::EMPTY);
     }
 
+    new_move.current_pass = get_pass();
     new_move.hash_value = hash_table.get_hash();
     move_list.push_back(new_move);
 }
@@ -123,7 +138,9 @@ void Board::undo_move(bool by_player) {
 
     if (by_player) {
         undo_list.push_back(last_move);
+        set_pass(last_move.current_pass);
         toggle_turn();
+        
     }
 }
 

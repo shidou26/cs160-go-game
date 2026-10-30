@@ -1,8 +1,10 @@
 #include <iostream>
+#include <utility>
 
 #include "../include/ui.h"
 #include "../include/helper.h"
 #include "../include/rule.h"
+#include "../include/score.h"
 
 UI::UI() {
     start_x = START_X;
@@ -15,13 +17,16 @@ UI::UI() {
     line_color = (Color){ 60, 40, 20, 255 };
     board_border = (Color){ 180, 133, 78, 255 };
 
-    // Khởi tạo vị trí các nút Option trên giao diện
+    // Init option buttons for playing phase
     btn_size9  = { { 260, 25, 75, 36 }, "9x9" };
     btn_size13 = { { 345, 25, 85, 36 }, "13x13" };
     btn_size19 = { { 440, 25, 85, 36 }, "19x19" };
     btn_undo   = { { 555, 25, 95, 36 }, "Undo" };
     btn_reset  = { { 660, 25, 100, 36 }, "Reset" };
-    btn_pass   = { {770, 25, 105, 36}, "Pass" };
+    btn_pass   = { { 770, 25, 105, 36 }, "Pass" };
+
+    // Init option buttons for gameover phase
+    btn_back   = { { 380, 250, 500, 200 }, "Return to title screen"};
 }
 
 Color UI::get_background_color() const {
@@ -33,7 +38,7 @@ int UI::get_cell_size(const Board &board) const {
     return (board_size > 1) ? (grid_width / (board_size - 1)) : grid_width;
 }
 
-void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active) const {
+void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active, int font_size) const {
     bool is_hovered = CheckCollisionPointRec(mouse_pos, btn.bounds);
 
     Color fill = is_active
@@ -45,7 +50,6 @@ void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active)
     DrawRectangleRounded(btn.bounds, 0.25f, 6, fill);
     DrawRectangleRoundedLines(btn.bounds, 0.25f, 6, border_col);
 
-    int font_size = 18;
     int text_weight = MeasureText(btn.label, font_size);
     DrawText(
         btn.label,
@@ -133,6 +137,25 @@ void UI::draw(Board &board) {
     }
 }
 
+void UI::draw_ending(const Board &board) {
+    Vector2 mouse_pos = GetMousePosition();
+
+    std::pair<double, double> final_score = scoring(board);
+    std::cerr << final_score.first << " " << final_score.second << '\n';
+
+    if (final_score.first == final_score.second) {
+        DrawText(TextFormat("Tie"), 500, 33, 22, RAYWHITE);
+    }
+    else if(final_score.first < final_score.second) {
+        DrawText(TextFormat("White wins by %.1f", final_score.second - final_score.first), 500, 33, 22, RAYWHITE);
+    }
+    else {
+        DrawText(TextFormat("Black wins by %.1f", final_score.first - final_score.second), 500, 33, 22, RAYWHITE);
+    }
+
+    draw_button(btn_back, mouse_pos, false, 36);
+}
+
 bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const {
     int board_size = board.get_size();
     int cell_size = get_cell_size(board);
@@ -143,30 +166,44 @@ bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &co
     return (row >= 0 && row < board_size && col >= 0 && col < board_size);
 }
 
-bool UI::handle_option_click(Vector2 mouse_pos, Board &board) {
-    if (CheckCollisionPointRec(mouse_pos, btn_size9.bounds)) {
-        board.reset(9);
-        return true;
-    }
-    if (CheckCollisionPointRec(mouse_pos, btn_size13.bounds)) {
-        board.reset(13);
-        return true;
-    }
-    if (CheckCollisionPointRec(mouse_pos, btn_size19.bounds)) {
-        board.reset(19);
-        return true;
-    }
-    if (CheckCollisionPointRec(mouse_pos, btn_undo.bounds)) {
-        board.undo_move(true);
-        return true;
-    }
-    if (CheckCollisionPointRec(mouse_pos, btn_reset.bounds)) {
-        board.reset();
-        return true;
-    }
-    if(CheckCollisionPointRec(mouse_pos, btn_pass.bounds)) {
-        board.toggle_turn();
-        return true;
-    }
-    return false;
+bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) {
+    switch (phase) {
+        case GamePhase::START:
+
+            break;
+        case GamePhase::PLAYING:
+            if (CheckCollisionPointRec(mouse_pos, btn_size9.bounds)) {
+                board.reset(9);
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_size13.bounds)) {
+                board.reset(13);
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_size19.bounds)) {
+                board.reset(19);
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_undo.bounds)) {
+                board.undo_move(true);
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_reset.bounds)) {
+                board.reset();
+                return true;
+            }
+            if(CheckCollisionPointRec(mouse_pos, btn_pass.bounds)) {
+                board.toggle_turn();
+                board.pass_turn();
+                return true;
+            }
+            break;
+        case GamePhase::GAMEOVER:
+            if (CheckCollisionPointRec(mouse_pos, btn_back.bounds)) {
+                board.reset();
+                phase = GamePhase::PLAYING;
+            }
+            break;
+    } 
+   return false;
 }

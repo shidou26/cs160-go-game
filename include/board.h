@@ -10,9 +10,10 @@
 struct Move {
     int pos_x, pos_y;
     StoneType stone_type; 
+    int current_pass; 
     unsigned long long hash_value; 
     std::vector<std::pair<int, int>> captured_stones;
-    Move(int pos_x = -1, int pos_y = -1, StoneType stone_type = StoneType::EMPTY, unsigned long long hash_value = 0, std::vector<std::pair<int, int>> captured_stones = {});
+    Move(int pos_x = -1, int pos_y = -1, StoneType stone_type = StoneType::EMPTY, int current_pass = 0, unsigned long long hash_value = 0, std::vector<std::pair<int, int>> captured_stones = {});
 };
 
 class Board {
@@ -86,6 +87,25 @@ public:
      */
     void toggle_turn();
     
+    /**
+     * @brief Pass turn 
+     * 
+     */
+    void pass_turn(); 
+
+    /**
+     * @brief Set the pass counter
+     * 
+     */
+    void set_pass(int p);
+
+    /**
+     * @brief Return the number of pass currently
+     * 
+     * @return int 
+     */
+    int get_pass();
+
     /**
      * @brief Update the cell with new_stone_type
      * 

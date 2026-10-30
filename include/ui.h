@@ -2,7 +2,8 @@
 
 #include <raylib.h>
 
-#include "board.h"
+#include "../include/board.h"
+#include "../include/helper.h"
 
 struct OptionButton {
     Rectangle bounds;
@@ -21,7 +22,9 @@ private:
     Color line_color;
     Color board_border;
 
-    // option button in user interface
+    // Option button during start screen
+
+    // Option button during game 
     OptionButton btn_size9;
     OptionButton btn_size13;
     OptionButton btn_size19;
@@ -29,8 +32,11 @@ private:
     OptionButton btn_reset;
     OptionButton btn_pass;
 
+    // Option button during gameover menu
+    OptionButton btn_back; // go back to start screen
+
     int get_cell_size(const Board &board) const;
-    void draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active = false) const;
+    void draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active = false, int font_size = 18) const;
 
 public:
     UI();
@@ -40,9 +46,15 @@ public:
     // Chỉ làm nhiệm vụ vẽ bàn cờ, quân cờ và các nút Option dựa trên dữ liệu từ Board
     void draw(Board &board);
 
+    /**
+     * @brief Drawing function for gameover phase 
+     * 
+     */
+    void draw_ending(const Board &board);
+
     // Chuyển đổi tọa độ click chuột trên màn hình sang vị trí (row, col) của Board
     bool screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const;
 
     // Xử lý khi người chơi nháy chuột vào các nút Option trên giao diện
-    bool handle_option_click(Vector2 mouse_pos, Board &board);
+    bool handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board);
 };

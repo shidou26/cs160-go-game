@@ -13,6 +13,17 @@ enum StoneType {
     WHITESTONE = 'O' 
 };
 
+enum GamePhase {
+    START,
+    PLAYING,
+    GAMEOVER
+};
+
+enum GameMode {
+    PVP,
+    PVE 
+};
+
 constexpr int direction_x[4] = {1, 0, -1, 0},
               direction_y[4] = {0, 1, 0, -1};
 
