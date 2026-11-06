@@ -1,6 +1,9 @@
 shidou26, Shidou Le, Hong Anh Le: Le Hong Anh - 26125003
 MarioNathanPro: Doan Nhat Anh - 26125002
 
+- **4cc161b** [2026-11-06] *MarioNathanPro*: board resize
+- **b4776fd** [2026-11-06] *shidou26*: feat: start menu and redo
+- **69576f9** [2026-10-30] *MarioNathanPro*: adding commit log
 - **5230dc3** [2026-10-30] *MarioNathanPro*: adding AI usage
 - **46069b0** [2026-10-30] *shidou26*: feat: add gameover phase
 - **0e2e8e1** [2026-10-28] *shidou26*: refactor: integrate ui with rule
