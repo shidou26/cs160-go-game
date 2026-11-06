@@ -6,17 +6,35 @@
 #include "../include/helper.h"
 
 int main() {
-    InitWindow(1280, 960, "The Game of Go");
-    SetTargetFPS(30);
+    //Setup
+    InitWindow(1280, 960, "Anhs's Game of Go");
+    SetTargetFPS(60);
 
-    GamePhase phase = GamePhase::PLAYING;
+    //Set game icon
+    Image icon = LoadImage("assets/icon.png");
+    SetWindowIcon(icon);
+    UnloadImage(icon);
+
+    //Game
+    GamePhase phase = GamePhase::START;
     GameMode mode;
     Board board(BOARD_SIZE);
     UI user_interface;
 
     while (!WindowShouldClose()) {
         if (phase == GamePhase::START) {
+            if(IsKeyPressed(KEY_H)) {
+                break;
+            }
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                Vector2 mouse_pos = GetMousePosition();
+                user_interface.handle_option_click(mouse_pos, phase, board);
+            }
 
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
+            user_interface.draw_starting(board);
+            EndDrawing();
         } 
         else if(phase == GamePhase::PLAYING) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {

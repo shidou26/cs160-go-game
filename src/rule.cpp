@@ -96,7 +96,6 @@ int add_move(Board &current_board, Move new_move) {
         return 2;
     }
 
-    current_board.clear_undo_list();
     return 0;
 }   
 

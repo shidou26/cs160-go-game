@@ -17,16 +17,22 @@ UI::UI() {
     line_color = (Color){ 60, 40, 20, 255 };
     board_border = (Color){ 180, 133, 78, 255 };
 
-    // Init option buttons for playing phase
+    //Init option buttons for starting phase
+    btn_new_game  = {{ 100, 100, 300, 100 }, "NEW GAME"};
+    btn_load_game = {{ 100, 250, 300, 100 }, "LOAD GAME"};
+    btn_config    = {{ 100, 400, 300, 100 }, "CONFIG"};
+
+    //Init option buttons for playing phase
     btn_size9  = { { 260, 25, 75, 36 }, "9x9" };
     btn_size13 = { { 345, 25, 85, 36 }, "13x13" };
     btn_size19 = { { 440, 25, 85, 36 }, "19x19" };
     btn_undo   = { { 555, 25, 95, 36 }, "Undo" };
-    btn_reset  = { { 660, 25, 100, 36 }, "Reset" };
-    btn_pass   = { { 770, 25, 105, 36 }, "Pass" };
+    btn_redo   = { { 660, 25, 100, 36}, "Redo" };
+    btn_reset  = { { 770, 25, 105, 36 }, "Reset" };
+    btn_pass   = { { 880, 25, 110, 36 }, "Pass" };
 
-    // Init option buttons for gameover phase
-    btn_back   = { { 380, 250, 500, 200 }, "Return to title screen"};
+    //Init option buttons for gameover phase
+    btn_back = { { 380, 250, 500, 200 }, "Return to title screen"};
 }
 
 Color UI::get_background_color() const {
@@ -77,6 +83,7 @@ void UI::draw(Board &board) {
     draw_button(btn_size13, mouse_pos, board_size == 13);
     draw_button(btn_size19, mouse_pos, board_size == 19);
     draw_button(btn_undo,   mouse_pos, false);
+    draw_button(btn_redo,   mouse_pos, false);
     draw_button(btn_reset,  mouse_pos, false);
     draw_button(btn_pass,   mouse_pos, false);
 
@@ -137,6 +144,17 @@ void UI::draw(Board &board) {
     }
 }
 
+void UI::draw_starting(const Board &board) {
+    Vector2 mouse_pos = GetMousePosition();
+
+    DrawText(TextFormat("Anhs's Game of Go"), 500, 33, 32, RAYWHITE);
+    DrawText(TextFormat("Press H to exit"), 1000, 800, 20, RAYWHITE);
+
+    draw_button(btn_new_game, mouse_pos, false, 36);
+    draw_button(btn_load_game, mouse_pos, false, 36);
+    draw_button(btn_config, mouse_pos, false, 36);
+}
+
 void UI::draw_ending(const Board &board) {
     Vector2 mouse_pos = GetMousePosition();
 
@@ -169,7 +187,17 @@ bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &co
 bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) {
     switch (phase) {
         case GamePhase::START:
+            if (CheckCollisionPointRec(mouse_pos, btn_new_game.bounds)) {
+                phase = GamePhase::PLAYING;
+                board.reset(19);
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_load_game.bounds)) {
 
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_config.bounds)) {
+
+            }
             break;
         case GamePhase::PLAYING:
             if (CheckCollisionPointRec(mouse_pos, btn_size9.bounds)) {
@@ -188,6 +216,10 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 board.undo_move(true);
                 return true;
             }
+            if (CheckCollisionPointRec(mouse_pos, btn_redo.bounds)) {
+                board.redo_move();
+                return true;
+            }
             if (CheckCollisionPointRec(mouse_pos, btn_reset.bounds)) {
                 board.reset();
                 return true;
@@ -201,7 +233,7 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
         case GamePhase::GAMEOVER:
             if (CheckCollisionPointRec(mouse_pos, btn_back.bounds)) {
                 board.reset();
-                phase = GamePhase::PLAYING;
+                phase = GamePhase::START;
             }
             break;
     } 

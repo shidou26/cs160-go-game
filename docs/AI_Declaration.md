@@ -12,3 +12,4 @@ All usages are listed in the AI Usage Log below.
 | AI03 | 2026-10-28 | Le Hong Anh | Gemini 3.8 Flash | Asking | what option can I use to display captured stones from white and black in raylib | To know how to display | ui.cpp | 
 | AI04 | 2026-10-28 | Le Hong Anh | Gemini 3.8 Flash | Asking | In a state of a match, only one ko cell can exist, right? | To double checking | rule.cpp | 
 | AI05 | 2026-10-30 | Le Hong Anh | Gemini 3.8 Flash | Asking | only sugestion, don't code: How can I order my code in main.cpp to display a winning/losing menu and a rematch button | To ask | main.cpp
+| AI06 | 2026-11-6 | Le Hong Anh | ChatGPT (GPT-6) | Asking | check out why my set game icon does not work in main.cpp | To know about icon setting | main.cpp

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "../include/helper.h"
 #include "../include/board.h"
 #include "../include/rule.h"
@@ -43,6 +45,7 @@ bool Board::place_stone(int row, int col) {
         if (grid[row][col] == StoneType::EMPTY) {
             StoneType stone = (get_turn() == 1) ? StoneType::BLACKSTONE : StoneType::WHITESTONE;
             if (add_move(*this, Move(row, col, stone))) return false;
+            this->clear_undo_list();
             toggle_turn();
             set_pass(0); 
             return true;
@@ -125,7 +128,6 @@ void Board::undo_move(bool by_player) {
     move_list.pop_back();
 
     update_cell(last_move.pos_x, last_move.pos_y, last_move.stone_type, StoneType::EMPTY);
-
     StoneType opponent = opposite_stone(last_move.stone_type);
     for (auto [pos_x, pos_y] : last_move.captured_stones) {
         update_cell(pos_x, pos_y, StoneType::EMPTY, opponent);
@@ -140,18 +142,32 @@ void Board::undo_move(bool by_player) {
         undo_list.push_back(last_move);
         set_pass(last_move.current_pass);
         toggle_turn();
-        
+        std::cout << "Acutally undo with " << undo_list.size() << '\n';
     }
 }
 
 void Board::redo_move() {
+    std::cout << undo_list.size() << '\n';
     if (undo_list.empty()) return;
+    std::cout << "Calling" << '\n';
 
     Move next_move = undo_list.back();
     undo_list.pop_back();
 
-    play_move(next_move);
+    update_cell(next_move.pos_x, next_move.pos_y, StoneType::EMPTY, next_move.stone_type);
+    StoneType opponent = opposite_stone(next_move.stone_type);
+    for (auto [pos_x, pos_y] : next_move.captured_stones) {
+        update_cell(pos_x, pos_y, opponent, StoneType::EMPTY);
+    }
+
+    if (next_move.stone_type == StoneType::BLACKSTONE)
+        captured[1] += (int)next_move.captured_stones.size();
+    else if (next_move.stone_type == StoneType::WHITESTONE)
+        captured[0] += (int)next_move.captured_stones.size();
+
+    set_pass(next_move.current_pass);
     toggle_turn();
+    move_list.push_back(next_move);
 }
 
 void Board::clear_undo_list() {

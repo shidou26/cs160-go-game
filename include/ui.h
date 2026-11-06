@@ -22,13 +22,17 @@ private:
     Color line_color;
     Color board_border;
 
-    // Option button during start screen
+    // Option button during start menu
+    OptionButton btn_new_game;
+    OptionButton btn_load_game;
+    OptionButton btn_config;
 
     // Option button during game 
     OptionButton btn_size9;
     OptionButton btn_size13;
     OptionButton btn_size19;
     OptionButton btn_undo;
+    OptionButton btn_redo;
     OptionButton btn_reset;
     OptionButton btn_pass;
 
@@ -47,7 +51,14 @@ public:
     void draw(Board &board);
 
     /**
-     * @brief Drawing function for gameover phase 
+     * @brief Drawing function for start menu
+     * 
+     * @param board 
+     */
+    void draw_starting(const Board &board);
+
+    /**
+     * @brief Drawing function for gameover menu
      * 
      */
     void draw_ending(const Board &board);
