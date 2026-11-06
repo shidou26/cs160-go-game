@@ -2,7 +2,7 @@
 
 #define BOARD_SIZE 19
 #define KOMI 6.5
-#define DEFAULT_GRID_WIDTH 480
+#define DEFAULT_GRID_WIDTH 720
 #define START_X 160
 #define START_Y 160
 #define PADDING 50
