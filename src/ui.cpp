@@ -5,6 +5,7 @@
 #include "../include/helper.h"
 #include "../include/rule.h"
 #include "../include/score.h"
+#include "../include/board.h"
 
 UI::UI() {
     start_x = START_X;
@@ -130,7 +131,7 @@ void UI::draw(Board &board) {
     }
 
     std::pair<int, int> ko_cell = check_ko_rule(board);
-    if (in_board(ko_cell.first, ko_cell.second)) {
+    if (board.in_board(ko_cell.first, ko_cell.second)) {
         float center_x = (float)(start_x + ko_cell.second * cell_size);
         float center_y = (float)(start_y + ko_cell.first * cell_size);
         float square_size = cell_size * 0.45f;

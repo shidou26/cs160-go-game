@@ -25,15 +25,25 @@ private:
     std::array<int, 2> captured;
     std::vector<Move> move_list;
     std::vector<Move> undo_list;
-    StoneType grid[BOARD_SIZE][BOARD_SIZE];
+    std::vector<std::vector<StoneType>> grid;
 
 public:
     Board(int size = BOARD_SIZE);
 
     /**
+     * @brief Return if (pos_x, pos_y) is in board
+     * 
+     * @param pos_x 
+     * @param pos_y 
+     * @return true 
+     * @return false 
+     */
+    bool in_board(const int &pos_x, const int &pos_y) const;
+
+    /**
      * @brief Reset bàn cờ về trạng thái ban đầu (có thể truyền kích thước mới: 9, 13, 19)
      */
-    void reset(int new_size = -1);
+    void reset(int new_size = BOARD_SIZE);
 
     /**
      * @brief Lấy kích thước bàn cờ hiện tại (9, 13, hoặc 19)

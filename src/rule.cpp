@@ -21,7 +21,7 @@ std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const Board 
             j += direction_y[k];
         }
         
-        if(in_board(i, j) && !visited[i][j] && current_board.get_state(i, j) != StoneType::EMPTY) {
+        if(current_board.in_board(i, j) && !visited[i][j] && current_board.get_state(i, j) != StoneType::EMPTY) {
             visited[i][j] = true;
 
             bool alive = false;
@@ -36,7 +36,7 @@ std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const Board 
                     int x = u + direction_x[d];
                     int y = v + direction_y[d];
                     
-                    if(in_board(x, y)) {
+                    if(current_board.in_board(x, y)) {
                         if(current_board.get_state(x, y) == StoneType::EMPTY) alive = true;
                         else {
                             if(current_board.get_state(x, y) == current_board.get_state(i, j) && !visited[x][y]) {
@@ -61,7 +61,7 @@ std::array<std::vector<std::pair<int, int>>, 2> get_captured_stones(const Board 
 }
 
 int add_move(Board &current_board, Move new_move) {
-    if(!in_board(new_move.pos_x, new_move.pos_y)) return 1;
+    if(!current_board.in_board(new_move.pos_x, new_move.pos_y)) return 1;
     if(current_board.get_state(new_move.pos_x, new_move.pos_y) != StoneType::EMPTY) return 1;
 
     current_board.play_move(new_move);
@@ -123,7 +123,7 @@ bool check_ko_threat(Board &current_board, Move new_move) {
         int i = new_move.pos_x + direction_x[k];
         int j = new_move.pos_y + direction_y[k];
         
-        if(in_board(i, j)) {
+        if(current_board.in_board(i, j)) {
             std::queue<std::pair<int, int>> heap;
             memset(visited, false, sizeof(visited));
             
@@ -138,7 +138,7 @@ bool check_ko_threat(Board &current_board, Move new_move) {
                     int x = u + direction_x[d];
                     int y = v + direction_y[d];
                     
-                    if(in_board(x, y)) {
+                    if(current_board.in_board(x, y)) {
                         if(current_board.get_state(x, y) == opponent && !visited[x][y]) {
                             visited[x][y] = true;
                             heap.emplace(x, y);

@@ -14,14 +14,11 @@ Move::Move(int pos_x, int pos_y, StoneType stone_type, int current_pass, unsigne
 }
 
 Board::Board(int size) {
-    current_size = (size > 0 && size <= BOARD_SIZE) ? size : 9;
-    reset(current_size);
+    reset(size);
 }
 
 void Board::reset(int new_size) {
-    if (new_size > 0 && new_size <= BOARD_SIZE) {
-        current_size = new_size;
-    }
+    current_size = new_size; 
     turn = 1;
     pass = 0;
     captured = {0, 0};
@@ -29,8 +26,9 @@ void Board::reset(int new_size) {
     undo_list.clear();
     hash_table = ZobristHash();
 
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        for (int j = 0; j < BOARD_SIZE; j++) {
+    grid.resize(current_size, std::vector<StoneType>(current_size));
+    for (int i = 0; i < current_size; i++) {
+        for (int j = 0; j < current_size; j++) {
             grid[i][j] = StoneType::EMPTY;
         }
     }
@@ -38,6 +36,10 @@ void Board::reset(int new_size) {
 
 int Board::get_size() const {
     return current_size;
+}
+
+bool Board::in_board(const int &pos_x, const int &pos_y) const {
+    return pos_x >= 0 && pos_x < current_size && pos_y >= 0 && pos_y < current_size;
 }
 
 bool Board::place_stone(int row, int col) {
@@ -55,7 +57,7 @@ bool Board::place_stone(int row, int col) {
 }
 
 int Board::get_cell(int row, int col) const {
-    if (row >= 0 && row < current_size && col >= 0 && col < current_size) {
+    if (in_board(row, col)) {
         if (grid[row][col] == StoneType::BLACKSTONE) return 1;
         if (grid[row][col] == StoneType::WHITESTONE) return 2;
     }
@@ -63,7 +65,7 @@ int Board::get_cell(int row, int col) const {
 }
 
 StoneType Board::get_state(const int &pos_x, const int &pos_y) const {
-    if (pos_x >= 0 && pos_x < BOARD_SIZE && pos_y >= 0 && pos_y < BOARD_SIZE) {
+    if (in_board(pos_x, pos_y)) {
         return grid[pos_x][pos_y];
     }
     return StoneType::EMPTY;
@@ -142,14 +144,11 @@ void Board::undo_move(bool by_player) {
         undo_list.push_back(last_move);
         set_pass(last_move.current_pass);
         toggle_turn();
-        std::cout << "Acutally undo with " << undo_list.size() << '\n';
     }
 }
 
 void Board::redo_move() {
-    std::cout << undo_list.size() << '\n';
     if (undo_list.empty()) return;
-    std::cout << "Calling" << '\n';
 
     Move next_move = undo_list.back();
     undo_list.pop_back();
@@ -165,7 +164,7 @@ void Board::redo_move() {
     else if (next_move.stone_type == StoneType::WHITESTONE)
         captured[0] += (int)next_move.captured_stones.size();
 
-    set_pass(next_move.current_pass);
+    set_pass(0);
     toggle_turn();
     move_list.push_back(next_move);
 }

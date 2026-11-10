@@ -13,6 +13,8 @@ std::pair<double, double> scoring(const Board &current_board) {
         for(int j = 0; j < BOARD_SIZE; j++) {
             if(!visisted[i][j] && current_board.get_state(i, j) == StoneType::EMPTY) {
                 std::queue<std::pair<int, int>> q;
+                q.emplace(i, j);
+                
                 bool touch_black = false, touch_white = false;
                 int point = 0;
 
@@ -24,7 +26,7 @@ std::pair<double, double> scoring(const Board &current_board) {
                         int x = i + direction_x[d];
                         int y = j + direction_y[d];
                         
-                        if(in_board(x, y)) {
+                        if(current_board.in_board(x, y)) {
                             if(current_board.get_state(x, y) == StoneType::BLACKSTONE) touch_black = true;
                             else if(current_board.get_state(x, y) == StoneType::WHITESTONE) touch_white = true;
                             else if(!visisted[x][y]) {
