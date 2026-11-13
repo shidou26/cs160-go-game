@@ -19,12 +19,20 @@ enum GamePhase {
     GAMEOVER,
     CONFIG,
     SAVING,
-    LOADING
+    LOADING,
+    MODE,
+    DIFFICULTY
 };
 
 enum GameMode {
     PVP,
     PVE 
+};
+
+enum Difficulty {
+    EASY,
+    MEDIUM,
+    HARD
 };
 
 constexpr int direction_x[4] = {1, 0, -1, 0},

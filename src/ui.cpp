@@ -24,6 +24,15 @@ UI::UI() {
     btn_load_game = {{ 100, 250, 300, 100 }, "LOAD GAME"};
     btn_config    = {{ 100, 400, 300, 100 }, "CONFIG"};
 
+    //Init option buttons for choosing mode
+    btn_pvp = { { 390, 250, 500, 100 }, "Play against Friend" };
+    btn_pve = { { 390, 400, 500, 100 }, "Play against Seol" };
+
+    //Init option buttons for choosing difficulty
+    btn_easy = { { 390, 250, 500, 100 }, "Easy" };
+    btn_medium = { { 390, 400, 500, 100 }, "Medium" };
+    btn_hard = { { 390, 550, 500, 100 }, "Hard" };
+
     //Init option buttons for playing phase
     btn_size9  = { { 240, 25, 88, 40 }, "9x9" };
     btn_size13 = { { 338, 25, 88, 40 }, "13x13" };
@@ -175,6 +184,24 @@ void UI::draw_starting(const Board &board) {
     draw_button(btn_config, mouse_pos, false, 36);
 }
 
+void UI::draw_mode() {
+    Vector2 mouse_pos = GetMousePosition();
+
+    DrawText("CHOOSE GAME MODE", 390, 120, 36, RAYWHITE);
+    draw_button(btn_pvp, mouse_pos, false, 28);
+    draw_button(btn_pve, mouse_pos, false, 28);
+}
+
+void UI::draw_difficulty() {
+    Vector2 mouse_pos = GetMousePosition();
+
+    DrawText("CHOOSE DIFFICULTY", 390, 120, 36, RAYWHITE);
+    DrawText("Choose the computer's difficulty.", 390, 175, 20, RAYWHITE);
+    draw_button(btn_easy, mouse_pos, false, 28);
+    draw_button(btn_medium, mouse_pos, false, 28);
+    draw_button(btn_hard, mouse_pos, false, 28);
+}
+
 void UI::draw_ending(const Board &board) {
     Vector2 mouse_pos = GetMousePosition();
 
@@ -295,7 +322,7 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             break;
         case GamePhase::START:
             if (CheckCollisionPointRec(mouse_pos, btn_new_game.bounds)) {
-                phase = GamePhase::PLAYING;
+                phase = GamePhase::MODE;
                 board.reset(19);
                 return true;
             }
@@ -305,6 +332,35 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             }
             if (CheckCollisionPointRec(mouse_pos, btn_load_game.bounds)) {
                 phase = GamePhase::LOADING;
+                return true;
+            }
+            break;
+        case GamePhase::MODE:
+            if (CheckCollisionPointRec(mouse_pos, btn_pvp.bounds)) {
+                board.set_mode(GameMode::PVP);
+                phase = GamePhase::PLAYING;
+                return true;
+            } 
+            if (CheckCollisionPointRec(mouse_pos, btn_pve.bounds)) {
+                board.set_mode(GameMode::PVE);
+                phase = GamePhase::DIFFICULTY;
+                return true;
+            }
+            break;
+        case GamePhase::DIFFICULTY:
+            if (CheckCollisionPointRec(mouse_pos, btn_easy.bounds)) {
+                board.set_difficulty(Difficulty::EASY);
+                phase = GamePhase::PLAYING;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_medium.bounds)) {
+                board.set_difficulty(Difficulty::MEDIUM);
+                phase = GamePhase::PLAYING;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_hard.bounds)) {
+                board.set_difficulty(Difficulty::HARD);
+                phase = GamePhase::PLAYING;
                 return true;
             }
             break;

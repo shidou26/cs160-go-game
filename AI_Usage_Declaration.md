@@ -17,3 +17,8 @@ All usages are listed in the AI Usage Log below.
 | AI08 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Asking | How can I save multiple slots and let user decide which slot | To know about saving | src and include folder |
 | AI09 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | Implementing notice for overwriting saves | To notice user for overwrritng saves | ui.cpp | 
 | AI10 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | change btn_back of ui to btn_back_from_end and add a btn_back_from_play | Implementing back button from playing phase | ui.cpp |
+| AI11 | 2026-11-23 | Le Hong Anh | ChatGPT (GPT-6) | Asking | Minimax algorithm for chess/go play communicate through the board right? | To know about Minimax | cpu.cpp and cpu.h |
+| AI12 | 2026-11-23 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | fix the code for me to include difficulty and gamemode in board instead of in main | To refactor the code | main.cpp and board.cpp | 
+| AI13 | 2026-11-23 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | draw the choose mode in draw_mode in ui.cpp for me | To design the choosing mode menu | ui.cpp |
+| AI14 | 2026-11-23 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | draw the choose difficulty in ui.cpp for me | To design the choosing difficulty mode menu | ui.cpp |
+| AI15 | 2026-11-23 | Le Hong Anh | ChatGPT (GPT-6) | Reviewing | review my code | To review potential bugs | all |

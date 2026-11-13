@@ -59,7 +59,7 @@ void Board::reset(int new_size) {
     undo_list.clear();
     hash_table = ZobristHash();
 
-    grid.resize(current_size, std::vector<StoneType>(current_size));
+    grid.assign(current_size, std::vector<StoneType>(current_size));
     for (int i = 0; i < current_size; i++) {
         for (int j = 0; j < current_size; j++) {
             grid[i][j] = StoneType::EMPTY;
@@ -69,6 +69,26 @@ void Board::reset(int new_size) {
 
 int Board::get_size() const {
     return current_size;
+}
+
+GameMode Board::get_mode() const {
+    return mode;
+}
+
+Difficulty Board::get_difficulty() const {
+    return difficulty;
+}
+
+bool Board::is_human_turn() const {
+    return mode == GameMode::PVP || turn == 1;
+}
+
+void Board::set_mode(GameMode new_mode) {
+    mode = new_mode;
+}
+
+void Board::set_difficulty(Difficulty new_difficulty) {
+    difficulty = new_difficulty;
 }
 
 bool Board::in_board(const int &pos_x, const int &pos_y) const {
@@ -215,20 +235,18 @@ bool Board::save_game(const std::string &path) {
     try {
         json data = {
             {"current_size", this->current_size},
+            {"mode", this->mode},
+            {"difficulty", this->difficulty},
             {"turn", this->turn},
             {"pass", this->pass},
             {"hash_table", this->hash_table},
             {"captured", this->captured},
             {"move_list", this->move_list},
             {"undo_list", this->undo_list},
-            {"grid", this->grid}
+            {"grid", this->grid},
         };
 
-        auto folder = std::filesystem::path(path).parent_path();
-        if (!folder.empty()) {
-            std::filesystem::create_directories(folder);
-        }
-
+        std::filesystem::create_directories(std::filesystem::path(path).parent_path());
         std::ofstream stream(path);
         stream << data.dump(4);
         stream.close();
@@ -258,6 +276,8 @@ bool Board::load_game(const std::string &path) {
         data.at("move_list").get_to(this->move_list);
         data.at("undo_list").get_to(this->undo_list);
         data.at("grid").get_to(this->grid);
+        data.at("difficulty").get_to(this->difficulty);
+        data.at("mode").get_to(this->mode);
 
         return true;
     }

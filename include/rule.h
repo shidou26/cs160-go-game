@@ -3,7 +3,8 @@
 #include <array>
 #include <vector>
 #include <utility>
-#include "board.h"
+
+#include "../include/board.h"
 
 /**
  * @brief Get the captured stones: 

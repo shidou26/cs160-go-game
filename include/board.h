@@ -35,6 +35,8 @@ private:
     std::vector<Move> move_list;
     std::vector<Move> undo_list;
     std::vector<std::vector<StoneType>> grid;
+    GameMode mode = GameMode::PVP;
+    Difficulty difficulty = Difficulty::EASY;
 
 public:
     Board(int size = BOARD_SIZE);
@@ -45,6 +47,8 @@ public:
     int get_turn() const; //(1: Black, 2: White)
     int get_captured(const int &type) const; //(0: Dead black, 1: Dead white)
     StoneType get_state(const int &pos_x, const int &pos_y) const;
+    GameMode get_mode() const;
+    Difficulty get_difficulty() const;
 
     /**
      * @brief Return if (pos_x, pos_y) is in board
@@ -57,6 +61,14 @@ public:
     bool in_board(const int &pos_x, const int &pos_y) const;
 
     /**
+     * @brief Human always play black <=> odd turns
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool is_human_turn() const;
+
+    /**
      * @brief Reset bàn cờ về trạng thái ban đầu (có thể truyền kích thước mới: 9, 13, 19)
      */
     void reset(int new_size = BOARD_SIZE);
@@ -65,6 +77,9 @@ public:
      * @brief Đặt quân cờ lên vị trí (row, col) cho người chơi (1: Đen, 2: Trắng)
      */
     bool place_stone(int row, int col);
+
+    void set_mode(GameMode new_mode);
+    void set_difficulty(Difficulty new_difficulty);
 
     /**
      * @brief Set the turn 

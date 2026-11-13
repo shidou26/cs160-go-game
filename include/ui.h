@@ -53,6 +53,16 @@ private:
     //Option button during config
     OptionButton btn_check;
 
+    //Option button during choosing mode
+    OptionButton btn_pvp;
+    OptionButton btn_pve;
+
+    //Option button during choose difficulty
+    OptionButton btn_easy;
+    OptionButton btn_medium;
+    OptionButton btn_hard;
+
+
     int get_cell_size(const Board &board) const;
     void draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active = false, int font_size = 18) const;
 
@@ -72,6 +82,8 @@ public:
     void draw_config();
     void draw_loading();
     void draw_saving();
+    void draw_mode();
+    void draw_difficulty();
 
     // Chuyển đổi tọa độ click chuột trên màn hình sang vị trí (row, col) của Board
     bool screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const;

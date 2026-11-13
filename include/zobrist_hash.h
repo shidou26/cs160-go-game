@@ -1,6 +1,6 @@
 #pragma once
 
-#include "helper.h"
+#include "../include/helper.h"
 
 class ZobristHash {
 public:
