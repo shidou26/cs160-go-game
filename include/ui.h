@@ -22,12 +22,12 @@ private:
     Color line_color;
     Color board_border;
 
-    // Option button during start menu
+    //Option button during start menu
     OptionButton btn_new_game;
     OptionButton btn_load_game;
     OptionButton btn_config;
 
-    // Option button during game 
+    //Option button during game 
     OptionButton btn_size9;
     OptionButton btn_size13;
     OptionButton btn_size19;
@@ -35,9 +35,14 @@ private:
     OptionButton btn_redo;
     OptionButton btn_reset;
     OptionButton btn_pass;
+    OptionButton btn_save;
+    OptionButton btn_save_slots[3];
 
-    // Option button during gameover menu
+    //Option button during gameover menu
     OptionButton btn_back; // go back to start screen
+
+    //Option button during config
+    OptionButton btn_check;
 
     int get_cell_size(const Board &board) const;
     void draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active = false, int font_size = 18) const;
@@ -47,21 +52,16 @@ public:
 
     Color get_background_color() const;
 
-    // Chỉ làm nhiệm vụ vẽ bàn cờ, quân cờ và các nút Option dựa trên dữ liệu từ Board
-    void draw(Board &board);
-
     /**
-     * @brief Drawing function for start menu
+     * @brief Drawing
      * 
      * @param board 
      */
+    void draw(Board &board);
     void draw_starting(const Board &board);
-
-    /**
-     * @brief Drawing function for gameover menu
-     * 
-     */
     void draw_ending(const Board &board);
+    void draw_config();
+    void draw_loading();
 
     // Chuyển đổi tọa độ click chuột trên màn hình sang vị trí (row, col) của Board
     bool screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const;

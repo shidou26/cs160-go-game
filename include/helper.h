@@ -16,7 +16,8 @@ enum StoneType {
 enum GamePhase {
     START,
     PLAYING,
-    GAMEOVER
+    GAMEOVER,
+    CONFIG,
 };
 
 enum GameMode {

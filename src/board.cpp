@@ -1,4 +1,5 @@
 #include <iostream>
+#include <filesystem>
 
 #include "../include/helper.h"
 #include "../include/board.h"
@@ -11,6 +12,38 @@ Move::Move(int pos_x, int pos_y, StoneType stone_type, int current_pass, unsigne
     this->current_pass = current_pass; 
     this->hash_value = hash_value;
     this->captured_stones = captured_stones;
+}
+
+void to_json(json &j, const Move &move) {
+    j = {
+        {"pos_x", move.pos_x},
+        {"pos_y", move.pos_y},
+        {"stone_type", move.stone_type},
+        {"current_pass", move.current_pass},
+        {"hash_value", move.hash_value},
+        {"captured_stones", move.captured_stones}
+    };
+}
+
+void to_json(json &j, const ZobristHash &hash_table) {
+    j = {
+        {"key", hash_table.key},
+        {"current_hash", hash_table.current_hash}
+    };
+}
+
+void from_json(const json &j, Move &move) {
+    j.at("pos_x").get_to(move.pos_x);
+    j.at("pos_y").get_to(move.pos_y);
+    j.at("stone_type").get_to(move.stone_type);
+    j.at("current_pass").get_to(move.current_pass);
+    j.at("hash_value").get_to(move.hash_value);
+    j.at("captured_stones").get_to(move.captured_stones);
+}
+
+void from_json(const json &j, ZobristHash &hash_table) {
+    j.at("key").get_to(hash_table.key);
+    j.at("current_hash").get_to(hash_table.current_hash);
 }
 
 Board::Board(int size) {
@@ -95,7 +128,7 @@ void Board::set_pass(int p) {
     pass = p;
 }
 
-int Board::get_pass() {
+int Board::get_pass() const {
     return pass;
 }
 
@@ -119,7 +152,7 @@ void Board::play_move(Move new_move) {
     }
 
     new_move.current_pass = get_pass();
-    new_move.hash_value = hash_table.get_hash();
+    new_move.hash_value = hash_table.current_hash;
     move_list.push_back(new_move);
 }
 
@@ -175,5 +208,60 @@ void Board::clear_undo_list() {
 
 bool Board::check_existed_state() const {
     if ((int)move_list.size() < 3) return false;
-    return hash_table.get_hash() == move_list[(int)move_list.size() - 3].hash_value;
+    return hash_table.current_hash == move_list[(int)move_list.size() - 3].hash_value;
+}
+
+bool Board::save_game(const std::string &path) {
+    try {
+        json data = {
+            {"current_size", this->current_size},
+            {"turn", this->turn},
+            {"pass", this->pass},
+            {"hash_table", this->hash_table},
+            {"captured", this->captured},
+            {"move_list", this->move_list},
+            {"undo_list", this->undo_list},
+            {"grid", this->grid}
+        };
+
+        auto folder = std::filesystem::path(path).parent_path();
+        if (!folder.empty()) {
+            std::filesystem::create_directories(folder);
+        }
+
+        std::ofstream stream(path);
+        stream << data.dump(4);
+        stream.close();
+
+        return true;
+    } 
+    catch(std::exception) {
+        return false;
+    }
+}
+
+bool Board::load_game(const std::string &path) {
+    try {
+        json data;
+        std::ifstream stream(path);
+        if (!stream.is_open()) {
+            return false;
+        }
+        stream >> data;
+        stream.close();
+
+        data.at("current_size").get_to(this->current_size);
+        data.at("turn").get_to(this->turn);
+        data.at("pass").get_to(this->pass);
+        data.at("hash_table").get_to(this->hash_table);
+        data.at("captured").get_to(this->captured);
+        data.at("move_list").get_to(this->move_list);
+        data.at("undo_list").get_to(this->undo_list);
+        data.at("grid").get_to(this->grid);
+
+        return true;
+    }
+    catch(std::exception) {
+        return false;
+    }
 }

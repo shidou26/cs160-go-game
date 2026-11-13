@@ -24,13 +24,14 @@ UI::UI() {
     btn_config    = {{ 100, 400, 300, 100 }, "CONFIG"};
 
     //Init option buttons for playing phase
-    btn_size9  = { { 260, 25, 75, 36 }, "9x9" };
-    btn_size13 = { { 345, 25, 85, 36 }, "13x13" };
-    btn_size19 = { { 440, 25, 85, 36 }, "19x19" };
-    btn_undo   = { { 555, 25, 95, 36 }, "Undo" };
-    btn_redo   = { { 660, 25, 100, 36}, "Redo" };
-    btn_reset  = { { 770, 25, 105, 36 }, "Reset" };
-    btn_pass   = { { 880, 25, 110, 36 }, "Pass" };
+    btn_size9  = { { 240, 25, 88, 40 }, "9x9" };
+    btn_size13 = { { 338, 25, 88, 40 }, "13x13" };
+    btn_size19 = { { 436, 25, 88, 40 }, "19x19" };
+    btn_undo   = { { 554, 25, 88, 40 }, "Undo" };
+    btn_redo   = { { 652, 25, 88, 40 }, "Redo" };
+    btn_reset  = { { 750, 25, 88, 40 }, "Reset" };
+    btn_pass   = { { 848, 25, 88, 40 }, "Pass" };
+    btn_save   = { { 946, 25, 88, 40 }, "Save" };
 
     //Init option buttons for gameover phase
     btn_back = { { 380, 250, 500, 200 }, "Return to title screen"};
@@ -87,6 +88,7 @@ void UI::draw(Board &board) {
     draw_button(btn_redo,   mouse_pos, false);
     draw_button(btn_reset,  mouse_pos, false);
     draw_button(btn_pass,   mouse_pos, false);
+    draw_button(btn_save,   mouse_pos, false);
 
     DrawText(TextFormat("Black: %i", board.get_captured(1)), 1150, 33, 22, RAYWHITE);
     DrawText(TextFormat("White: %i", board.get_captured(0)), 1150, 66, 22, RAYWHITE);
@@ -175,6 +177,14 @@ void UI::draw_ending(const Board &board) {
     draw_button(btn_back, mouse_pos, false, 36);
 }
 
+void UI::draw_config() {
+
+}
+
+void UI::draw_loading() {
+
+}
+
 bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const {
     int board_size = board.get_size();
     int cell_size = get_cell_size(board);
@@ -193,11 +203,14 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 board.reset(19);
                 return true;
             }
-            if (CheckCollisionPointRec(mouse_pos, btn_load_game.bounds)) {
-
-            }
             if (CheckCollisionPointRec(mouse_pos, btn_config.bounds)) {
-
+                phase = GamePhase::CONFIG;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_load_game.bounds)) {
+                board.load_game("./saves/slot_1.json");
+                phase = GamePhase::PLAYING;
+                return true;
             }
             break;
         case GamePhase::PLAYING:
@@ -225,9 +238,13 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 board.reset();
                 return true;
             }
-            if(CheckCollisionPointRec(mouse_pos, btn_pass.bounds)) {
+            if (CheckCollisionPointRec(mouse_pos, btn_pass.bounds)) {
                 board.toggle_turn();
                 board.pass_turn();
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_save.bounds)) {
+                board.save_game("./saves/slot_1.json");
                 return true;
             }
             break;

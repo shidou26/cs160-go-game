@@ -14,10 +14,6 @@ ZobristHash::ZobristHash() {
     }
 }
 
-unsigned long long ZobristHash::get_hash() const {
-    return current_hash;
-}
-
 void ZobristHash::update_hash(const int &pos_x, const int &pos_y, const StoneType &stone_type) {
     if(stone_type == StoneType::BLACKSTONE) current_hash ^= key[pos_x][pos_y][0];
     else if(stone_type == StoneType::WHITESTONE) current_hash ^= key[pos_x][pos_y][1];

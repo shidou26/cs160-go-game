@@ -3,9 +3,14 @@
 #include <utility>
 #include <vector>
 #include <array>
+#include <fstream>
+#include <string> 
 
+#include "../lib/json.hpp"
 #include "../include/helper.h"
 #include "../include/zobrist_hash.h"
+
+using json = nlohmann::json;
 
 struct Move {
     int pos_x, pos_y;
@@ -14,7 +19,11 @@ struct Move {
     unsigned long long hash_value; 
     std::vector<std::pair<int, int>> captured_stones;
     Move(int pos_x = -1, int pos_y = -1, StoneType stone_type = StoneType::EMPTY, int current_pass = 0, unsigned long long hash_value = 0, std::vector<std::pair<int, int>> captured_stones = {});
+
 };
+
+void to_json(json &j, const Move &move);
+void from_json(const json &j, Move &move);
 
 class Board {
 private:
@@ -29,6 +38,13 @@ private:
 
 public:
     Board(int size = BOARD_SIZE);
+
+    int get_size() const;
+    int get_pass() const;
+    int get_cell(int row, int col) const; //(0: Empty, 1: Black, 2: White)
+    int get_turn() const; //(1: Black, 2: White)
+    int get_captured(const int &type) const; //(0: Dead black, 1: Dead white)
+    StoneType get_state(const int &pos_x, const int &pos_y) const;
 
     /**
      * @brief Return if (pos_x, pos_y) is in board
@@ -46,44 +62,9 @@ public:
     void reset(int new_size = BOARD_SIZE);
 
     /**
-     * @brief Lấy kích thước bàn cờ hiện tại (9, 13, hoặc 19)
-     */
-    int get_size() const;
-
-    /**
      * @brief Đặt quân cờ lên vị trí (row, col) cho người chơi (1: Đen, 2: Trắng)
      */
     bool place_stone(int row, int col);
-
-    /**
-     * @brief Lấy giá trị ô cờ dạng số nguyên cho UI (0: Trống, 1: Đen, 2: Trắng)
-     */
-    int get_cell(int row, int col) const;
-
-    /**
-     * @brief Return the state of cell
-     * 
-     * @param pos_x 
-     * @param pos_y 
-     * @return StoneType 
-     */
-    StoneType get_state(const int &pos_x, const int &pos_y) const;
-
-    /**
-     * @brief Return the captured pieces: 0 for black pieces that died and 1 for white
-     * 
-     * @param type
-     * @return int
-     */
-    int get_captured(const int &type) const;
-
-    /**
-     * @brief Return the turn of the game
-     * 
-     * @return 2 for white
-     * @return 1 for black
-     */
-    int get_turn() const;
 
     /**
      * @brief Set the turn 
@@ -108,13 +89,6 @@ public:
      * 
      */
     void set_pass(int p);
-
-    /**
-     * @brief Return the number of pass currently
-     * 
-     * @return int 
-     */
-    int get_pass();
 
     /**
      * @brief Update the cell with new_stone_type
@@ -152,10 +126,13 @@ public:
     void clear_undo_list();
 
     /**
-     * @brief 
+     * @brief Check repition within 2 moves
      * 
      * @return true 
      * @return false 
      */
     bool check_existed_state() const;
+
+    bool save_game(const std::string &path);
+    bool load_game(const std::string &path);
 };

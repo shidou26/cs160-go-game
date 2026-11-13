@@ -22,7 +22,13 @@ int main() {
     UI user_interface;
 
     while (!WindowShouldClose()) {
-        if (phase == GamePhase::START) {
+        if (phase == GamePhase::CONFIG) {
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
+            user_interface.draw_config();
+            EndDrawing();
+        } 
+        else if (phase == GamePhase::START) {
             if(IsKeyPressed(KEY_H)) {
                 break;
             }
