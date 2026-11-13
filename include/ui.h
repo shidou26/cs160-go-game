@@ -36,10 +36,19 @@ private:
     OptionButton btn_reset;
     OptionButton btn_pass;
     OptionButton btn_save;
+    OptionButton btn_back_from_play;
+
+    //Option buttons for saving and loading
     OptionButton btn_save_slots[3];
+    OptionButton btn_load_slots[3];
+    OptionButton btn_back_save;
+    OptionButton btn_back_load;
+    OptionButton btn_confirm_overwrite;
+    OptionButton btn_cancel_overwrite;
+    int overwrite_slot = -1;
 
     //Option button during gameover menu
-    OptionButton btn_back; // go back to start screen
+    OptionButton btn_back_from_end; // go back to start screen
 
     //Option button during config
     OptionButton btn_check;
@@ -62,6 +71,7 @@ public:
     void draw_ending(const Board &board);
     void draw_config();
     void draw_loading();
+    void draw_saving();
 
     // Chuyển đổi tọa độ click chuột trên màn hình sang vị trí (row, col) của Board
     bool screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const;

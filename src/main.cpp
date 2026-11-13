@@ -22,7 +22,23 @@ int main() {
     UI user_interface;
 
     while (!WindowShouldClose()) {
-        if (phase == GamePhase::CONFIG) {
+        if (phase == GamePhase::SAVING || phase == GamePhase::LOADING) {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                Vector2 mouse_pos = GetMousePosition();
+                user_interface.handle_option_click(mouse_pos, phase, board);
+            }
+            if (phase != GamePhase::SAVING && phase != GamePhase::LOADING) continue;
+
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
+            if (phase == GamePhase::SAVING) {
+                user_interface.draw_saving();
+            } else {
+                user_interface.draw_loading();
+            }
+            EndDrawing();
+        }
+        else if (phase == GamePhase::CONFIG) {
             BeginDrawing();
             ClearBackground(user_interface.get_background_color());
             user_interface.draw_config();

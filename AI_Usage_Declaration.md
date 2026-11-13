@@ -13,4 +13,7 @@ All usages are listed in the AI Usage Log below.
 | AI04 | 2026-10-28 | Le Hong Anh | Gemini 3.8 Flash | Asking | In a state of a match, only one ko cell can exist, right? | To double checking | rule.cpp | 
 | AI05 | 2026-10-30 | Le Hong Anh | Gemini 3.8 Flash | Asking | only sugestion, don't code: How can I order my code in main.cpp to display a winning/losing menu and a rematch button | To ask | main.cpp
 | AI06 | 2026-11-6 | Le Hong Anh | ChatGPT (GPT-6) | Asking | check out why my set game icon does not work in main.cpp | To know about icon setting | main.cpp | 
-| AI07 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Asking | How can I save the state of the game through save and load | To know about saving | main.cpp | 
+| AI07 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Asking | How can I save the state of the game through save and load | To know about saving | src and include folder | 
+| AI08 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Asking | How can I save multiple slots and let user decide which slot | To know about saving | src and include folder |
+| AI09 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | Implementing notice for overwriting saves | To notice user for overwrritng saves | ui.cpp | 
+| AI10 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | change btn_back of ui to btn_back_from_end and add a btn_back_from_play | Implementing back button from playing phase | ui.cpp |

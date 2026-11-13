@@ -18,6 +18,8 @@ enum GamePhase {
     PLAYING,
     GAMEOVER,
     CONFIG,
+    SAVING,
+    LOADING
 };
 
 enum GameMode {

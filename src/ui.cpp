@@ -1,5 +1,6 @@
 #include <iostream>
 #include <utility>
+#include <filesystem>
 
 #include "../include/ui.h"
 #include "../include/helper.h"
@@ -32,9 +33,24 @@ UI::UI() {
     btn_reset  = { { 750, 25, 88, 40 }, "Reset" };
     btn_pass   = { { 848, 25, 88, 40 }, "Pass" };
     btn_save   = { { 946, 25, 88, 40 }, "Save" };
+    btn_back_from_play = { { 1044, 25, 88, 40 }, "Back" };
+
+    //Init option buttons for saving phase
+    btn_save_slots[0] = { { 390, 220, 500, 80 }, "Save to Slot 1" };
+    btn_save_slots[1] = { { 390, 330, 500, 80 }, "Save to Slot 2" };
+    btn_save_slots[2] = { { 390, 440, 500, 80 }, "Save to Slot 3" };
+    btn_back_save = { { 390, 650, 500, 60 }, "Back to game" };
+    btn_confirm_overwrite = { { 390, 400, 230, 60 }, "Overwrite" };
+    btn_cancel_overwrite = { { 660, 400, 230, 60 }, "Cancel" };
+
+    //Init option buttons for loading phase
+    btn_load_slots[0] = { { 390, 220, 500, 80 }, "Load Slot 1" };
+    btn_load_slots[1] = { { 390, 330, 500, 80 }, "Load Slot 2" };
+    btn_load_slots[2] = { { 390, 440, 500, 80 }, "Load Slot 3" };
+    btn_back_load = { { 390, 650, 500, 60 }, "Back to title screen" };
 
     //Init option buttons for gameover phase
-    btn_back = { { 380, 250, 500, 200 }, "Return to title screen"};
+    btn_back_from_end = { { 380, 250, 500, 200 }, "Return to title screen"};
 }
 
 Color UI::get_background_color() const {
@@ -89,6 +105,7 @@ void UI::draw(Board &board) {
     draw_button(btn_reset,  mouse_pos, false);
     draw_button(btn_pass,   mouse_pos, false);
     draw_button(btn_save,   mouse_pos, false);
+    draw_button(btn_back_from_play, mouse_pos, false);
 
     DrawText(TextFormat("Black: %i", board.get_captured(1)), 1150, 33, 22, RAYWHITE);
     DrawText(TextFormat("White: %i", board.get_captured(0)), 1150, 66, 22, RAYWHITE);
@@ -174,7 +191,7 @@ void UI::draw_ending(const Board &board) {
         DrawText(TextFormat("Black wins by %.1f", final_score.first - final_score.second), 500, 33, 22, RAYWHITE);
     }
 
-    draw_button(btn_back, mouse_pos, false, 36);
+    draw_button(btn_back_from_end, mouse_pos, false, 36);
 }
 
 void UI::draw_config() {
@@ -182,7 +199,32 @@ void UI::draw_config() {
 }
 
 void UI::draw_loading() {
+    Vector2 mouse_pos = GetMousePosition();
 
+    DrawText("Choose a slot to loa", 390, 120, 28, RAYWHITE);
+
+    for (int i = 0; i < 3; i++) {
+        draw_button(btn_load_slots[i], mouse_pos, false, 28);
+    }
+    draw_button(btn_back_load, mouse_pos, false, 24);
+}
+
+void UI::draw_saving() {
+    Vector2 mouse_pos = GetMousePosition();
+
+    DrawText("SAVE GAME", 390, 120, 36, RAYWHITE);
+    if (overwrite_slot != -1) {
+        DrawText(TextFormat("Overwrite the saved game in Slot %i?", overwrite_slot + 1), 390, 250, 24, RAYWHITE);
+        draw_button(btn_confirm_overwrite, mouse_pos, false, 24);
+        draw_button(btn_cancel_overwrite, mouse_pos, false, 24);
+        return;
+    }
+    DrawText("Choose a slot to save.", 390, 175, 20, RAYWHITE);
+
+    for (int i = 0; i < 3; i++) {
+        draw_button(btn_save_slots[i], mouse_pos, false, 28);
+    }
+    draw_button(btn_back_save, mouse_pos, false, 24);
 }
 
 bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const {
@@ -197,6 +239,60 @@ bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &co
 
 bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) {
     switch (phase) {
+        case GamePhase::SAVING:
+            if (overwrite_slot != -1) {
+                if (CheckCollisionPointRec(mouse_pos, btn_cancel_overwrite.bounds)) {
+                    overwrite_slot = -1;
+                } else if (CheckCollisionPointRec(mouse_pos, btn_confirm_overwrite.bounds)) {
+                    std::string path = "saves/slot_" + std::to_string(overwrite_slot + 1) + ".json";
+                    overwrite_slot = -1;
+                    if (board.save_game(path)) {
+                        phase = GamePhase::PLAYING;
+                    } else {
+                        std::cerr << "Could not save to " << path << '\n';
+                    }
+                }
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_back_save.bounds)) {
+                phase = GamePhase::PLAYING;
+                return true;
+            }
+            for (int i = 0; i < 3; i++) {
+                if (CheckCollisionPointRec(mouse_pos, btn_save_slots[i].bounds)) {
+                    std::string path = "saves/slot_" + std::to_string(i + 1) + ".json";
+                    if (std::filesystem::exists(path)) {
+                        overwrite_slot = i;
+                        return true;
+                    }
+                    if (board.save_game(path)) {
+                        phase = GamePhase::PLAYING;
+                    } else {
+                        std::cerr << "Could not save to " << path << '\n';
+                    }
+                    return true;
+                }
+            }
+            break;
+        case GamePhase::LOADING:
+            if (CheckCollisionPointRec(mouse_pos, btn_back_load.bounds)) {
+                phase = GamePhase::START;
+                return true;
+            }
+            for (int i = 0; i < 3; i++) {
+                if (CheckCollisionPointRec(mouse_pos, btn_load_slots[i].bounds)) {
+                    std::string path = "saves/slot_" + std::to_string(i + 1) + ".json";
+                    Board loaded = board;
+                    if (loaded.load_game(path)) {
+                        board = std::move(loaded);
+                        phase = board.get_pass() == 2 ? GamePhase::GAMEOVER : GamePhase::PLAYING;
+                    } else {
+                        std::cerr << "Could not load " << path << '\n';
+                    }
+                    return true;
+                }
+            }
+            break;
         case GamePhase::START:
             if (CheckCollisionPointRec(mouse_pos, btn_new_game.bounds)) {
                 phase = GamePhase::PLAYING;
@@ -208,12 +304,15 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_load_game.bounds)) {
-                board.load_game("./saves/slot_1.json");
-                phase = GamePhase::PLAYING;
+                phase = GamePhase::LOADING;
                 return true;
             }
             break;
         case GamePhase::PLAYING:
+            if (CheckCollisionPointRec(mouse_pos, btn_back_from_play.bounds)) {
+                phase = GamePhase::START;
+                return true;
+            }
             if (CheckCollisionPointRec(mouse_pos, btn_size9.bounds)) {
                 board.reset(9);
                 return true;
@@ -244,12 +343,13 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_save.bounds)) {
-                board.save_game("./saves/slot_1.json");
+                overwrite_slot = -1;
+                phase = GamePhase::SAVING;
                 return true;
             }
             break;
         case GamePhase::GAMEOVER:
-            if (CheckCollisionPointRec(mouse_pos, btn_back.bounds)) {
+            if (CheckCollisionPointRec(mouse_pos, btn_back_from_end.bounds)) {
                 board.reset();
                 phase = GamePhase::START;
             }
