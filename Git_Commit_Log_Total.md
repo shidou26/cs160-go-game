@@ -1,6 +1,13 @@
 shidou26, Shidou Le, Hong Anh Le: Le Hong Anh - 26125003
 MarioNathanPro: Doan Nhat Anh - 26125002
 
+- **7c5fc8c** [2026-11-13] *MarioNathanPro*: feat: added game modes, redesign the game, changing how stones and board look, adding fullscreen mode (in setting)
+- **213e4fc** [2026-11-13] *shidou26*: feat: cpu prototype
+- **d1c63a3** [2026-11-13] *shidou26*: feat: add save and load slots
+- **44387b6** [2026-11-13] *shidou26*: feat: save and load
+- **0783490** [2026-11-10] *Shidou Le*: chore: fix board size
+- **a88473e** [2026-11-06] *MarioNathanPro*: reposition files
+- **7384760** [2026-11-06] *MarioNathanPro*: adding commit log
 - **4cc161b** [2026-11-06] *MarioNathanPro*: board resize
 - **b4776fd** [2026-11-06] *shidou26*: feat: start menu and redo
 - **69576f9** [2026-10-30] *MarioNathanPro*: adding commit log
