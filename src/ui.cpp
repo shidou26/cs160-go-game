@@ -1,6 +1,9 @@
 #include <iostream>
 #include <utility>
 #include <filesystem>
+#include <cmath>
+#include <algorithm>
+#include <vector>
 
 #include "../include/ui.h"
 #include "../include/helper.h"
@@ -8,7 +11,157 @@
 #include "../include/score.h"
 #include "../include/board.h"
 
+namespace {
+
+const int VIRTUAL_WIDTH = 1280;
+const int VIRTUAL_HEIGHT = 960;
+
+// [HD UPGRADE]: Generate high-resolution 3D stone texture (512x512) with smooth anti-aliased edges
+// and glossy specular highlight matching the reference style
+Texture2D create_hd_stone_texture(bool is_black) {
+    const int tex_size = 512;
+    Image img = GenImageColor(tex_size, tex_size, BLANK);
+    Color *pixels = (Color *)img.data;
+
+    float center = (tex_size - 1) * 0.5f;
+    float max_r = tex_size * 0.47f;
+
+    for (int y = 0; y < tex_size; y++) {
+        for (int x = 0; x < tex_size; x++) {
+            float dx = (x - center) / max_r;
+            float dy = (y - center) / max_r;
+            float dist = std::sqrt(dx * dx + dy * dy);
+
+            if (dist > 1.0f) continue;
+
+            // Sub-pixel anti-aliasing along the circle edge for crisp, smooth borders
+            float edge_alpha = std::clamp((1.0f - dist) * (max_r * 0.5f), 0.0f, 1.0f);
+
+            // Compute 3D sphere normal vector
+            float nz = std::sqrt(std::max(0.0f, 1.0f - dist * dist));
+
+            // Main light source from top-left (-0.42, -0.45, 0.78)
+            float lx = -0.42f, ly = -0.45f, lz = 0.78f;
+            float diff = std::max(0.0f, dx * lx + dy * ly + nz * lz);
+
+            // Glossy specular highlight at top-left
+            float hx = dx + 0.36f;
+            float hy = dy + 0.38f;
+            float h_dist = std::sqrt(hx * hx + hy * hy);
+            float specular = std::pow(std::max(0.0f, 1.0f - h_dist / 0.48f), 2.8f) * 0.65f;
+
+            // Bottom-right rim light for 3D depth
+            float rx = dx - 0.35f;
+            float ry = dy - 0.35f;
+            float rim = std::pow(std::clamp(dist, 0.0f, 1.0f), 3.0f) * std::max(0.0f, (rx + ry) * 0.45f);
+
+            float r_val, g_val, b_val;
+            if (is_black) {
+                // Black stone: glossy slate finish with crisp reflections
+                float base = 14.0f + diff * 48.0f + rim * 55.0f;
+                r_val = base + specular * 215.0f;
+                g_val = base + specular * 218.0f;
+                b_val = base + 4.0f + specular * 230.0f;
+            } else {
+                // White stone: ivory shell stone with soft 3D shading and highlight
+                float shade = 195.0f + diff * 55.0f - std::pow(dist, 2.2f) * 32.0f + rim * 28.0f;
+                // Subtle natural shell grain
+                float grain = std::sin((dx * 6.0f + dy * 3.0f) * 3.14159f) * 2.5f;
+                r_val = shade + grain + specular * 55.0f;
+                g_val = shade + grain + specular * 55.0f;
+                b_val = shade + 3.0f + grain + specular * 58.0f;
+            }
+
+            // Slightly darken the outer rim to separate the stone from the board
+            float border_darken = std::clamp((1.0f - std::pow(dist, 6.0f) * 0.35f), 0.65f, 1.0f);
+            r_val *= border_darken;
+            g_val *= border_darken;
+            b_val *= border_darken;
+
+            pixels[y * tex_size + x] = (Color){
+                (unsigned char)std::clamp((int)r_val, 0, 255),
+                (unsigned char)std::clamp((int)g_val, 0, 255),
+                (unsigned char)std::clamp((int)b_val, 0, 255),
+                (unsigned char)std::clamp((int)(edge_alpha * 255.0f), 0, 255)
+            };
+        }
+    }
+
+    Texture2D tex = LoadTextureFromImage(img);
+    UnloadImage(img);
+
+    // [HD UPGRADE]: Generate Mipmaps and enable Trilinear filtering so 19x19 stones stay sharp when scaled down
+    GenTextureMipmaps(&tex);
+    SetTextureFilter(tex, TEXTURE_FILTER_TRILINEAR);
+    return tex;
+}
+
+// [HD UPGRADE]: Generate high-resolution natural wood grain texture (1024x1024) for the board
+Texture2D create_hd_wood_texture() {
+    const int tex_size = 1024;
+    Image img = GenImageColor(tex_size, tex_size, BLANK);
+    Color *pixels = (Color *)img.data;
+
+    for (int y = 0; y < tex_size; y++) {
+        for (int x = 0; x < tex_size; x++) {
+            float u = (float)x / tex_size;
+            float v = (float)y / tex_size;
+
+            // Vertical wood grain fibers resembling a Kaya Go board
+            float wave = std::sin(v * 6.28318f * 1.5f + std::sin(u * 25.0f) * 0.35f) * 0.04f;
+            float fiber1 = std::sin((u + wave) * 180.0f);
+            float fiber2 = std::sin((u * 0.7f + wave * 1.3f) * 420.0f) * 0.45f;
+            float fine_grain = std::sin((u * 950.0f) + v * 18.0f) * 0.2f;
+            float plank_tone = std::sin(u * 18.0f) * 6.0f;
+
+            float grain_val = (fiber1 + fiber2 + fine_grain) * 5.5f + plank_tone;
+
+            // Warm golden wood tone
+            int r = std::clamp((int)(226.0f + grain_val * 1.05f), 0, 255);
+            int g = std::clamp((int)(178.0f + grain_val * 0.95f), 0, 255);
+            int b = std::clamp((int)(108.0f + grain_val * 0.75f), 0, 255);
+
+            pixels[y * tex_size + x] = (Color){ (unsigned char)r, (unsigned char)g, (unsigned char)b, 255 };
+        }
+    }
+
+    Texture2D tex = LoadTextureFromImage(img);
+    UnloadImage(img);
+    GenTextureMipmaps(&tex);
+    SetTextureFilter(tex, TEXTURE_FILTER_TRILINEAR);
+    return tex;
+}
+
+} // namespace
+
 UI::UI() {
+    // [HD UPGRADE]: Initialize high-res 3D stone and wood board textures with Mipmaps + Trilinear filtering
+    black_stone_tex = create_hd_stone_texture(true);
+    white_stone_tex = create_hd_stone_texture(false);
+    wood_board_tex  = create_hd_wood_texture();
+    render_target   = LoadRenderTexture(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+    SetTextureFilter(render_target.texture, TEXTURE_FILTER_BILINEAR);
+
+    // [HD UPGRADE]: Load system TrueType font at large size (64px) for crisp, non-pixelated text
+    const char* font_paths[] = {
+        "C:/Windows/Fonts/segoeuib.ttf",
+        "C:/Windows/Fonts/segoeui.ttf",
+        "C:/Windows/Fonts/arialbd.ttf",
+        "C:/Windows/Fonts/arial.ttf"
+    };
+    has_custom_font = false;
+    for (const char* path : font_paths) {
+        if (std::filesystem::exists(path)) {
+            ui_font = LoadFontEx(path, 64, nullptr, 0);
+            if (ui_font.texture.id != 0) {
+                GenTextureMipmaps(&ui_font.texture);
+                SetTextureFilter(ui_font.texture, TEXTURE_FILTER_TRILINEAR);
+                has_custom_font = true;
+                break;
+            }
+        }
+    }
+
     start_x = START_X;
     start_y = START_Y;
     padding = PADDING;
@@ -16,13 +169,13 @@ UI::UI() {
 
     bg_color = (Color){ 20, 24, 35, 255 };
     board_wood = (Color){ 219, 169, 99, 255 };
-    line_color = (Color){ 60, 40, 20, 255 };
-    board_border = (Color){ 180, 133, 78, 255 };
+    line_color = (Color){ 55, 36, 18, 255 };
+    board_border = (Color){ 170, 124, 70, 255 };
 
     //Init option buttons for starting phase
     btn_new_game  = {{ 100, 100, 300, 100 }, "NEW GAME"};
     btn_load_game = {{ 100, 250, 300, 100 }, "LOAD GAME"};
-    btn_config    = {{ 100, 400, 300, 100 }, "CONFIG"};
+    btn_config    = {{ 100, 400, 300, 100 }, "SETTINGS"};
 
     //Init option buttons for choosing mode
     btn_pvp = { { 390, 250, 500, 100 }, "Play against Friend" };
@@ -42,7 +195,16 @@ UI::UI() {
     btn_reset  = { { 750, 25, 88, 40 }, "Reset" };
     btn_pass   = { { 848, 25, 88, 40 }, "Pass" };
     btn_save   = { { 946, 25, 88, 40 }, "Save" };
+    btn_setting_play   = { { 1135, 110, 115, 40 }, "Settings" };
     btn_back_from_play = { { 1044, 25, 88, 40 }, "Back" };
+
+    //Init option buttons for config (Settings) phase
+    btn_sound_down  = { { 560, 240, 60, 50 }, "-" };
+    btn_sound_up    = { { 760, 240, 60, 50 }, "+" };
+    btn_sound_mute  = { { 840, 240, 120, 50 }, "Mute" };
+    btn_windowed    = { { 560, 360, 190, 55 }, "Windowed" };
+    btn_fullscreen  = { { 770, 360, 190, 55 }, "Fullscreen" };
+    btn_back_config = { { 390, 650, 500, 60 }, "Back" };
 
     //Init option buttons for saving phase
     btn_save_slots[0] = { { 390, 220, 500, 80 }, "Save to Slot 1" };
@@ -66,6 +228,61 @@ Color UI::get_background_color() const {
     return bg_color;
 }
 
+void UI::unload() {
+    UnloadTexture(black_stone_tex);
+    UnloadTexture(white_stone_tex);
+    UnloadTexture(wood_board_tex);
+    UnloadRenderTexture(render_target);
+    if (has_custom_font) {
+        UnloadFont(ui_font);
+    }
+}
+
+Vector2 UI::get_virtual_mouse() const {
+    float sw = (float)GetScreenWidth();
+    float sh = (float)GetScreenHeight();
+    float scale = std::min(sw / VIRTUAL_WIDTH, sh / VIRTUAL_HEIGHT);
+    float offset_x = (sw - VIRTUAL_WIDTH * scale) * 0.5f;
+    float offset_y = (sh - VIRTUAL_HEIGHT * scale) * 0.5f;
+
+    Vector2 m = GetMousePosition();
+    return {
+        (m.x - offset_x) / scale,
+        (m.y - offset_y) / scale
+    };
+}
+
+void UI::begin_render() const {
+    BeginTextureMode(render_target);
+    ClearBackground(bg_color);
+}
+
+void UI::end_render() const {
+    EndTextureMode();
+
+    float sw = (float)GetScreenWidth();
+    float sh = (float)GetScreenHeight();
+    float scale = std::min(sw / VIRTUAL_WIDTH, sh / VIRTUAL_HEIGHT);
+    float offset_x = (sw - VIRTUAL_WIDTH * scale) * 0.5f;
+    float offset_y = (sh - VIRTUAL_HEIGHT * scale) * 0.5f;
+
+    BeginDrawing();
+    ClearBackground(bg_color);
+    Rectangle src = { 0.0f, 0.0f, (float)render_target.texture.width, -(float)render_target.texture.height };
+    Rectangle dst = { offset_x, offset_y, VIRTUAL_WIDTH * scale, VIRTUAL_HEIGHT * scale };
+    DrawTexturePro(render_target.texture, src, dst, { 0.0f, 0.0f }, 0.0f, WHITE);
+    EndDrawing();
+}
+
+// [HD UPGRADE]: Render high-resolution text using DrawTextEx
+void UI::draw_text_hd(const char* text, float x, float y, float font_size, Color color) const {
+    if (has_custom_font) {
+        DrawTextEx(ui_font, text, { x, y }, font_size, 1.0f, color);
+    } else {
+        DrawText(text, (int)x, (int)y, (int)font_size, color);
+    }
+}
+
 int UI::get_cell_size(const Board &board) const {
     int board_size = board.get_size();
     return (board_size > 1) ? (grid_width / (board_size - 1)) : grid_width;
@@ -80,30 +297,43 @@ void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active,
     Color text_col = is_active ? (Color){ 20, 24, 35, 255 } : RAYWHITE;
     Color border_col = is_active ? RAYWHITE : (Color){ 100, 115, 140, 255 };
 
-    DrawRectangleRounded(btn.bounds, 0.25f, 6, fill);
-    DrawRectangleRoundedLines(btn.bounds, 0.25f, 6, border_col);
+    // [HD UPGRADE]: Increase corner roundness segments (16) for smoother button borders
+    DrawRectangleRounded(btn.bounds, 0.28f, 16, fill);
+    DrawRectangleRoundedLinesEx(btn.bounds, 0.28f, 16, 1.5f, border_col);
 
-    int text_weight = MeasureText(btn.label, font_size);
-    DrawText(
-        btn.label,
-        (int)(btn.bounds.x + (btn.bounds.width - text_weight) / 2),
-        (int)(btn.bounds.y + (btn.bounds.height - font_size) / 2),
-        font_size,
-        text_col
-    );
+    // [HD UPGRADE]: Center and render button text using the HD font
+    if (has_custom_font) {
+        Vector2 text_size = MeasureTextEx(ui_font, btn.label, (float)font_size, 1.0f);
+        draw_text_hd(
+            btn.label,
+            btn.bounds.x + (btn.bounds.width - text_size.x) * 0.5f,
+            btn.bounds.y + (btn.bounds.height - text_size.y) * 0.5f,
+            (float)font_size,
+            text_col
+        );
+    } else {
+        int text_weight = MeasureText(btn.label, font_size);
+        DrawText(
+            btn.label,
+            (int)(btn.bounds.x + (btn.bounds.width - text_weight) / 2),
+            (int)(btn.bounds.y + (btn.bounds.height - font_size) / 2),
+            font_size,
+            text_col
+        );
+    }
 }
 
 void UI::draw(Board &board) {
     int board_size = board.get_size();
     int cell_size = get_cell_size(board);
     int actual_grid_width = (board_size - 1) * cell_size;
-    Vector2 mouse_pos = GetMousePosition();
+    Vector2 mouse_pos = get_virtual_mouse();
 
-    // 1. Vẽ thông tin lượt chơi và các nút Option
+    // 1. Draw current turn info and Option buttons using the HD font
     if (board.get_turn() == 1) {
-        DrawText("Turn: BLACK", 30, 33, 22, RAYWHITE);
+        draw_text_hd("Turn: BLACK", 30, 33, 24, RAYWHITE);
     } else {
-        DrawText("Turn: WHITE", 30, 33, 22, RAYWHITE);
+        draw_text_hd("Turn: WHITE", 30, 33, 24, RAYWHITE);
     }
 
     draw_button(btn_size9,  mouse_pos, board_size == 9);
@@ -115,11 +345,12 @@ void UI::draw(Board &board) {
     draw_button(btn_pass,   mouse_pos, false);
     draw_button(btn_save,   mouse_pos, false);
     draw_button(btn_back_from_play, mouse_pos, false);
+    draw_button(btn_setting_play, mouse_pos, false);
 
-    DrawText(TextFormat("Black: %i", board.get_captured(1)), 1150, 33, 22, RAYWHITE);
-    DrawText(TextFormat("White: %i", board.get_captured(0)), 1150, 66, 22, RAYWHITE);
+    draw_text_hd(TextFormat("Black: %i", board.get_captured(1)), 1145, 28, 24, RAYWHITE);
+    draw_text_hd(TextFormat("White: %i", board.get_captured(0)), 1145, 62, 24, RAYWHITE);
 
-    // 2. Vẽ mặt bàn cờ gỗ
+    // 2. [HD UPGRADE]: Draw realistic wooden board (Drop shadow + 3D border + HD wood grain texture)
     Rectangle board_rect = { 
         (float)(start_x - padding), 
         (float)(start_y - padding), 
@@ -127,33 +358,85 @@ void UI::draw(Board &board) {
         (float)(actual_grid_width + padding * 2) 
     };
 
-    DrawRectangleRounded(board_rect, 0.05f, 4, board_wood); 
+    // Drop shadow underneath the board for depth
+    Rectangle board_shadow = { board_rect.x + 8.0f, board_rect.y + 10.0f, board_rect.width, board_rect.height };
+    DrawRectangleRounded(board_shadow, 0.05f, 24, (Color){ 0, 0, 0, 110 });
 
-    // 3. Vẽ các đường kẻ lưới
+    // Darker outer wood border
+    Rectangle outer_border = { board_rect.x - 4.0f, board_rect.y - 4.0f, board_rect.width + 8.0f, board_rect.height + 8.0f };
+    DrawRectangleRounded(outer_border, 0.05f, 24, board_border);
+    DrawRectangleRounded(board_rect, 0.05f, 24, board_wood);
+
+    // Overlay natural HD wood grain texture onto the board surface
+    Rectangle wood_src = { 0.0f, 0.0f, (float)wood_board_tex.width, (float)wood_board_tex.height };
+    Rectangle wood_dst = { board_rect.x + 6.0f, board_rect.y + 6.0f, board_rect.width - 12.0f, board_rect.height - 12.0f };
+    DrawTexturePro(wood_board_tex, wood_src, wood_dst, { 0.0f, 0.0f }, 0.0f, WHITE);
+    DrawRectangleRoundedLinesEx(board_rect, 0.05f, 24, 4.0f, board_border);
+
+    // 3. [HD UPGRADE]: Draw grid lines with engraved groove effect (1 highlight line + 1 dark line)
+    Color groove_highlight = { 245, 208, 145, 160 };
     for (int i = 0; i < board_size; i++) {
-        DrawLine(start_x + i * cell_size, start_y, start_x + i * cell_size, start_y + actual_grid_width, line_color);
-        DrawLine(start_x, start_y + i * cell_size, start_x + actual_grid_width, start_y + i * cell_size, line_color);
+        float x_pos = (float)(start_x + i * cell_size);
+        float y_pos = (float)(start_y + i * cell_size);
+
+        // Thin bright line beside the groove for lighting depth
+        DrawLineEx({ x_pos + 1.2f, (float)start_y }, { x_pos + 1.2f, (float)(start_y + actual_grid_width) }, 1.2f, groove_highlight);
+        DrawLineEx({ (float)start_x, y_pos + 1.2f }, { (float)(start_x + actual_grid_width), y_pos + 1.2f }, 1.2f, groove_highlight);
+
+        // Crisp dark main groove line
+        DrawLineEx({ x_pos, (float)start_y }, { x_pos, (float)(start_y + actual_grid_width) }, 1.8f, line_color);
+        DrawLineEx({ (float)start_x, y_pos }, { (float)(start_x + actual_grid_width), y_pos }, 1.8f, line_color);
     }
 
-    // 4. Vẽ các quân cờ dựa trên dữ liệu đọc từ Board
-    float radius = (cell_size * 0.4f);
-    Color black_stone_color = { 0, 0, 0, 255 };
+    // 3b. [HD UPGRADE]: Draw standard Star Points (Hoshi) based on board size
+    std::vector<int> star_coords;
+    if (board_size == 19) star_coords = { 3, 9, 15 };
+    else if (board_size == 13) star_coords = { 3, 6, 9 };
+    else if (board_size == 9) star_coords = { 2, 4, 6 };
 
+    for (int sr : star_coords) {
+        for (int sc : star_coords) {
+            // For 9x9 and 13x13 boards, only draw the 4 corner star points and the center point (Tengen)
+            if (board_size != 19) {
+                int mid = board_size / 2;
+                bool is_center = (sr == mid && sc == mid);
+                bool is_corner = (sr != mid && sc != mid);
+                if (!is_center && !is_corner) continue;
+            }
+            Vector2 star_pos = { (float)(start_x + sc * cell_size), (float)(start_y + sr * cell_size) };
+            DrawCircleV(star_pos, std::max(4.0f, cell_size * 0.1f), line_color);
+        }
+    }
+
+    // 4. [HD UPGRADE]: Draw glossy 3D stones with soft gradient drop shadows
+    float radius = cell_size * 0.475f;
     for (int r = 0; r < board_size; r++) {
         for (int c = 0; c < board_size; c++) {
             int cell_state = board.get_cell(r, c);
             if (cell_state != 0) {
-                int stone_x = start_x + c * cell_size;
-                int stone_y = start_y + r * cell_size;
+                float stone_x = (float)(start_x + c * cell_size);
+                float stone_y = (float)(start_y + r * cell_size);
 
-                if (cell_state == 1) {
-                    // Quân Đen
-                    DrawCircle(stone_x, stone_y, (float)radius, black_stone_color);
-                } else if (cell_state == 2) {
-                    // Quân Trắng + viền xám nhẹ để nổi bật trên mặt gỗ
-                    DrawCircle(stone_x, stone_y, (float)radius, RAYWHITE);
-                    DrawCircleLines(stone_x, stone_y, (float)radius, DARKGRAY);
-                }
+                // Soft gradient drop shadow offset toward bottom-right for 3D elevation
+                float shadow_offset_x = radius * 0.10f;
+                float shadow_offset_y = radius * 0.14f;
+                DrawCircleGradient(
+                    { stone_x + shadow_offset_x, stone_y + shadow_offset_y },
+                    radius * 1.06f,
+                    (Color){ 0, 0, 0, 125 },
+                    (Color){ 0, 0, 0, 0 }
+                );
+
+                // Draw smoothed HD 3D stone texture (Trilinear + Mipmaps)
+                Texture2D tex = (cell_state == 1) ? black_stone_tex : white_stone_tex;
+                Rectangle source = { 0.0f, 0.0f, (float)tex.width, (float)tex.height };
+                Rectangle dest = {
+                    stone_x - radius,
+                    stone_y - radius,
+                    radius * 2.0f,
+                    radius * 2.0f
+                };
+                DrawTexturePro(tex, source, dest, { 0.0f, 0.0f }, 0.0f, WHITE);
             }
         }
     }
@@ -174,10 +457,11 @@ void UI::draw(Board &board) {
 }
 
 void UI::draw_starting(const Board &board) {
-    Vector2 mouse_pos = GetMousePosition();
+    (void)board;
+    Vector2 mouse_pos = get_virtual_mouse();
 
-    DrawText(TextFormat("Anhs's Game of Go"), 500, 33, 32, RAYWHITE);
-    DrawText(TextFormat("Press H to exit"), 1000, 800, 20, RAYWHITE);
+    draw_text_hd(TextFormat("Anhs's Game of Go"), 500, 33, 36, RAYWHITE);
+    draw_text_hd(TextFormat("Press H to exit"), 1000, 800, 22, RAYWHITE);
 
     draw_button(btn_new_game, mouse_pos, false, 36);
     draw_button(btn_load_game, mouse_pos, false, 36);
@@ -185,50 +469,68 @@ void UI::draw_starting(const Board &board) {
 }
 
 void UI::draw_mode() {
-    Vector2 mouse_pos = GetMousePosition();
+    Vector2 mouse_pos = get_virtual_mouse();
 
-    DrawText("CHOOSE GAME MODE", 390, 120, 36, RAYWHITE);
+    draw_text_hd("CHOOSE GAME MODE", 390, 120, 36, RAYWHITE);
     draw_button(btn_pvp, mouse_pos, false, 28);
     draw_button(btn_pve, mouse_pos, false, 28);
 }
 
 void UI::draw_difficulty() {
-    Vector2 mouse_pos = GetMousePosition();
+    Vector2 mouse_pos = get_virtual_mouse();
 
-    DrawText("CHOOSE DIFFICULTY", 390, 120, 36, RAYWHITE);
-    DrawText("Choose the computer's difficulty.", 390, 175, 20, RAYWHITE);
+    draw_text_hd("CHOOSE DIFFICULTY", 390, 120, 36, RAYWHITE);
+    draw_text_hd("Choose the computer's difficulty.", 390, 175, 22, RAYWHITE);
     draw_button(btn_easy, mouse_pos, false, 28);
     draw_button(btn_medium, mouse_pos, false, 28);
     draw_button(btn_hard, mouse_pos, false, 28);
 }
 
 void UI::draw_ending(const Board &board) {
-    Vector2 mouse_pos = GetMousePosition();
+    Vector2 mouse_pos = get_virtual_mouse();
 
     std::pair<double, double> final_score = scoring(board);
     std::cerr << final_score.first << " " << final_score.second << '\n';
 
     if (final_score.first == final_score.second) {
-        DrawText(TextFormat("Tie"), 500, 33, 22, RAYWHITE);
+        draw_text_hd(TextFormat("Tie"), 500, 33, 28, RAYWHITE);
     }
     else if(final_score.first < final_score.second) {
-        DrawText(TextFormat("White wins by %.1f", final_score.second - final_score.first), 500, 33, 22, RAYWHITE);
+        draw_text_hd(TextFormat("White wins by %.1f", final_score.second - final_score.first), 500, 33, 28, RAYWHITE);
     }
     else {
-        DrawText(TextFormat("Black wins by %.1f", final_score.first - final_score.second), 500, 33, 22, RAYWHITE);
+        draw_text_hd(TextFormat("Black wins by %.1f", final_score.first - final_score.second), 500, 33, 28, RAYWHITE);
     }
 
     draw_button(btn_back_from_end, mouse_pos, false, 36);
 }
 
 void UI::draw_config() {
+    Vector2 mouse_pos = get_virtual_mouse();
+    bool is_fs = IsWindowFullscreen();
 
+    draw_text_hd("SETTINGS", 390, 120, 40, RAYWHITE);
+
+    // Sound Volume section (UI placeholder)
+    draw_text_hd("Sound Volume", 320, 250, 26, RAYWHITE);
+    draw_button(btn_sound_down, mouse_pos, false, 24);
+    const char* vol_text = is_muted ? "Muted" : TextFormat("%d%%", sound_volume);
+    draw_text_hd(vol_text, 660, 252, 24, is_muted ? RED : RAYWHITE);
+    draw_button(btn_sound_up, mouse_pos, false, 24);
+    draw_button(btn_sound_mute, mouse_pos, is_muted, 22);
+
+    // Display Mode section (Windowed / Fullscreen)
+    draw_text_hd("Display Mode", 320, 372, 26, RAYWHITE);
+    draw_button(btn_windowed, mouse_pos, !is_fs, 22);
+    draw_button(btn_fullscreen, mouse_pos, is_fs, 22);
+
+    draw_button(btn_back_config, mouse_pos, false, 26);
 }
 
 void UI::draw_loading() {
-    Vector2 mouse_pos = GetMousePosition();
+    Vector2 mouse_pos = get_virtual_mouse();
 
-    DrawText("Choose a slot to loa", 390, 120, 28, RAYWHITE);
+    draw_text_hd("Choose a slot to load", 390, 120, 32, RAYWHITE);
 
     for (int i = 0; i < 3; i++) {
         draw_button(btn_load_slots[i], mouse_pos, false, 28);
@@ -237,16 +539,16 @@ void UI::draw_loading() {
 }
 
 void UI::draw_saving() {
-    Vector2 mouse_pos = GetMousePosition();
+    Vector2 mouse_pos = get_virtual_mouse();
 
-    DrawText("SAVE GAME", 390, 120, 36, RAYWHITE);
+    draw_text_hd("SAVE GAME", 390, 120, 36, RAYWHITE);
     if (overwrite_slot != -1) {
-        DrawText(TextFormat("Overwrite the saved game in Slot %i?", overwrite_slot + 1), 390, 250, 24, RAYWHITE);
+        draw_text_hd(TextFormat("Overwrite the saved game in Slot %i?", overwrite_slot + 1), 390, 250, 24, RAYWHITE);
         draw_button(btn_confirm_overwrite, mouse_pos, false, 24);
         draw_button(btn_cancel_overwrite, mouse_pos, false, 24);
         return;
     }
-    DrawText("Choose a slot to save.", 390, 175, 20, RAYWHITE);
+    draw_text_hd("Choose a slot to save.", 390, 175, 22, RAYWHITE);
 
     for (int i = 0; i < 3; i++) {
         draw_button(btn_save_slots[i], mouse_pos, false, 28);
@@ -327,6 +629,7 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_config.bounds)) {
+                previous_phase = GamePhase::START;
                 phase = GamePhase::CONFIG;
                 return true;
             }
@@ -403,6 +706,46 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 phase = GamePhase::SAVING;
                 return true;
             }
+            if (CheckCollisionPointRec(mouse_pos, btn_setting_play.bounds)) {
+                previous_phase = GamePhase::PLAYING;
+                phase = GamePhase::CONFIG;
+                return true;
+            }
+            break;
+        case GamePhase::CONFIG:
+            if (CheckCollisionPointRec(mouse_pos, btn_sound_down.bounds)) {
+                sound_volume = std::max(0, sound_volume - 10);
+                if (sound_volume == 0) is_muted = true;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_sound_up.bounds)) {
+                sound_volume = std::min(100, sound_volume + 10);
+                is_muted = false;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_sound_mute.bounds)) {
+                is_muted = !is_muted;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_windowed.bounds)) {
+                if (IsWindowFullscreen()) {
+                    ToggleFullscreen();
+                    SetWindowSize(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+                }
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_fullscreen.bounds)) {
+                if (!IsWindowFullscreen()) {
+                    int monitor = GetCurrentMonitor();
+                    SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
+                    ToggleFullscreen();
+                }
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_back_config.bounds)) {
+                phase = previous_phase;
+                return true;
+            }
             break;
         case GamePhase::GAMEOVER:
             if (CheckCollisionPointRec(mouse_pos, btn_back_from_end.bounds)) {
@@ -410,6 +753,8 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 phase = GamePhase::START;
             }
             break;
+        default:
+            break;
     } 
-   return false;
+    return false;
 }

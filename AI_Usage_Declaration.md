@@ -17,8 +17,14 @@ All usages are listed in the AI Usage Log below.
 | AI08 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Asking | How can I save multiple slots and let user decide which slot | To know about saving | src and include folder |
 | AI09 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | Implementing notice for overwriting saves | To notice user for overwrritng saves | ui.cpp | 
 | AI10 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | change btn_back of ui to btn_back_from_end and add a btn_back_from_play | Implementing back button from playing phase | ui.cpp |
-| AI11 | 2026-11-23 | Le Hong Anh | ChatGPT (GPT-6) | Asking | Minimax algorithm for chess/go play communicate through the board right? | To know about Minimax | cpu.cpp and cpu.h |
-| AI12 | 2026-11-23 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | fix the code for me to include difficulty and gamemode in board instead of in main | To refactor the code | main.cpp and board.cpp | 
-| AI13 | 2026-11-23 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | draw the choose mode in draw_mode in ui.cpp for me | To design the choosing mode menu | ui.cpp |
-| AI14 | 2026-11-23 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | draw the choose difficulty in ui.cpp for me | To design the choosing difficulty mode menu | ui.cpp |
-| AI15 | 2026-11-23 | Le Hong Anh | ChatGPT (GPT-6) | Reviewing | review my code | To review potential bugs | all |
+| AI11 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Asking | Minimax algorithm for chess/go play communicate through the board right? | To know about Minimax | cpu.cpp and cpu.h |
+| AI12 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | fix the code for me to include difficulty and gamemode in board instead of in main | To refactor the code | main.cpp and board.cpp | 
+| AI13 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | draw the choose mode in draw_mode in ui.cpp for me | To design the choosing mode menu | ui.cpp |
+| AI14 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | draw the choose difficulty in ui.cpp for me | To design the choosing difficulty mode menu | ui.cpp |
+| AI15 | 2026-11-13 | Le Hong Anh | ChatGPT (GPT-6) | Reviewing | review my code | To review potential bugs | all |
+| AI16 | 2026-11-13 | Doan Nhat Anh | Gemini 4 Hydrogen | Asking | what's changed since the last time I was here | to know what my teamate changed | all |
+| AI17 | 2026-11-13 | Doan Nhat Anh | Gemini 4 Hydrogen | Asking | don't code, can you explain me about the Minimax algorithm and Alpha-Beta pruning so I can make the Medium and Hard gamemodes| all |
+| AI18 | 2026-11-13 | Doan Nhat Anh | Gemini 4 Hydrogen | Asking | Can you suggest me how I should code the Minimax algorithm and Alpha-beta pruning | cpu.cpp |
+| AI19 | 2026-11-13 | Doan Nhat Anh | Gemini 4 Hydrogen | Asking | my game's resolution is so low, I can see the edges of the circle, especially when changing the board size. Can you help me to improve the resolution of my game, suggest me some codes, libraries, and explain me the code, note where I should use the code (which line) | ui.h and ui.cpp |
+| AI20 | 2026-11-13 | Doan Nhat Anh | Gemini 4 Hydrogen | Asking | How do I put my personal .png file into the game, I want the stones to have the appearence of .png files. Suggest me the code and where should I implement it | ui.h and ui.cpp |
+| AI21 | 2026-11-13 | Doan Nhat Anh | Gemini 4 Hydrogen | Asking | How do I make my game fullscreen, and can switch between windowed and fullscreen | ui.h and ui.cpp |

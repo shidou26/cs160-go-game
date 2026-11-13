@@ -17,6 +17,14 @@ private:
     int padding;
     int grid_width;
 
+    // [HD UPGRADE]: High-resolution Textures for stones, wood board, and crisp custom Font
+    Texture2D black_stone_tex;
+    Texture2D white_stone_tex;
+    Texture2D wood_board_tex;
+    RenderTexture2D render_target;
+    Font ui_font;
+    bool has_custom_font = false;
+
     Color bg_color;
     Color board_wood;
     Color line_color;
@@ -36,6 +44,7 @@ private:
     OptionButton btn_reset;
     OptionButton btn_pass;
     OptionButton btn_save;
+    OptionButton btn_setting_play;
     OptionButton btn_back_from_play;
 
     //Option buttons for saving and loading
@@ -50,8 +59,16 @@ private:
     //Option button during gameover menu
     OptionButton btn_back_from_end; // go back to start screen
 
-    //Option button during config
-    OptionButton btn_check;
+    //Option button during config (Settings)
+    OptionButton btn_sound_down;
+    OptionButton btn_sound_up;
+    OptionButton btn_sound_mute;
+    OptionButton btn_windowed;
+    OptionButton btn_fullscreen;
+    OptionButton btn_back_config;
+    int sound_volume = 80;
+    bool is_muted = false;
+    GamePhase previous_phase = GamePhase::START;
 
     //Option button during choosing mode
     OptionButton btn_pvp;
@@ -66,6 +83,9 @@ private:
     int get_cell_size(const Board &board) const;
     void draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active = false, int font_size = 18) const;
 
+    // [HD UPGRADE]: Helper to render crisp text using high-res custom font instead of default DrawText
+    void draw_text_hd(const char* text, float x, float y, float font_size, Color color) const;
+
 public:
     UI();
 
@@ -76,6 +96,10 @@ public:
      * 
      * @param board 
      */
+    void unload();
+    void begin_render() const;
+    void end_render() const;
+    Vector2 get_virtual_mouse() const;
     void draw(Board &board);
     void draw_starting(const Board &board);
     void draw_ending(const Board &board);
@@ -85,9 +109,9 @@ public:
     void draw_mode();
     void draw_difficulty();
 
-    // Chuyển đổi tọa độ click chuột trên màn hình sang vị trí (row, col) của Board
+    // Convert screen mouse coordinates to Board (row, col) position
     bool screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const;
 
-    // Xử lý khi người chơi nháy chuột vào các nút Option trên giao diện
+    // Handle mouse clicks on UI option buttons
     bool handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board);
 };
