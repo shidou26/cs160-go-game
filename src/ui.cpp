@@ -173,9 +173,9 @@ UI::UI() {
     board_border = (Color){ 170, 124, 70, 255 };
 
     //Init option buttons for starting phase
-    btn_new_game  = {{ 100, 100, 300, 100 }, "NEW GAME"};
-    btn_load_game = {{ 100, 250, 300, 100 }, "LOAD GAME"};
-    btn_config    = {{ 100, 400, 300, 100 }, "SETTINGS"};
+    btn_new_game  = {{ 480, 430, 300, 100 }, "NEW GAME"};
+    btn_load_game = {{ 480, 580, 300, 100 }, "LOAD GAME"};
+    btn_config    = {{ 480, 730, 300, 100 }, "SETTINGS"};
 
     //Init option buttons for choosing mode
     btn_pvp = { { 390, 250, 500, 100 }, "Play against Friend" };
@@ -461,7 +461,7 @@ void UI::draw_starting(const Board &board) {
     Vector2 mouse_pos = get_virtual_mouse();
 
     draw_text_hd(TextFormat("Anhs's Game of Go"), 500, 33, 36, RAYWHITE);
-    draw_text_hd(TextFormat("Press H to exit"), 1000, 800, 22, RAYWHITE);
+    draw_text_hd(TextFormat("Press H to exit"), 1080, 900, 20, RAYWHITE);
 
     draw_button(btn_new_game, mouse_pos, false, 36);
     draw_button(btn_load_game, mouse_pos, false, 36);
