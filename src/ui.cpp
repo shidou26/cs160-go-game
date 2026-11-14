@@ -173,9 +173,9 @@ UI::UI() {
     board_border = (Color){ 170, 124, 70, 255 };
 
     //Init option buttons for starting phase
-    btn_new_game  = {{ 480, 430, 300, 100 }, "NEW GAME"};
-    btn_load_game = {{ 480, 580, 300, 100 }, "LOAD GAME"};
-    btn_config    = {{ 480, 730, 300, 100 }, "SETTINGS"};
+    btn_new_game  = {{ 140, 590, 1000, 80 }, "New Game"};
+    btn_load_game = {{ 140, 690, 1000, 80 }, "Load Game"};
+    btn_config    = {{ 140, 790, 1000, 80 }, "Settings"};
 
     //Init option buttons for choosing mode
     btn_pvp = { { 390, 250, 500, 100 }, "Play against Friend" };
@@ -210,7 +210,7 @@ UI::UI() {
     btn_save_slots[0] = { { 390, 220, 500, 80 }, "Save to Slot 1" };
     btn_save_slots[1] = { { 390, 330, 500, 80 }, "Save to Slot 2" };
     btn_save_slots[2] = { { 390, 440, 500, 80 }, "Save to Slot 3" };
-    btn_back_save = { { 390, 650, 500, 60 }, "Back to game" };
+    btn_back_save = { { 390, 650, 500, 60 }, "Return to game" };
     btn_confirm_overwrite = { { 390, 400, 230, 60 }, "Overwrite" };
     btn_cancel_overwrite = { { 660, 400, 230, 60 }, "Cancel" };
 
@@ -218,7 +218,7 @@ UI::UI() {
     btn_load_slots[0] = { { 390, 220, 500, 80 }, "Load Slot 1" };
     btn_load_slots[1] = { { 390, 330, 500, 80 }, "Load Slot 2" };
     btn_load_slots[2] = { { 390, 440, 500, 80 }, "Load Slot 3" };
-    btn_back_load = { { 390, 650, 500, 60 }, "Back to title screen" };
+    btn_back_load = { { 390, 650, 500, 60 }, "Return to title screen" };
 
     //Init option buttons for gameover phase
     btn_back_from_end = { { 380, 250, 500, 200 }, "Return to title screen"};
@@ -457,11 +457,10 @@ void UI::draw(Board &board) {
 }
 
 void UI::draw_starting(const Board &board) {
-    (void)board;
     Vector2 mouse_pos = get_virtual_mouse();
 
-    draw_text_hd(TextFormat("Anhs's Game of Go"), 500, 33, 36, RAYWHITE);
-    draw_text_hd(TextFormat("Press H to exit"), 1080, 900, 20, RAYWHITE);
+    draw_text_hd(TITLE, 310, 280, 150, RAYWHITE);
+    draw_text_hd("Press H to exit", 1120, 920, 20, RAYWHITE);
 
     draw_button(btn_new_game, mouse_pos, false, 36);
     draw_button(btn_load_game, mouse_pos, false, 36);

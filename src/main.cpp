@@ -9,7 +9,7 @@
 int main() {
     //Setup
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-    InitWindow(1280, 960, "Anhs's Game of Go");
+    InitWindow(1280, 960, TITLE);
     SetTargetFPS(60);
 
     //Set game icon
@@ -28,7 +28,6 @@ int main() {
                 Vector2 mouse_pos = user_interface.get_virtual_mouse();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
-            if (phase != GamePhase::SAVING && phase != GamePhase::LOADING) continue;
 
             user_interface.begin_render();
 

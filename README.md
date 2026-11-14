@@ -55,3 +55,6 @@ Game.exe
 # Run on Linux
 ./Game
 ```
+# Technology Stack
+
+# Credit
