@@ -122,7 +122,9 @@ int main() {
             user_interface.end_render();
         }
     }
+
     user_interface.unload();
     CloseWindow();
+    
     return 0;
 }
