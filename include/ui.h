@@ -94,12 +94,12 @@ private:
 
 public:
     int sound_volume = 80;
-    int music_volume = 80;
+    int music_volume = 50;
     int master_volume = 80;
     bool is_muted_sound = false;
     bool is_muted_music = false;
     bool is_muted_master = false;
-    
+
     UI();
 
     Color get_background_color() const;

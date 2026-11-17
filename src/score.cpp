@@ -7,13 +7,15 @@
 std::pair<double, double> scoring(const Board &current_board) {
     double black_point = current_board.get_captured(1);
     double white_point = KOMI + current_board.get_captured(0);
+    int board_size = current_board.get_size();
 
     bool visisted[BOARD_SIZE][BOARD_SIZE]{};
-    for(int i = 0; i < BOARD_SIZE; i++) {
-        for(int j = 0; j < BOARD_SIZE; j++) {
+    for(int i = 0; i < board_size; i++) {
+        for(int j = 0; j < board_size; j++) {
             if(!visisted[i][j] && current_board.get_state(i, j) == StoneType::EMPTY) {
                 std::queue<std::pair<int, int>> q;
                 q.emplace(i, j);
+                visisted[i][j] = true;
                 
                 bool touch_black = false, touch_white = false;
                 int point = 0;
@@ -23,8 +25,8 @@ std::pair<double, double> scoring(const Board &current_board) {
                     point++;
 
                     for(int d = 0; d < 4; d++) {
-                        int x = i + direction_x[d];
-                        int y = j + direction_y[d];
+                        int x = u + direction_x[d];
+                        int y = v + direction_y[d];
                         
                         if(current_board.in_board(x, y)) {
                             if(current_board.get_state(x, y) == StoneType::BLACKSTONE) touch_black = true;

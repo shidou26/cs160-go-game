@@ -31,12 +31,3 @@ int add_move(Board &current_board, Move new_move);
  * @return std::pair<int, int> 
  */
 std::pair<int, int> check_ko_rule(Board &current_board);
-
-/**
- * @brief Check if this move will make a KO threat
- * 
- * @param new_move 
- * @return true 
- * @return false 
- */
-bool check_ko_threat(Board &current_board, Move new_move);

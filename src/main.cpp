@@ -20,6 +20,9 @@ int main() {
     //Set game soundeffect and soundtrack
     InitAudioDevice();
     Sound stone_sound = LoadSound("assets/sfx/go_stone_1.wav");
+    Sound click_sound = LoadSound("assets/sfx/click.wav");
+    Sound load_save_sound = LoadSound("assets/sfx/load_save.wav");
+    Sound end_sound = LoadSound("assets/sfx/end.wav");
     Music music = LoadMusicStream("assets/soundtrack/song_1.mp3");
     PlayMusicStream(music);
 
@@ -31,6 +34,9 @@ int main() {
     while (!WindowShouldClose()) {
         //Sound handler
         UpdateMusicStream(music);
+        SetMasterVolume(user_interface.is_muted_master ? 0.0 : user_interface.master_volume / 100.0);
+        SetSoundVolume(stone_sound, user_interface.is_muted_sound ? 0.0 : user_interface.sound_volume / 100.0);
+        SetMusicVolume(music, user_interface.is_muted_music ? 0.0 : user_interface.music_volume / 100.0);
 
         if (phase == GamePhase::SAVING) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
