@@ -22,7 +22,8 @@ enum GamePhase {
     SAVING,
     LOADING,
     MODE,
-    DIFFICULTY
+    DIFFICULTY,
+    CHOOSING_SIZE
 };
 
 enum GameMode {

@@ -16,8 +16,6 @@ namespace {
 const int VIRTUAL_WIDTH = 1280;
 const int VIRTUAL_HEIGHT = 960;
 
-// [HD UPGRADE]: Generate high-resolution 3D stone texture (512x512) with smooth anti-aliased edges
-// and glossy specular highlight matching the reference style
 Texture2D create_hd_stone_texture(bool is_black) {
     const int tex_size = 512;
     Image img = GenImageColor(tex_size, tex_size, BLANK);
@@ -199,11 +197,17 @@ UI::UI() {
     btn_back_from_play = { { 1044, 25, 88, 40 }, "Back" };
 
     //Init option buttons for config (Settings) phase
-    btn_sound_down  = { { 560, 240, 60, 50 }, "-" };
-    btn_sound_up    = { { 760, 240, 60, 50 }, "+" };
-    btn_sound_mute  = { { 840, 240, 120, 50 }, "Mute" };
-    btn_windowed    = { { 560, 360, 190, 55 }, "Windowed" };
-    btn_fullscreen  = { { 770, 360, 190, 55 }, "Fullscreen" };
+    btn_master_down = { { 560, 240, 60, 50 }, "-" };
+    btn_master_up   = { { 760, 240, 60, 50 }, "+" };
+    btn_master_mute = { { 840, 240, 120, 50 }, "Mute" };
+    btn_music_down  = { { 560, 330, 60, 50 }, "-" };
+    btn_music_up    = { { 760, 330, 60, 50 }, "+" };
+    btn_music_mute  = { { 840, 330, 120, 50 }, "Mute" };
+    btn_sound_down  = { { 560, 420, 60, 50 }, "-" };
+    btn_sound_up    = { { 760, 420, 60, 50 }, "+" };
+    btn_sound_mute  = { { 840, 420, 120, 50 }, "Mute" };
+    btn_windowed    = { { 560, 530, 190, 55 }, "Windowed" };
+    btn_fullscreen  = { { 770, 530, 190, 55 }, "Fullscreen" };
     btn_back_config = { { 390, 650, 500, 60 }, "Back" };
 
     //Init option buttons for saving phase
@@ -336,9 +340,6 @@ void UI::draw(Board &board) {
         draw_text_hd("Turn: WHITE", 30, 33, 24, RAYWHITE);
     }
 
-    draw_button(btn_size9,  mouse_pos, board_size == 9);
-    draw_button(btn_size13, mouse_pos, board_size == 13);
-    draw_button(btn_size19, mouse_pos, board_size == 19);
     draw_button(btn_undo,   mouse_pos, false);
     draw_button(btn_redo,   mouse_pos, false);
     draw_button(btn_reset,  mouse_pos, false);
@@ -479,10 +480,18 @@ void UI::draw_difficulty() {
     Vector2 mouse_pos = get_virtual_mouse();
 
     draw_text_hd("CHOOSE DIFFICULTY", 390, 120, 36, RAYWHITE);
-    draw_text_hd("Choose the computer's difficulty.", 390, 175, 22, RAYWHITE);
     draw_button(btn_easy, mouse_pos, false, 28);
     draw_button(btn_medium, mouse_pos, false, 28);
     draw_button(btn_hard, mouse_pos, false, 28);
+}
+
+void UI::draw_choosing_board_size(const Board &board) {
+    Vector2 mouse_pos = get_virtual_mouse();
+    int board_size = board.get_size();
+
+    draw_button(btn_size9,  mouse_pos, board_size == 9);
+    draw_button(btn_size13, mouse_pos, board_size == 13);
+    draw_button(btn_size19, mouse_pos, board_size == 19);
 }
 
 void UI::draw_ending(const Board &board) {
@@ -510,16 +519,30 @@ void UI::draw_config() {
 
     draw_text_hd("SETTINGS", 390, 120, 40, RAYWHITE);
 
-    // Sound Volume section (UI placeholder)
-    draw_text_hd("Sound Volume", 320, 250, 26, RAYWHITE);
+    // Audio volume rows
+    draw_text_hd("Master Volume", 320, 250, 26, RAYWHITE);
+    draw_button(btn_master_down, mouse_pos, false, 24);
+    draw_text_hd(is_muted_master ? "Muted" : TextFormat("%d%%", master_volume),
+                 660, 252, 24, is_muted_master ? RED : RAYWHITE);
+    draw_button(btn_master_up, mouse_pos, false, 24);
+    draw_button(btn_master_mute, mouse_pos, is_muted_master, 22);
+
+    draw_text_hd("Music Volume", 320, 340, 26, RAYWHITE);
+    draw_button(btn_music_down, mouse_pos, false, 24);
+    draw_text_hd(is_muted_music ? "Muted" : TextFormat("%d%%", music_volume),
+                 660, 342, 24, is_muted_music ? RED : RAYWHITE);
+    draw_button(btn_music_up, mouse_pos, false, 24);
+    draw_button(btn_music_mute, mouse_pos, is_muted_music, 22);
+
+    draw_text_hd("Sound Effects", 320, 430, 26, RAYWHITE);
     draw_button(btn_sound_down, mouse_pos, false, 24);
-    const char* vol_text = is_muted ? "Muted" : TextFormat("%d%%", sound_volume);
-    draw_text_hd(vol_text, 660, 252, 24, is_muted ? RED : RAYWHITE);
+    draw_text_hd(is_muted_sound ? "Muted" : TextFormat("%d%%", sound_volume),
+                 660, 432, 24, is_muted_sound ? RED : RAYWHITE);
     draw_button(btn_sound_up, mouse_pos, false, 24);
-    draw_button(btn_sound_mute, mouse_pos, is_muted, 22);
+    draw_button(btn_sound_mute, mouse_pos, is_muted_sound, 22);
 
     // Display Mode section (Windowed / Fullscreen)
-    draw_text_hd("Display Mode", 320, 372, 26, RAYWHITE);
+    draw_text_hd("Display Mode", 320, 542, 26, RAYWHITE);
     draw_button(btn_windowed, mouse_pos, !is_fs, 22);
     draw_button(btn_fullscreen, mouse_pos, is_fs, 22);
 
@@ -623,8 +646,7 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             break;
         case GamePhase::START:
             if (CheckCollisionPointRec(mouse_pos, btn_new_game.bounds)) {
-                phase = GamePhase::MODE;
-                board.reset(19);
+                phase = GamePhase::CHOOSING_SIZE;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_config.bounds)) {
@@ -634,6 +656,23 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             }
             if (CheckCollisionPointRec(mouse_pos, btn_load_game.bounds)) {
                 phase = GamePhase::LOADING;
+                return true;
+            }
+            break;
+        case GamePhase::CHOOSING_SIZE:
+            if (CheckCollisionPointRec(mouse_pos, btn_size9.bounds)) {
+                board.reset(9);
+                phase = GamePhase::MODE;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_size13.bounds)) {
+                board.reset(13);
+                phase = GamePhase::MODE;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_size19.bounds)) {
+                board.reset(19);
+                phase = GamePhase::MODE;
                 return true;
             }
             break;
@@ -671,18 +710,6 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 phase = GamePhase::START;
                 return true;
             }
-            if (CheckCollisionPointRec(mouse_pos, btn_size9.bounds)) {
-                board.reset(9);
-                return true;
-            }
-            if (CheckCollisionPointRec(mouse_pos, btn_size13.bounds)) {
-                board.reset(13);
-                return true;
-            }
-            if (CheckCollisionPointRec(mouse_pos, btn_size19.bounds)) {
-                board.reset(19);
-                return true;
-            }
             if (CheckCollisionPointRec(mouse_pos, btn_undo.bounds)) {
                 board.undo_move(true);
                 return true;
@@ -692,7 +719,7 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_reset.bounds)) {
-                board.reset();
+                board.reset(board.get_size());
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_pass.bounds)) {
@@ -712,18 +739,46 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             }
             break;
         case GamePhase::CONFIG:
+            if (CheckCollisionPointRec(mouse_pos, btn_master_down.bounds)) {
+                master_volume = std::max(0, master_volume - 10);
+                if (master_volume == 0) is_muted_master = true;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_master_up.bounds)) {
+                master_volume = std::min(100, master_volume + 10);
+                is_muted_master = false;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_master_mute.bounds)) {
+                is_muted_master = !is_muted_master;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_music_down.bounds)) {
+                music_volume = std::max(0, music_volume - 10);
+                if (music_volume == 0) is_muted_music = true;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_music_up.bounds)) {
+                music_volume = std::min(100, music_volume + 10);
+                is_muted_music = false;
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_music_mute.bounds)) {
+                is_muted_music = !is_muted_music;
+                return true;
+            }
             if (CheckCollisionPointRec(mouse_pos, btn_sound_down.bounds)) {
                 sound_volume = std::max(0, sound_volume - 10);
-                if (sound_volume == 0) is_muted = true;
+                if (sound_volume == 0) is_muted_sound = true;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_sound_up.bounds)) {
                 sound_volume = std::min(100, sound_volume + 10);
-                is_muted = false;
+                is_muted_sound = false;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_sound_mute.bounds)) {
-                is_muted = !is_muted;
+                is_muted_sound = !is_muted_sound;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_windowed.bounds)) {
@@ -748,7 +803,7 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             break;
         case GamePhase::GAMEOVER:
             if (CheckCollisionPointRec(mouse_pos, btn_back_from_end.bounds)) {
-                board.reset();
+                board.reset(board.get_size());
                 phase = GamePhase::START;
             }
             break;

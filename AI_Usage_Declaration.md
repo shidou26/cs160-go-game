@@ -29,3 +29,6 @@ All usages are listed in the AI Usage Log below.
 | AI20 | 2026-11-13 | Doan Nhat Anh | Gemini 4 Hydrogen | Asking | How do I put my personal .png file into the game, I want the stones to have the appearence of .png files. Suggest me the code and where should I implement it | ui.h and ui.cpp |
 | AI21 | 2026-11-13 | Doan Nhat Anh | Gemini 4 Hydrogen | Asking | How do I make my game fullscreen, and can switch between windowed and fullscreen | ui.h and ui.cpp |
 | AI22 | 2026-11-14 | Le Hong Anh | ChatGPT (GPT-6) | Fixing bug | why tapping the return to title screen in the load slot menu is affecting on the button in start menu | To fix the bug of double click | main.cpp | 
+| AI23 | 2026-11-17 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how audio works in raylib | To learn the audio of raylib | |
+| AI24 | 2026-11-17 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | 
+in the ui.h add for me btn for music, sound, and master audio | To speed up the development | ui.h | 

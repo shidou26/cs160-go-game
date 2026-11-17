@@ -2,7 +2,7 @@
 
 C++ final project for CS160 - Introduction to Computer Science.
 
-# Introduction
+## Introduction
 This project is the Go game written in C++ language, with usage of Raylib library.
 
 ## Features
@@ -29,4 +29,12 @@ Game.exe #To run on Windows
 ./Game #To run on Linux
 ```
 
-# Demo
+## Demo
+
+## Credit
+- [Raylib](https://github.com/raysan5/raylib)
+- [JSON for Modern C++](https://github.com/nlohmann/json)
+- Background music: 
+    - Song 1: Mizuiro - Go Sakabe
+
+The music and imagery displayed in this game are not made or owned by me. All rights are reserved to their respective owners and no copyright infringement is intended.

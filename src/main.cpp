@@ -8,7 +8,7 @@
 
 int main() {
     //Setup
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
+    SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_ALWAYS_RUN);
     InitWindow(1280, 960, TITLE);
     SetTargetFPS(60);
 
@@ -17,25 +17,39 @@ int main() {
     SetWindowIcon(icon);
     UnloadImage(icon);
 
+    //Set game soundeffect and soundtrack
+    InitAudioDevice();
+    Sound stone_sound = LoadSound("assets/sfx/go_stone_1.wav");
+    Music music = LoadMusicStream("assets/soundtrack/song_1.mp3");
+    PlayMusicStream(music);
+
     //Game
     GamePhase phase = GamePhase::START;
     Board board;
     UI user_interface;
 
     while (!WindowShouldClose()) {
-        if (phase == GamePhase::SAVING || phase == GamePhase::LOADING) {
+        //Sound handler
+        UpdateMusicStream(music);
+
+        if (phase == GamePhase::SAVING) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 Vector2 mouse_pos = user_interface.get_virtual_mouse();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
 
             user_interface.begin_render();
-
-            if (phase == GamePhase::SAVING) {
-                user_interface.draw_saving();
-            } else {
-                user_interface.draw_loading();
+            user_interface.draw_saving();
+            user_interface.end_render();
+        }
+        else if(phase == GamePhase::LOADING) {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                user_interface.handle_option_click(mouse_pos, phase, board);
             }
+
+            user_interface.begin_render();
+            user_interface.draw_loading();
             user_interface.end_render();
         }
         else if (phase == GamePhase::CONFIG) {
@@ -43,8 +57,8 @@ int main() {
                 Vector2 mouse_pos = user_interface.get_virtual_mouse();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
-            user_interface.begin_render();
 
+            user_interface.begin_render();
             user_interface.draw_config();
             user_interface.end_render();
         } 
@@ -56,18 +70,28 @@ int main() {
                 Vector2 mouse_pos = user_interface.get_virtual_mouse();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
-            user_interface.begin_render();
 
+            user_interface.begin_render();
             user_interface.draw_starting(board);
             user_interface.end_render();
         } 
+        else if (phase == GamePhase::CHOOSING_SIZE) {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                user_interface.handle_option_click(mouse_pos, phase, board);
+            }
+
+            user_interface.begin_render();
+            user_interface.draw_choosing_board_size(board);
+            user_interface.end_render();
+        }
         else if (phase == GamePhase::MODE) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 Vector2 mouse_pos = user_interface.get_virtual_mouse();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
-            user_interface.begin_render();
 
+            user_interface.begin_render();
             user_interface.draw_mode();
             user_interface.end_render();
         }
@@ -76,8 +100,8 @@ int main() {
                 Vector2 mouse_pos = user_interface.get_virtual_mouse();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
-            user_interface.begin_render();
 
+            user_interface.begin_render();
             user_interface.draw_difficulty();
             user_interface.end_render();
         }
@@ -89,7 +113,9 @@ int main() {
 
                     if (!user_interface.handle_option_click(mouse_pos, phase, board)) {
                         if (user_interface.screen_to_grid(mouse_pos, board, row, col)) {
-                            board.place_stone(row, col);
+                            if (board.place_stone(row, col)) {
+                                PlaySound(stone_sound);
+                            }
                         }
                     }
                 }
@@ -102,11 +128,12 @@ int main() {
 
             if (!board.is_human_turn()) {
                 Move seol = cpu_play(board);
-                board.place_stone(seol.pos_x, seol.pos_y);
+                if (board.place_stone(seol.pos_x, seol.pos_y)) {
+                    PlaySound(stone_sound);
+                }
             }
             
             user_interface.begin_render();
-
             user_interface.draw(board);
             user_interface.end_render();
         } 
@@ -117,13 +144,16 @@ int main() {
             }
 
             user_interface.begin_render();
-
             user_interface.draw_ending(board);
             user_interface.end_render();
         }
     }
 
     user_interface.unload();
+    UnloadSound(stone_sound);
+    UnloadMusicStream(music);
+
+    CloseAudioDevice();
     CloseWindow();
     
     return 0;

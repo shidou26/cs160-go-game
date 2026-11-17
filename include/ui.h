@@ -35,10 +35,12 @@ private:
     OptionButton btn_load_game;
     OptionButton btn_config;
 
-    //Option button during game 
+    //Option button during choosing board size
     OptionButton btn_size9;
     OptionButton btn_size13;
     OptionButton btn_size19;
+
+    //Option button during game 
     OptionButton btn_undo;
     OptionButton btn_redo;
     OptionButton btn_reset;
@@ -60,14 +62,18 @@ private:
     OptionButton btn_back_from_end; // go back to start screen
 
     //Option button during config (Settings)
+    OptionButton btn_master_down;
+    OptionButton btn_master_up;
+    OptionButton btn_master_mute;
+    OptionButton btn_music_down;
+    OptionButton btn_music_up;
+    OptionButton btn_music_mute;
     OptionButton btn_sound_down;
     OptionButton btn_sound_up;
     OptionButton btn_sound_mute;
     OptionButton btn_windowed;
     OptionButton btn_fullscreen;
     OptionButton btn_back_config;
-    int sound_volume = 80;
-    bool is_muted = false;
     GamePhase previous_phase = GamePhase::START;
 
     //Option button during choosing mode
@@ -87,6 +93,13 @@ private:
     void draw_text_hd(const char* text, float x, float y, float font_size, Color color) const;
 
 public:
+    int sound_volume = 80;
+    int music_volume = 80;
+    int master_volume = 80;
+    bool is_muted_sound = false;
+    bool is_muted_music = false;
+    bool is_muted_master = false;
+    
     UI();
 
     Color get_background_color() const;
@@ -104,6 +117,7 @@ public:
     void draw_starting(const Board &board);
     void draw_ending(const Board &board);
     void draw_config();
+    void draw_choosing_board_size(const Board &board);
     void draw_loading();
     void draw_saving();
     void draw_mode();
