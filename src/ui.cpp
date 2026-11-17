@@ -1,3 +1,5 @@
+// AI-assisted: see AI09, AI10, AI13, AI14
+
 #include <iostream>
 #include <utility>
 #include <filesystem>

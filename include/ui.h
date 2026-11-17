@@ -1,3 +1,5 @@
+// AI-assisted: see AI24
+
 #pragma once
 
 #include <raylib.h>

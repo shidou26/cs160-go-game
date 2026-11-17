@@ -1,3 +1,5 @@
+// AI-assisted: see AI12
+
 #include <raylib.h>
 #include <iostream>
 
