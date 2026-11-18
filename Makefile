@@ -1,7 +1,7 @@
 # AI-assisted: see AI01
 
 CXX ?= g++
-SRC = src/main.cpp src/ui.cpp src/board.cpp src/zobrist_hash.cpp src/rule.cpp src/score.cpp src/cpu.cpp
+SRC = src/main.cpp src/ui.cpp src/board.cpp src/zobrist_hash.cpp src/rule.cpp src/score.cpp src/cpu.cpp src/audio.cpp
 CXXFLAGS = -Iinclude -std=c++17
 
 ifeq ($(OS),Windows_NT)

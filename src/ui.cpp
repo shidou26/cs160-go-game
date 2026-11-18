@@ -12,6 +12,7 @@
 #include "../include/rule.h"
 #include "../include/score.h"
 #include "../include/board.h"
+#include "../include/audio.h"
 
 namespace {
 
@@ -490,7 +491,6 @@ void UI::draw_difficulty() {
 void UI::draw_choosing_board_size(const Board &board) {
     Vector2 mouse_pos = get_virtual_mouse();
     int board_size = board.get_size();
-
     draw_button(btn_size9,  mouse_pos, board_size == 9);
     draw_button(btn_size13, mouse_pos, board_size == 13);
     draw_button(btn_size19, mouse_pos, board_size == 19);
@@ -595,19 +595,23 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
         case GamePhase::SAVING:
             if (overwrite_slot != -1) {
                 if (CheckCollisionPointRec(mouse_pos, btn_cancel_overwrite.bounds)) {
+                    Audio::play(SFX::CLICK);
                     overwrite_slot = -1;
                 } else if (CheckCollisionPointRec(mouse_pos, btn_confirm_overwrite.bounds)) {
                     std::string path = "saves/slot_" + std::to_string(overwrite_slot + 1) + ".json";
                     overwrite_slot = -1;
                     if (board.save_game(path)) {
+                        Audio::play(SFX::POSITIVE);
                         phase = GamePhase::PLAYING;
                     } else {
+                        Audio::play(SFX::NEGATIVE);
                         std::cerr << "Could not save to " << path << '\n';
                     }
                 }
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_back_save.bounds)) {
+                Audio::play(SFX::CLICK);
                 phase = GamePhase::PLAYING;
                 return true;
             }
@@ -619,8 +623,10 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                         return true;
                     }
                     if (board.save_game(path)) {
+                        Audio::play(SFX::POSITIVE);
                         phase = GamePhase::PLAYING;
                     } else {
+                        Audio::play(SFX::NEGATIVE);
                         std::cerr << "Could not save to " << path << '\n';
                     }
                     return true;
@@ -629,6 +635,7 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             break;
         case GamePhase::LOADING:
             if (CheckCollisionPointRec(mouse_pos, btn_back_load.bounds)) {
+                Audio::play(SFX::CLICK);
                 phase = GamePhase::START;
                 return true;
             }
@@ -637,9 +644,11 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                     std::string path = "saves/slot_" + std::to_string(i + 1) + ".json";
                     Board loaded = board;
                     if (loaded.load_game(path)) {
+                        Audio::play(SFX::POSITIVE);
                         board = std::move(loaded);
                         phase = board.get_pass() == 2 ? GamePhase::GAMEOVER : GamePhase::PLAYING;
                     } else {
+                        Audio::play(SFX::NEGATIVE);
                         std::cerr << "Could not load " << path << '\n';
                     }
                     return true;
@@ -648,31 +657,37 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             break;
         case GamePhase::START:
             if (CheckCollisionPointRec(mouse_pos, btn_new_game.bounds)) {
+                Audio::play(SFX::CLICK);
                 phase = GamePhase::CHOOSING_SIZE;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_config.bounds)) {
+                Audio::play(SFX::CLICK);
                 previous_phase = GamePhase::START;
                 phase = GamePhase::CONFIG;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_load_game.bounds)) {
+                Audio::play(SFX::CLICK);
                 phase = GamePhase::LOADING;
                 return true;
             }
             break;
         case GamePhase::CHOOSING_SIZE:
             if (CheckCollisionPointRec(mouse_pos, btn_size9.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.reset(9);
                 phase = GamePhase::MODE;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_size13.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.reset(13);
                 phase = GamePhase::MODE;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_size19.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.reset(19);
                 phase = GamePhase::MODE;
                 return true;
@@ -680,11 +695,13 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             break;
         case GamePhase::MODE:
             if (CheckCollisionPointRec(mouse_pos, btn_pvp.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.set_mode(GameMode::PVP);
                 phase = GamePhase::PLAYING;
                 return true;
             } 
             if (CheckCollisionPointRec(mouse_pos, btn_pve.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.set_mode(GameMode::PVE);
                 phase = GamePhase::DIFFICULTY;
                 return true;
@@ -692,16 +709,19 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             break;
         case GamePhase::DIFFICULTY:
             if (CheckCollisionPointRec(mouse_pos, btn_easy.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.set_difficulty(Difficulty::EASY);
                 phase = GamePhase::PLAYING;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_medium.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.set_difficulty(Difficulty::MEDIUM);
                 phase = GamePhase::PLAYING;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_hard.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.set_difficulty(Difficulty::HARD);
                 phase = GamePhase::PLAYING;
                 return true;
@@ -709,32 +729,39 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             break;
         case GamePhase::PLAYING:
             if (CheckCollisionPointRec(mouse_pos, btn_back_from_play.bounds)) {
+                Audio::play(SFX::CLICK);
                 phase = GamePhase::START;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_undo.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.undo_move(true);
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_redo.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.redo_move();
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_reset.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.reset(board.get_size());
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_pass.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.toggle_turn();
                 board.pass_turn();
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_save.bounds)) {
+                Audio::play(SFX::CLICK);
                 overwrite_slot = -1;
                 phase = GamePhase::SAVING;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_setting_play.bounds)) {
+                Audio::play(SFX::CLICK);
                 previous_phase = GamePhase::PLAYING;
                 phase = GamePhase::CONFIG;
                 return true;
@@ -742,48 +769,58 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             break;
         case GamePhase::CONFIG:
             if (CheckCollisionPointRec(mouse_pos, btn_master_down.bounds)) {
+                Audio::play(SFX::CLICK);
                 master_volume = std::max(0, master_volume - 10);
                 if (master_volume == 0) is_muted_master = true;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_master_up.bounds)) {
+                Audio::play(SFX::CLICK);
                 master_volume = std::min(100, master_volume + 10);
                 is_muted_master = false;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_master_mute.bounds)) {
+                Audio::play(SFX::CLICK);
                 is_muted_master = !is_muted_master;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_music_down.bounds)) {
+                Audio::play(SFX::CLICK);
                 music_volume = std::max(0, music_volume - 10);
                 if (music_volume == 0) is_muted_music = true;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_music_up.bounds)) {
+                Audio::play(SFX::CLICK);
                 music_volume = std::min(100, music_volume + 10);
                 is_muted_music = false;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_music_mute.bounds)) {
+                Audio::play(SFX::CLICK);
                 is_muted_music = !is_muted_music;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_sound_down.bounds)) {
+                Audio::play(SFX::CLICK);
                 sound_volume = std::max(0, sound_volume - 10);
                 if (sound_volume == 0) is_muted_sound = true;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_sound_up.bounds)) {
+                Audio::play(SFX::CLICK);
                 sound_volume = std::min(100, sound_volume + 10);
                 is_muted_sound = false;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_sound_mute.bounds)) {
+                Audio::play(SFX::CLICK);
                 is_muted_sound = !is_muted_sound;
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_windowed.bounds)) {
+                Audio::play(SFX::CLICK);
                 if (IsWindowFullscreen()) {
                     ToggleFullscreen();
                     SetWindowSize(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
@@ -791,6 +828,7 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_fullscreen.bounds)) {
+                Audio::play(SFX::CLICK);
                 if (!IsWindowFullscreen()) {
                     int monitor = GetCurrentMonitor();
                     SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
@@ -799,12 +837,14 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_back_config.bounds)) {
+                Audio::play(SFX::CLICK);
                 phase = previous_phase;
                 return true;
             }
             break;
         case GamePhase::GAMEOVER:
             if (CheckCollisionPointRec(mouse_pos, btn_back_from_end.bounds)) {
+                Audio::play(SFX::CLICK);
                 board.reset(board.get_size());
                 phase = GamePhase::START;
             }

@@ -33,3 +33,4 @@ All usages are listed in the AI Usage Log below.
 | AI22 | 2026-11-14 | Le Hong Anh | ChatGPT (GPT-6) | Fixing bug | why tapping the return to title screen in the load slot menu is affecting on the button in start menu | To fix the bug of double click | main.cpp |
 | AI23 | 2026-11-17 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how audio works in raylib | To learn the audio of raylib |  |
 | AI24 | 2026-11-17 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | in the ui.h add for me btn for music, sound, and master audio | To speed up the development | ui.h |
+| AI25 | 2026-11-18 | Le Hong Anh | ChatGPT (GPT-6) | Asking | in the cs160-go-game project, how can handle sound from multiple files without passing too much parameter, i am thinking of creating another file | To ask about the sound handler | main.cpp | 

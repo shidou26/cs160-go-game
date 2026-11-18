@@ -7,6 +7,7 @@
 #include "../include/ui.h"
 #include "../include/helper.h"
 #include "../include/cpu.h"
+#include "../include/audio.h"
 
 int main() {
     //Setup
@@ -20,13 +21,7 @@ int main() {
     UnloadImage(icon);
 
     //Set game soundeffect and soundtrack
-    InitAudioDevice();
-    Sound stone_sound = LoadSound("assets/sfx/go_stone_1.wav");
-    Sound click_sound = LoadSound("assets/sfx/click.wav");
-    Sound load_save_sound = LoadSound("assets/sfx/load_save.wav");
-    Sound end_sound = LoadSound("assets/sfx/end.wav");
-    Music music = LoadMusicStream("assets/soundtrack/song_1.mp3");
-    PlayMusicStream(music);
+    Audio::init();
 
     //Game
     GamePhase phase = GamePhase::START;
@@ -35,10 +30,12 @@ int main() {
 
     while (!WindowShouldClose()) {
         //Sound handler
-        UpdateMusicStream(music);
-        SetMasterVolume(user_interface.is_muted_master ? 0.0 : user_interface.master_volume / 100.0);
-        SetSoundVolume(stone_sound, user_interface.is_muted_sound ? 0.0 : user_interface.sound_volume / 100.0);
-        SetMusicVolume(music, user_interface.is_muted_music ? 0.0 : user_interface.music_volume / 100.0);
+        Audio::update();
+        Audio::set_volume(
+            user_interface.is_muted_master ? 0 : user_interface.master_volume,
+            user_interface.is_muted_sound ? 0 : user_interface.sound_volume,
+            user_interface.is_muted_music ? 0 : user_interface.music_volume
+        );
 
         if (phase == GamePhase::SAVING) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -122,7 +119,7 @@ int main() {
                     if (!user_interface.handle_option_click(mouse_pos, phase, board)) {
                         if (user_interface.screen_to_grid(mouse_pos, board, row, col)) {
                             if (board.place_stone(row, col)) {
-                                PlaySound(stone_sound);
+                                Audio::play(SFX::STONE);
                             }
                         }
                     }
@@ -131,13 +128,14 @@ int main() {
 
             if (board.get_pass() == 2) {
                 phase = GamePhase::GAMEOVER;
+                Audio::play(SFX::END);
                 continue;
             }
 
             if (!board.is_human_turn()) {
                 Move seol = cpu_play(board);
                 if (board.place_stone(seol.pos_x, seol.pos_y)) {
-                    PlaySound(stone_sound);
+                    Audio::play(SFX::STONE);
                 }
             }
             
@@ -158,10 +156,7 @@ int main() {
     }
 
     user_interface.unload();
-    UnloadSound(stone_sound);
-    UnloadMusicStream(music);
-
-    CloseAudioDevice();
+    Audio::shutdown();
     CloseWindow();
     
     return 0;

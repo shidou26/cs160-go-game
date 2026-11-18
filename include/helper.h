@@ -37,6 +37,14 @@ enum Difficulty {
     HARD
 };
 
+enum SFX {
+    STONE,
+    CLICK,
+    POSITIVE,
+    NEGATIVE,
+    END
+};
+
 constexpr int direction_x[4] = {1, 0, -1, 0},
               direction_y[4] = {0, 1, 0, -1};
 
