@@ -736,11 +736,17 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             if (CheckCollisionPointRec(mouse_pos, btn_undo.bounds)) {
                 Audio::play(SFX::CLICK);
                 board.undo_move(true);
+                if (board.get_mode() == GameMode::PVE) {
+                    board.undo_move(true);
+                }
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_redo.bounds)) {
                 Audio::play(SFX::CLICK);
                 board.redo_move();
+                if (board.get_mode() == GameMode::PVE) {
+                    board.redo_move();
+                }
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_reset.bounds)) {

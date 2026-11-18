@@ -27,8 +27,14 @@ int main() {
     GamePhase phase = GamePhase::START;
     Board board;
     UI user_interface;
+    double cpu_turn_started = -1.0;
+    const double CPU_DELAY = 1.5; // seconds
 
     while (!WindowShouldClose()) {
+        if (phase != GamePhase::PLAYING) {
+            cpu_turn_started = -1.0;
+        }
+
         //Sound handler
         Audio::update();
         Audio::set_volume(
@@ -37,6 +43,7 @@ int main() {
             user_interface.is_muted_music ? 0 : user_interface.music_volume
         );
 
+        //Phase handler
         if (phase == GamePhase::SAVING) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 Vector2 mouse_pos = user_interface.get_virtual_mouse();
@@ -133,10 +140,18 @@ int main() {
             }
 
             if (!board.is_human_turn()) {
-                Move seol = cpu_play(board);
-                if (board.place_stone(seol.pos_x, seol.pos_y)) {
-                    Audio::play(SFX::STONE);
+                if (cpu_turn_started < 0.0) {
+                    cpu_turn_started = GetTime();
                 }
+                if (GetTime() - cpu_turn_started >= CPU_DELAY) {
+                    Move seol = cpu_play(board);
+                    if (board.place_stone(seol.pos_x, seol.pos_y)) {
+                        Audio::play(SFX::STONE);
+                    }
+                    cpu_turn_started = -1.0;
+                }
+            } else {
+                cpu_turn_started = -1.0;
             }
             
             user_interface.begin_render();
