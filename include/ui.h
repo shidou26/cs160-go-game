@@ -3,6 +3,7 @@
 #pragma once
 
 #include <raylib.h>
+#include <string>
 
 #include "../include/board.h"
 #include "../include/helper.h"
@@ -73,10 +74,13 @@ private:
     OptionButton btn_sound_down;
     OptionButton btn_sound_up;
     OptionButton btn_sound_mute;
+    OptionButton btn_change_music;
+    OptionButton opt_music[3];
     OptionButton btn_windowed;
     OptionButton btn_fullscreen;
     OptionButton btn_back_config;
     GamePhase previous_phase = GamePhase::START;
+    bool music_dropdown_open = false;
 
     //Option button during choosing mode
     OptionButton btn_pvp;
@@ -95,12 +99,13 @@ private:
     void draw_text_hd(const char* text, float x, float y, float font_size, Color color) const;
 
 public:
-    int sound_volume = 80;
-    int music_volume = 50;
-    int master_volume = 80;
-    bool is_muted_sound = false;
-    bool is_muted_music = false;
-    bool is_muted_master = false;
+    int sound_volume;
+    int music_volume;
+    int master_volume;
+    bool is_muted_sound;
+    bool is_muted_music;
+    bool is_muted_master;
+    int selected_music;
 
     UI();
 
@@ -125,9 +130,15 @@ public:
     void draw_mode();
     void draw_difficulty();
 
-    // Convert screen mouse coordinates to Board (row, col) position
+    //Convert screen mouse coordinates to Board (row, col) position
     bool screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const;
 
-    // Handle mouse clicks on UI option buttons
+    //Handle mouse clicks on UI option buttons
     bool handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board);
+
+    //Save settings
+    bool save_setting(const std::string &path);
+
+    //Load settings
+    bool load_setting(const std::string &path);
 };

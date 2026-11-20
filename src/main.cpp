@@ -20,13 +20,17 @@ int main() {
     SetWindowIcon(icon);
     UnloadImage(icon);
 
+    //Interface
+    UI user_interface;
+    user_interface.load_setting("saves/config.json");
+
     //Set game soundeffect and soundtrack
     Audio::init();
-
+    Audio::change_music(user_interface.selected_music);
+    
     //Game
     GamePhase phase = GamePhase::START;
     Board board;
-    UI user_interface;
     double cpu_turn_started = -1.0;
     const double CPU_DELAY = 1.5; // seconds
 
@@ -67,7 +71,9 @@ int main() {
         else if (phase == GamePhase::CONFIG) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 Vector2 mouse_pos = user_interface.get_virtual_mouse();
-                user_interface.handle_option_click(mouse_pos, phase, board);
+                if (user_interface.handle_option_click(mouse_pos, phase, board)) {
+                    user_interface.save_setting("saves/config.json");
+                }
             }
 
             user_interface.begin_render();

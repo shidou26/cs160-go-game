@@ -209,6 +209,10 @@ UI::UI() {
     btn_sound_down  = { { 560, 420, 60, 50 }, "-" };
     btn_sound_up    = { { 760, 420, 60, 50 }, "+" };
     btn_sound_mute  = { { 840, 420, 120, 50 }, "Mute" };
+    btn_change_music = { { 980, 330, 230, 50 }, "Change Music" };
+    opt_music[0] = { { 980, 385, 230, 50 }, "Song 1" };
+    opt_music[1] = { { 980, 435, 230, 50 }, "Song 2" };
+    opt_music[2] = { { 980, 485, 230, 50 }, "Song 3" };
     btn_windowed    = { { 560, 530, 190, 55 }, "Windowed" };
     btn_fullscreen  = { { 770, 530, 190, 55 }, "Fullscreen" };
     btn_back_config = { { 390, 650, 500, 60 }, "Back" };
@@ -521,7 +525,7 @@ void UI::draw_config() {
 
     draw_text_hd("SETTINGS", 390, 120, 40, RAYWHITE);
 
-    // Audio volume rows
+    //Audio
     draw_text_hd("Master Volume", 320, 250, 26, RAYWHITE);
     draw_button(btn_master_down, mouse_pos, false, 24);
     draw_text_hd(is_muted_master ? "Muted" : TextFormat("%d%%", master_volume),
@@ -543,7 +547,14 @@ void UI::draw_config() {
     draw_button(btn_sound_up, mouse_pos, false, 24);
     draw_button(btn_sound_mute, mouse_pos, is_muted_sound, 22);
 
-    // Display Mode section (Windowed / Fullscreen)
+    draw_button(btn_change_music, mouse_pos, music_dropdown_open, 22);
+    if (music_dropdown_open) {
+        for (int i = 0; i < 3; i++) {
+            draw_button(opt_music[i], mouse_pos, selected_music == i + 1, 22);
+        }
+    }
+
+    //Resolution
     draw_text_hd("Display Mode", 320, 542, 26, RAYWHITE);
     draw_button(btn_windowed, mouse_pos, !is_fs, 22);
     draw_button(btn_fullscreen, mouse_pos, is_fs, 22);
@@ -774,6 +785,26 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             }
             break;
         case GamePhase::CONFIG:
+            if (CheckCollisionPointRec(mouse_pos, btn_change_music.bounds)) {
+                Audio::play(SFX::CLICK);
+                music_dropdown_open = 1 - music_dropdown_open;
+                return true;
+            }
+            if (music_dropdown_open) {
+                music_dropdown_open = false;
+                for (int i = 0; i < 3; i++) {
+                    if (CheckCollisionPointRec(mouse_pos, opt_music[i].bounds)) {
+                        Audio::play(SFX::CLICK);
+                        if (selected_music != i + 1) {
+                            selected_music = i + 1;
+                            selected_music = i + 1;
+                            Audio::change_music(selected_music);
+                        }
+                        return true;
+                    }
+                }
+                return true;
+            }
             if (CheckCollisionPointRec(mouse_pos, btn_master_down.bounds)) {
                 Audio::play(SFX::CLICK);
                 master_volume = std::max(0, master_volume - 10);
@@ -859,4 +890,70 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             break;
     } 
     return false;
+}
+
+bool UI::save_setting(const std::string &path) {
+    try {
+        json data = {
+            {"selected_music", this->selected_music},
+            {"sound_volume", this->sound_volume},
+            {"music_volume", this->music_volume},
+            {"master_volume", this->master_volume},
+            {"is_muted_sound", this->is_muted_sound},
+            {"is_muted_music", this->is_muted_music},
+            {"is_muted_master", this->is_muted_master}
+        };
+        
+        std::ofstream stream(path);
+        stream << data.dump(4);
+        stream.close();
+
+        return true;
+    }
+    catch(std::exception) {
+        return false;
+    }
+}
+
+bool UI::load_setting(const std::string &path) {
+    try {
+        std::filesystem::create_directories(std::filesystem::path(path).parent_path());
+        std::ifstream stream(path);
+
+        if (!stream.is_open()) {
+            json default_data = {
+                {"selected_music", 3},
+                {"sound_volume", 80},
+                {"music_volume", 50},
+                {"master_volume", 80},
+                {"is_muted_sound", false},
+                {"is_muted_music", false},
+                {"is_muted_master", false}
+            };
+            
+            std::ofstream outstream(path);
+            outstream << default_data.dump(4);
+            outstream.close();
+        }
+        
+        stream.clear();
+        stream.open(path);
+        
+        json data;
+        stream >> data;
+        stream.close();
+        
+        data.at("selected_music").get_to(this->selected_music);
+        data.at("sound_volume").get_to(this->sound_volume);
+        data.at("music_volume").get_to(this->music_volume);
+        data.at("master_volume").get_to(this->master_volume);
+        data.at("is_muted_sound").get_to(this->is_muted_sound);
+        data.at("is_muted_music").get_to(this->is_muted_music);            
+        data.at("is_muted_master").get_to(this->is_muted_master);
+
+        return true;
+    } 
+    catch(std::exception) {
+        return false;
+    }
 }

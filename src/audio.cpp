@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <string> 
 
 #include "../include/audio.h"
 
@@ -9,14 +10,17 @@ namespace Audio {
     void init() {
         InitAudioDevice();
 
-        music = LoadMusicStream("assets/soundtrack/song_1.mp3");
-        PlayMusicStream(music);
-
         sounds[0] = LoadSound("assets/sfx/go_stone_1.wav");
         sounds[1] = LoadSound("assets/sfx/click.wav");
         sounds[2] = LoadSound("assets/sfx/positive.wav");
         sounds[3] = LoadSound("assets/sfx/negative.wav");
         sounds[4] = LoadSound("assets/sfx/end.wav");
+    }
+
+    void change_music(int id) {
+        UnloadMusicStream(music);
+        music = LoadMusicStream(("assets/soundtrack/song_" + std::to_string(id) + ".mp3").c_str());
+        PlayMusicStream(music);
     }
 
     void play(int id) {

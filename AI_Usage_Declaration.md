@@ -36,3 +36,5 @@ All usages are listed in the AI Usage Log below.
 | AI25 | 2026-11-18 | Le Hong Anh | ChatGPT (GPT-6) | Asking | in the cs160-go-game project, how can handle sound from multiple files without passing too much parameter, i am thinking of creating another file | To ask about the sound handler |  |
 | AI26 | 2026-11-18 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how can i pause the cpu move | To make artificial move |  |
 | AI27 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Asking | can you hint me an approach to tackle the problem of cannot undo pass | To handle the problem of cannot undo pass |  |
+| AI28 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how can i create a dropdown for change_music feature | To make a dropdown for music configuration | |
+| AI29 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how can i tackle the autosave, should i put in the exit of the game or after config is open | To autosave configuration | |
