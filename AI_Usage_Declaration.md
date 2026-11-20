@@ -39,3 +39,5 @@ All usages are listed in the AI Usage Log below.
 | AI28 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how can i create a dropdown for change_music feature | To make a dropdown for music configuration | |
 | AI29 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how can i tackle the autosave, should i put in the exit of the game or after config is open | To autosave configuration | |
 | AI30 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | update the current makefile to suport MacOS | To suport MacOS make | Makefile |
+| AI31 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | center the title in draw_starting and put the Press H to exit to the right corner | To center the uis | ui.cpp |
+| AI32 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | Reapply the font for text | To apply font on each type of text | ui.cpp | 

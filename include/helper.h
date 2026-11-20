@@ -6,7 +6,7 @@
 #define START_X 160
 #define START_Y 160
 #define PADDING 50
-#define TITLE "Anh's Baduk"
+#define TITLE "ANH'S BADUK"
 
 enum StoneType {
     EMPTY = '.',

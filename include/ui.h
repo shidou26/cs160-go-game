@@ -20,12 +20,12 @@ private:
     int padding;
     int grid_width;
 
-    // [HD UPGRADE]: High-resolution Textures for stones, wood board, and crisp custom Font
     Texture2D black_stone_tex;
     Texture2D white_stone_tex;
     Texture2D wood_board_tex;
-    Font ui_font;
-    bool has_custom_font = false;
+
+    //Font
+    Font title_font, heading_font, button_font, label_font, body_font;
 
     Color bg_color;
     Color board_wood;
@@ -92,8 +92,6 @@ private:
     int get_cell_size(const Board &board) const;
     void draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active = false, int font_size = 18) const;
 
-    // [HD UPGRADE]: Helper to render crisp text using high-res custom font instead of default DrawText
-    void draw_text_hd(const char* text, float x, float y, float font_size, Color color) const;
 
 public:
     int sound_volume;

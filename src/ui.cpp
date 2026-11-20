@@ -1,4 +1,4 @@
-// AI-assisted: see AI09, AI10, AI13, AI14
+// AI-assisted: see AI09, AI10, AI13, AI14, AI31, AI32
 
 #include <iostream>
 #include <utility>
@@ -6,6 +6,7 @@
 #include <cmath>
 #include <algorithm>
 #include <vector>
+#include <string> 
 
 #include "../include/ui.h"
 #include "../include/helper.h"
@@ -138,25 +139,16 @@ UI::UI() {
     white_stone_tex = create_hd_stone_texture(false);
     wood_board_tex  = create_hd_wood_texture();
 
-    // [HD UPGRADE]: Load system TrueType font at large size (64px) for crisp, non-pixelated text
-    const char* font_paths[] = {
-        "C:/Windows/Fonts/segoeuib.ttf",
-        "C:/Windows/Fonts/segoeui.ttf",
-        "C:/Windows/Fonts/arialbd.ttf",
-        "C:/Windows/Fonts/arial.ttf"
-    };
-    has_custom_font = false;
-    for (const char* path : font_paths) {
-        if (std::filesystem::exists(path)) {
-            ui_font = LoadFontEx(path, 64, nullptr, 0);
-            if (ui_font.texture.id != 0) {
-                GenTextureMipmaps(&ui_font.texture);
-                SetTextureFilter(ui_font.texture, TEXTURE_FILTER_TRILINEAR);
-                has_custom_font = true;
-                break;
-            }
-        }
-    }
+    title_font = LoadFontEx("assets/fonts/Cinzel-Bold.ttf", 150, nullptr, 0);
+    heading_font = LoadFontEx("assets/fonts/Pretendard-SemiBold.otf", 40, nullptr, 0);
+    button_font = LoadFontEx("assets/fonts/Pretendard-Medium.otf", 36, nullptr, 0);
+    label_font = LoadFontEx("assets/fonts/Pretendard-SemiBold.otf", 26, nullptr, 0);
+    body_font = LoadFontEx("assets/fonts/Pretendard-Regular.otf", 24, nullptr, 0);
+    //algorithm to render better at different sizes
+    SetTextureFilter(heading_font.texture, TEXTURE_FILTER_BILINEAR);
+    SetTextureFilter(button_font.texture, TEXTURE_FILTER_BILINEAR); 
+    SetTextureFilter(body_font.texture, TEXTURE_FILTER_BILINEAR);
+    SetTextureFilter(label_font.texture, TEXTURE_FILTER_BILINEAR); 
 
     start_x = START_X;
     start_y = START_Y;
@@ -183,9 +175,9 @@ UI::UI() {
     btn_hard = { { 390, 550, 500, 100 }, "Hard" };
 
     //Init option buttons for playing phase
-    btn_size9  = { { 240, 25, 88, 40 }, "9x9" };
-    btn_size13 = { { 338, 25, 88, 40 }, "13x13" };
-    btn_size19 = { { 436, 25, 88, 40 }, "19x19" };
+    btn_size9  = { { 390, 250, 500, 100 }, "9x9" };
+    btn_size13 = { { 390, 400, 500, 100 }, "13x13" };
+    btn_size19 = { { 390, 550, 500, 100 }, "19x19" };
     btn_undo   = { { 554, 25, 88, 40 }, "Undo" };
     btn_redo   = { { 652, 25, 88, 40 }, "Redo" };
     btn_reset  = { { 750, 25, 88, 40 }, "Reset" };
@@ -225,7 +217,7 @@ UI::UI() {
     btn_back_load = { { 390, 650, 500, 60 }, "Return to title screen" };
 
     //Init option buttons for gameover phase
-    btn_back_from_end = { { 380, 250, 500, 200 }, "Return to title screen"};
+    btn_back_from_end = { { (GetScreenWidth() - 360.0f) * 0.5f, 250, 360, 64 }, "Return to title screen"};
 }
 
 Color UI::get_background_color() const {
@@ -236,18 +228,11 @@ void UI::unload() {
     UnloadTexture(black_stone_tex);
     UnloadTexture(white_stone_tex);
     UnloadTexture(wood_board_tex);
-    if (has_custom_font) {
-        UnloadFont(ui_font);
-    }
-}
-
-// [HD UPGRADE]: Render high-resolution text using DrawTextEx
-void UI::draw_text_hd(const char* text, float x, float y, float font_size, Color color) const {
-    if (has_custom_font) {
-        DrawTextEx(ui_font, text, { x, y }, font_size, 1.0f, color);
-    } else {
-        DrawText(text, (int)x, (int)y, (int)font_size, color);
-    }
+    UnloadFont(title_font);
+    UnloadFont(heading_font);
+    UnloadFont(button_font);
+    UnloadFont(label_font);
+    UnloadFont(body_font);
 }
 
 int UI::get_cell_size(const Board &board) const {
@@ -264,30 +249,19 @@ void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active,
     Color text_col = is_active ? (Color){ 20, 24, 35, 255 } : RAYWHITE;
     Color border_col = is_active ? RAYWHITE : (Color){ 100, 115, 140, 255 };
 
-    // [HD UPGRADE]: Increase corner roundness segments (16) for smoother button borders
     DrawRectangleRounded(btn.bounds, 0.28f, 16, fill);
     DrawRectangleRoundedLinesEx(btn.bounds, 0.28f, 16, 1.5f, border_col);
 
-    // [HD UPGRADE]: Center and render button text using the HD font
-    if (has_custom_font) {
-        Vector2 text_size = MeasureTextEx(ui_font, btn.label, (float)font_size, 1.0f);
-        draw_text_hd(
-            btn.label,
-            btn.bounds.x + (btn.bounds.width - text_size.x) * 0.5f,
-            btn.bounds.y + (btn.bounds.height - text_size.y) * 0.5f,
-            (float)font_size,
-            text_col
-        );
-    } else {
-        int text_weight = MeasureText(btn.label, font_size);
-        DrawText(
-            btn.label,
-            (int)(btn.bounds.x + (btn.bounds.width - text_weight) / 2),
-            (int)(btn.bounds.y + (btn.bounds.height - font_size) / 2),
-            font_size,
-            text_col
-        );
-    }
+    Vector2 text_size = MeasureTextEx(button_font, btn.label, (float)font_size, 1.0f);
+    DrawTextEx(
+        button_font,
+        btn.label,
+        {btn.bounds.x + (btn.bounds.width - text_size.x) * 0.5f,
+        btn.bounds.y + (btn.bounds.height - text_size.y) * 0.5f},
+        (float)font_size,
+        1.0f,
+        text_col
+    );
 }
 
 void UI::draw(Board &board) {
@@ -296,12 +270,14 @@ void UI::draw(Board &board) {
     int actual_grid_width = (board_size - 1) * cell_size;
     Vector2 mouse_pos = GetMousePosition();
 
-    // 1. Draw current turn info and Option buttons using the HD font
-    if (board.get_turn() == 1) {
-        draw_text_hd("Turn: BLACK", 30, 33, 24, RAYWHITE);
-    } else {
-        draw_text_hd("Turn: WHITE", 30, 33, 24, RAYWHITE);
-    }
+    DrawTextEx(
+        label_font, 
+        board.get_turn() == 1 ? "Turn: BLACK" : "Turn: WHITE", 
+        {30, 33}, 
+        24, 
+        1.0f, 
+        RAYWHITE
+    );
 
     draw_button(btn_undo,   mouse_pos, false);
     draw_button(btn_redo,   mouse_pos, false);
@@ -311,8 +287,23 @@ void UI::draw(Board &board) {
     draw_button(btn_back_from_play, mouse_pos, false);
     draw_button(btn_setting_play, mouse_pos, false);
 
-    draw_text_hd(TextFormat("Black: %i", board.get_captured(1)), 1145, 28, 24, RAYWHITE);
-    draw_text_hd(TextFormat("White: %i", board.get_captured(0)), 1145, 62, 24, RAYWHITE);
+    DrawTextEx(
+        label_font, 
+        TextFormat("Black: %i", board.get_captured(1)), 
+        {1145, 28}, 
+        24, 
+        1.0f,
+        RAYWHITE
+    );
+
+    DrawTextEx(
+        label_font, 
+        TextFormat("White: %i", board.get_captured(0)), 
+        {1145, 62}, 
+        24, 
+        1.0f,
+        RAYWHITE
+    );
 
     // 2. [HD UPGRADE]: Draw realistic wooden board (Drop shadow + 3D border + HD wood grain texture)
     Rectangle board_rect = { 
@@ -445,8 +436,17 @@ void UI::draw(Board &board) {
 void UI::draw_starting(const Board &board) {
     Vector2 mouse_pos = GetMousePosition();
 
-    draw_text_hd(TITLE, 310, 280, 150, RAYWHITE);
-    draw_text_hd("Press H to exit", 1120, 920, 20, RAYWHITE);
+    Vector2 title_size = MeasureTextEx(title_font, TITLE, 150, 1.0f);
+    DrawTextEx(title_font, TITLE,
+        {(GetScreenWidth() - title_size.x) * 0.5f, 280},
+        150, 1.0f, RAYWHITE);
+
+    const float edge_padding = 20.0f;
+    Vector2 hint_size = MeasureTextEx(body_font, "Press H to exit", 20, 1.0f);
+    DrawTextEx(body_font, "Press H to exit",
+        {GetScreenWidth() - hint_size.x - edge_padding,
+         GetScreenHeight() - hint_size.y - edge_padding},
+        20, 1.0f, RAYWHITE);
 
     draw_button(btn_new_game, mouse_pos, false, 36);
     draw_button(btn_load_game, mouse_pos, false, 36);
@@ -455,27 +455,25 @@ void UI::draw_starting(const Board &board) {
 
 void UI::draw_mode() {
     Vector2 mouse_pos = GetMousePosition();
-
-    draw_text_hd("CHOOSE GAME MODE", 390, 120, 36, RAYWHITE);
-    draw_button(btn_pvp, mouse_pos, false, 28);
-    draw_button(btn_pve, mouse_pos, false, 28);
+    DrawTextEx(heading_font, "CHOOSE GAME MODE", {390, 120}, 36, 1.0f, RAYWHITE);
+    draw_button(btn_pvp, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_pvp.bounds), 28);
+    draw_button(btn_pve, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_pve.bounds), 28);
 }
 
 void UI::draw_difficulty() {
     Vector2 mouse_pos = GetMousePosition();
-
-    draw_text_hd("CHOOSE DIFFICULTY", 390, 120, 36, RAYWHITE);
-    draw_button(btn_easy, mouse_pos, false, 28);
-    draw_button(btn_medium, mouse_pos, false, 28);
-    draw_button(btn_hard, mouse_pos, false, 28);
+    DrawTextEx(heading_font, "CHOOSE DIFFICULTY", {390, 120}, 36, 1.0f, RAYWHITE);
+    draw_button(btn_easy,   mouse_pos, CheckCollisionPointRec(mouse_pos, btn_easy.bounds), 28);
+    draw_button(btn_medium, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_medium.bounds), 28);
+    draw_button(btn_hard,   mouse_pos, CheckCollisionPointRec(mouse_pos, btn_hard.bounds), 28);
 }
 
 void UI::draw_choosing_board_size(const Board &board) {
     Vector2 mouse_pos = GetMousePosition();
-    int board_size = board.get_size();
-    draw_button(btn_size9,  mouse_pos, board_size == 9);
-    draw_button(btn_size13, mouse_pos, board_size == 13);
-    draw_button(btn_size19, mouse_pos, board_size == 19);
+    DrawTextEx(heading_font, "CHOOSE BOARD SIZE", {390, 120}, 36, 1.0f, RAYWHITE);
+    draw_button(btn_size9,  mouse_pos, CheckCollisionPointRec(mouse_pos, btn_size9.bounds), 28);
+    draw_button(btn_size13, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_size13.bounds), 28);
+    draw_button(btn_size19, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_size19.bounds), 28);
 }
 
 void UI::draw_ending(const Board &board) {
@@ -485,42 +483,39 @@ void UI::draw_ending(const Board &board) {
     // std::cerr << final_score.first << " " << final_score.second << '\n';
 
     if (final_score.first == final_score.second) {
-        draw_text_hd(TextFormat("Tie"), 500, 33, 28, RAYWHITE);
+        DrawTextEx(heading_font, TextFormat("Tie"), {500, 33}, 28, 1.0f, RAYWHITE);
     }
     else if(final_score.first < final_score.second) {
-        draw_text_hd(TextFormat("White wins by %.1f", final_score.second - final_score.first), 500, 33, 28, RAYWHITE);
+        DrawTextEx(heading_font, TextFormat("White wins by %.1f", final_score.second - final_score.first), {500, 33}, 28, 1.0f, RAYWHITE);
     }
     else {
-        draw_text_hd(TextFormat("Black wins by %.1f", final_score.first - final_score.second), 500, 33, 28, RAYWHITE);
+        DrawTextEx(heading_font, TextFormat("Black wins by %.1f", final_score.first - final_score.second), {500, 33}, 28, 1.0f, RAYWHITE);
     }
 
-    draw_button(btn_back_from_end, mouse_pos, false, 36);
+    draw_button(btn_back_from_end, mouse_pos, false, 24);
 }
 
 void UI::draw_config() {
     Vector2 mouse_pos = GetMousePosition();
 
-    draw_text_hd("SETTINGS", 390, 120, 40, RAYWHITE);
+    DrawTextEx(heading_font, "SETTINGS", {390, 120}, 40, 1.0f, RAYWHITE);
 
     //Audio
-    draw_text_hd("Master Volume", 320, 250, 26, RAYWHITE);
+    DrawTextEx(label_font, "Master Volume", {320, 250}, 26, 1.0f, RAYWHITE);
     draw_button(btn_master_down, mouse_pos, false, 24);
-    draw_text_hd(is_muted_master ? "Muted" : TextFormat("%d%%", master_volume),
-                 660, 252, 24, is_muted_master ? RED : RAYWHITE);
+    DrawTextEx(label_font, is_muted_master ? "Muted" : TextFormat("%d%%", master_volume), {660, 252}, 24, 1.0f, is_muted_master ? RED : RAYWHITE);
     draw_button(btn_master_up, mouse_pos, false, 24);
     draw_button(btn_master_mute, mouse_pos, is_muted_master, 22);
 
-    draw_text_hd("Music Volume", 320, 340, 26, RAYWHITE);
+    DrawTextEx(label_font, "Music Volume", {320, 340}, 26, 1.0f, RAYWHITE);
     draw_button(btn_music_down, mouse_pos, false, 24);
-    draw_text_hd(is_muted_music ? "Muted" : TextFormat("%d%%", music_volume),
-                 660, 342, 24, is_muted_music ? RED : RAYWHITE);
+    DrawTextEx(label_font, is_muted_music ? "Muted" : TextFormat("%d%%", music_volume), {660, 342}, 24, 1.0f, is_muted_music ? RED : RAYWHITE);
     draw_button(btn_music_up, mouse_pos, false, 24);
     draw_button(btn_music_mute, mouse_pos, is_muted_music, 22);
 
-    draw_text_hd("Sound Effects", 320, 430, 26, RAYWHITE);
+    DrawTextEx(label_font, "Sound Effects", {320, 430}, 26, 1.0f, RAYWHITE);
     draw_button(btn_sound_down, mouse_pos, false, 24);
-    draw_text_hd(is_muted_sound ? "Muted" : TextFormat("%d%%", sound_volume),
-                 660, 432, 24, is_muted_sound ? RED : RAYWHITE);
+    DrawTextEx(label_font, is_muted_sound ? "Muted" : TextFormat("%d%%", sound_volume), {660, 432}, 24, 1.0f, is_muted_sound ? RED : RAYWHITE);
     draw_button(btn_sound_up, mouse_pos, false, 24);
     draw_button(btn_sound_mute, mouse_pos, is_muted_sound, 22);
 
@@ -537,7 +532,7 @@ void UI::draw_config() {
 void UI::draw_loading() {
     Vector2 mouse_pos = GetMousePosition();
 
-    draw_text_hd("Choose a slot to load", 390, 120, 32, RAYWHITE);
+    DrawTextEx(heading_font, "Choose a slot to load", {390, 120}, 32, 1.0f, RAYWHITE);
 
     for (int i = 0; i < 3; i++) {
         draw_button(btn_load_slots[i], mouse_pos, false, 28);
@@ -548,14 +543,14 @@ void UI::draw_loading() {
 void UI::draw_saving() {
     Vector2 mouse_pos = GetMousePosition();
 
-    draw_text_hd("SAVE GAME", 390, 120, 36, RAYWHITE);
+    DrawTextEx(heading_font, "SAVE GAME", {390, 120}, 36, 1.0f, RAYWHITE);
     if (overwrite_slot != -1) {
-        draw_text_hd(TextFormat("Overwrite the saved game in Slot %i?", overwrite_slot + 1), 390, 250, 24, RAYWHITE);
+        DrawTextEx(body_font, TextFormat("Overwrite the saved game in Slot %i?", overwrite_slot + 1), {390, 250}, 24, 1.0f, RAYWHITE);
         draw_button(btn_confirm_overwrite, mouse_pos, false, 24);
         draw_button(btn_cancel_overwrite, mouse_pos, false, 24);
         return;
     }
-    draw_text_hd("Choose a slot to save.", 390, 175, 22, RAYWHITE);
+    DrawTextEx(body_font, "Choose a slot to save.", {390, 175}, 22, 1.0f, RAYWHITE);
 
     for (int i = 0; i < 3; i++) {
         draw_button(btn_save_slots[i], mouse_pos, false, 28);
