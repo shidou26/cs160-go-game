@@ -16,9 +16,6 @@
 
 namespace {
 
-const int VIRTUAL_WIDTH = 1280;
-const int VIRTUAL_HEIGHT = 960;
-
 Texture2D create_hd_stone_texture(bool is_black) {
     const int tex_size = 512;
     Image img = GenImageColor(tex_size, tex_size, BLANK);
@@ -140,8 +137,6 @@ UI::UI() {
     black_stone_tex = create_hd_stone_texture(true);
     white_stone_tex = create_hd_stone_texture(false);
     wood_board_tex  = create_hd_wood_texture();
-    render_target   = LoadRenderTexture(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
-    SetTextureFilter(render_target.texture, TEXTURE_FILTER_BILINEAR);
 
     // [HD UPGRADE]: Load system TrueType font at large size (64px) for crisp, non-pixelated text
     const char* font_paths[] = {
@@ -213,8 +208,6 @@ UI::UI() {
     opt_music[0] = { { 980, 385, 230, 50 }, "Song 1" };
     opt_music[1] = { { 980, 435, 230, 50 }, "Song 2" };
     opt_music[2] = { { 980, 485, 230, 50 }, "Song 3" };
-    btn_windowed    = { { 560, 530, 190, 55 }, "Windowed" };
-    btn_fullscreen  = { { 770, 530, 190, 55 }, "Fullscreen" };
     btn_back_config = { { 390, 650, 500, 60 }, "Back" };
 
     //Init option buttons for saving phase
@@ -243,46 +236,9 @@ void UI::unload() {
     UnloadTexture(black_stone_tex);
     UnloadTexture(white_stone_tex);
     UnloadTexture(wood_board_tex);
-    UnloadRenderTexture(render_target);
     if (has_custom_font) {
         UnloadFont(ui_font);
     }
-}
-
-Vector2 UI::get_virtual_mouse() const {
-    float sw = (float)GetScreenWidth();
-    float sh = (float)GetScreenHeight();
-    float scale = std::min(sw / VIRTUAL_WIDTH, sh / VIRTUAL_HEIGHT);
-    float offset_x = (sw - VIRTUAL_WIDTH * scale) * 0.5f;
-    float offset_y = (sh - VIRTUAL_HEIGHT * scale) * 0.5f;
-
-    Vector2 m = GetMousePosition();
-    return {
-        (m.x - offset_x) / scale,
-        (m.y - offset_y) / scale
-    };
-}
-
-void UI::begin_render() const {
-    BeginTextureMode(render_target);
-    ClearBackground(bg_color);
-}
-
-void UI::end_render() const {
-    EndTextureMode();
-
-    float sw = (float)GetScreenWidth();
-    float sh = (float)GetScreenHeight();
-    float scale = std::min(sw / VIRTUAL_WIDTH, sh / VIRTUAL_HEIGHT);
-    float offset_x = (sw - VIRTUAL_WIDTH * scale) * 0.5f;
-    float offset_y = (sh - VIRTUAL_HEIGHT * scale) * 0.5f;
-
-    BeginDrawing();
-    ClearBackground(bg_color);
-    Rectangle src = { 0.0f, 0.0f, (float)render_target.texture.width, -(float)render_target.texture.height };
-    Rectangle dst = { offset_x, offset_y, VIRTUAL_WIDTH * scale, VIRTUAL_HEIGHT * scale };
-    DrawTexturePro(render_target.texture, src, dst, { 0.0f, 0.0f }, 0.0f, WHITE);
-    EndDrawing();
 }
 
 // [HD UPGRADE]: Render high-resolution text using DrawTextEx
@@ -338,7 +294,7 @@ void UI::draw(Board &board) {
     int board_size = board.get_size();
     int cell_size = get_cell_size(board);
     int actual_grid_width = (board_size - 1) * cell_size;
-    Vector2 mouse_pos = get_virtual_mouse();
+    Vector2 mouse_pos = GetMousePosition();
 
     // 1. Draw current turn info and Option buttons using the HD font
     if (board.get_turn() == 1) {
@@ -450,6 +406,28 @@ void UI::draw(Board &board) {
     }
 
     std::pair<int, int> ko_cell = check_ko_rule(board);
+    // Draw hover ghost stone preview
+    int hover_r = -1, hover_c = -1;
+    if (mouse_pos.x >= start_x - cell_size / 2.0f &&
+        mouse_pos.y >= start_y - cell_size / 2.0f &&
+        screen_to_grid(mouse_pos, board, hover_r, hover_c)) {
+        bool is_ko = (hover_r == ko_cell.first && hover_c == ko_cell.second);
+        bool is_human_turn = (board.get_mode() == GameMode::PVP || board.get_turn() == 1);
+        if (is_human_turn && board.get_cell(hover_r, hover_c) == 0 && !is_ko) {
+            float ghost_x = (float)(start_x + hover_c * cell_size);
+            float ghost_y = (float)(start_y + hover_r * cell_size);
+            Texture2D ghost_tex = (board.get_turn() == 1) ? black_stone_tex : white_stone_tex;
+            Rectangle source = { 0.0f, 0.0f, (float)ghost_tex.width, (float)ghost_tex.height };
+            Rectangle dest = {
+                ghost_x - radius,
+                ghost_y - radius,
+                radius * 2.0f,
+                radius * 2.0f
+            };
+            DrawTexturePro(ghost_tex, source, dest, { 0.0f, 0.0f }, 0.0f, Fade(WHITE, 0.45f));
+        }
+    }
+
     if (board.in_board(ko_cell.first, ko_cell.second)) {
         float center_x = (float)(start_x + ko_cell.second * cell_size);
         float center_y = (float)(start_y + ko_cell.first * cell_size);
@@ -465,7 +443,7 @@ void UI::draw(Board &board) {
 }
 
 void UI::draw_starting(const Board &board) {
-    Vector2 mouse_pos = get_virtual_mouse();
+    Vector2 mouse_pos = GetMousePosition();
 
     draw_text_hd(TITLE, 310, 280, 150, RAYWHITE);
     draw_text_hd("Press H to exit", 1120, 920, 20, RAYWHITE);
@@ -476,7 +454,7 @@ void UI::draw_starting(const Board &board) {
 }
 
 void UI::draw_mode() {
-    Vector2 mouse_pos = get_virtual_mouse();
+    Vector2 mouse_pos = GetMousePosition();
 
     draw_text_hd("CHOOSE GAME MODE", 390, 120, 36, RAYWHITE);
     draw_button(btn_pvp, mouse_pos, false, 28);
@@ -484,7 +462,7 @@ void UI::draw_mode() {
 }
 
 void UI::draw_difficulty() {
-    Vector2 mouse_pos = get_virtual_mouse();
+    Vector2 mouse_pos = GetMousePosition();
 
     draw_text_hd("CHOOSE DIFFICULTY", 390, 120, 36, RAYWHITE);
     draw_button(btn_easy, mouse_pos, false, 28);
@@ -493,7 +471,7 @@ void UI::draw_difficulty() {
 }
 
 void UI::draw_choosing_board_size(const Board &board) {
-    Vector2 mouse_pos = get_virtual_mouse();
+    Vector2 mouse_pos = GetMousePosition();
     int board_size = board.get_size();
     draw_button(btn_size9,  mouse_pos, board_size == 9);
     draw_button(btn_size13, mouse_pos, board_size == 13);
@@ -501,7 +479,7 @@ void UI::draw_choosing_board_size(const Board &board) {
 }
 
 void UI::draw_ending(const Board &board) {
-    Vector2 mouse_pos = get_virtual_mouse();
+    Vector2 mouse_pos = GetMousePosition();
 
     std::pair<double, double> final_score = scoring(board);
     // std::cerr << final_score.first << " " << final_score.second << '\n';
@@ -520,8 +498,7 @@ void UI::draw_ending(const Board &board) {
 }
 
 void UI::draw_config() {
-    Vector2 mouse_pos = get_virtual_mouse();
-    bool is_fs = IsWindowFullscreen();
+    Vector2 mouse_pos = GetMousePosition();
 
     draw_text_hd("SETTINGS", 390, 120, 40, RAYWHITE);
 
@@ -554,16 +531,11 @@ void UI::draw_config() {
         }
     }
 
-    //Resolution
-    draw_text_hd("Display Mode", 320, 542, 26, RAYWHITE);
-    draw_button(btn_windowed, mouse_pos, !is_fs, 22);
-    draw_button(btn_fullscreen, mouse_pos, is_fs, 22);
-
     draw_button(btn_back_config, mouse_pos, false, 26);
 }
 
 void UI::draw_loading() {
-    Vector2 mouse_pos = get_virtual_mouse();
+    Vector2 mouse_pos = GetMousePosition();
 
     draw_text_hd("Choose a slot to load", 390, 120, 32, RAYWHITE);
 
@@ -574,7 +546,7 @@ void UI::draw_loading() {
 }
 
 void UI::draw_saving() {
-    Vector2 mouse_pos = get_virtual_mouse();
+    Vector2 mouse_pos = GetMousePosition();
 
     draw_text_hd("SAVE GAME", 390, 120, 36, RAYWHITE);
     if (overwrite_slot != -1) {
@@ -854,23 +826,6 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             if (CheckCollisionPointRec(mouse_pos, btn_sound_mute.bounds)) {
                 Audio::play(SFX::CLICK);
                 is_muted_sound = !is_muted_sound;
-                return true;
-            }
-            if (CheckCollisionPointRec(mouse_pos, btn_windowed.bounds)) {
-                Audio::play(SFX::CLICK);
-                if (IsWindowFullscreen()) {
-                    ToggleFullscreen();
-                    SetWindowSize(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
-                }
-                return true;
-            }
-            if (CheckCollisionPointRec(mouse_pos, btn_fullscreen.bounds)) {
-                Audio::play(SFX::CLICK);
-                if (!IsWindowFullscreen()) {
-                    int monitor = GetCurrentMonitor();
-                    SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
-                    ToggleFullscreen();
-                }
                 return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_back_config.bounds)) {

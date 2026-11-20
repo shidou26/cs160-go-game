@@ -24,7 +24,6 @@ private:
     Texture2D black_stone_tex;
     Texture2D white_stone_tex;
     Texture2D wood_board_tex;
-    RenderTexture2D render_target;
     Font ui_font;
     bool has_custom_font = false;
 
@@ -76,8 +75,6 @@ private:
     OptionButton btn_sound_mute;
     OptionButton btn_change_music;
     OptionButton opt_music[3];
-    OptionButton btn_windowed;
-    OptionButton btn_fullscreen;
     OptionButton btn_back_config;
     GamePhase previous_phase = GamePhase::START;
     bool music_dropdown_open = false;
@@ -117,9 +114,6 @@ public:
      * @param board 
      */
     void unload();
-    void begin_render() const;
-    void end_render() const;
-    Vector2 get_virtual_mouse() const;
     void draw(Board &board);
     void draw_starting(const Board &board);
     void draw_ending(const Board &board);
