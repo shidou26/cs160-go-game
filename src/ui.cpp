@@ -504,7 +504,7 @@ void UI::draw_ending(const Board &board) {
     Vector2 mouse_pos = get_virtual_mouse();
 
     std::pair<double, double> final_score = scoring(board);
-    std::cerr << final_score.first << " " << final_score.second << '\n';
+    // std::cerr << final_score.first << " " << final_score.second << '\n';
 
     if (final_score.first == final_score.second) {
         draw_text_hd(TextFormat("Tie"), 500, 33, 28, RAYWHITE);
