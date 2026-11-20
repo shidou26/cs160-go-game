@@ -183,9 +183,9 @@ UI::UI() {
     btn_hard = { { 390, 550, 500, 100 }, "Hard" };
 
     //Init option buttons for playing phase
-    btn_size9  = { { 240, 25, 88, 40 }, "9x9" };
-    btn_size13 = { { 338, 25, 88, 40 }, "13x13" };
-    btn_size19 = { { 436, 25, 88, 40 }, "19x19" };
+    btn_size9  = { { 390, 250, 500, 100 }, "9x9" };
+    btn_size13 = { { 390, 400, 500, 100 }, "13x13" };
+    btn_size19 = { { 390, 550, 500, 100 }, "19x19" };
     btn_undo   = { { 554, 25, 88, 40 }, "Undo" };
     btn_redo   = { { 652, 25, 88, 40 }, "Redo" };
     btn_reset  = { { 750, 25, 88, 40 }, "Reset" };
@@ -457,25 +457,26 @@ void UI::draw_mode() {
     Vector2 mouse_pos = GetMousePosition();
 
     draw_text_hd("CHOOSE GAME MODE", 390, 120, 36, RAYWHITE);
-    draw_button(btn_pvp, mouse_pos, false, 28);
-    draw_button(btn_pve, mouse_pos, false, 28);
+    draw_button(btn_pvp, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_pvp.bounds), 28);
+    draw_button(btn_pve, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_pve.bounds), 28);
 }
 
 void UI::draw_difficulty() {
     Vector2 mouse_pos = GetMousePosition();
 
     draw_text_hd("CHOOSE DIFFICULTY", 390, 120, 36, RAYWHITE);
-    draw_button(btn_easy, mouse_pos, false, 28);
-    draw_button(btn_medium, mouse_pos, false, 28);
-    draw_button(btn_hard, mouse_pos, false, 28);
+    draw_button(btn_easy,   mouse_pos, CheckCollisionPointRec(mouse_pos, btn_easy.bounds), 28);
+    draw_button(btn_medium, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_medium.bounds), 28);
+    draw_button(btn_hard,   mouse_pos, CheckCollisionPointRec(mouse_pos, btn_hard.bounds), 28);
 }
 
 void UI::draw_choosing_board_size(const Board &board) {
     Vector2 mouse_pos = GetMousePosition();
-    int board_size = board.get_size();
-    draw_button(btn_size9,  mouse_pos, board_size == 9);
-    draw_button(btn_size13, mouse_pos, board_size == 13);
-    draw_button(btn_size19, mouse_pos, board_size == 19);
+
+    draw_text_hd("CHOOSE BOARD SIZE", 390, 120, 36, RAYWHITE);
+    draw_button(btn_size9,  mouse_pos, CheckCollisionPointRec(mouse_pos, btn_size9.bounds), 28);
+    draw_button(btn_size13, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_size13.bounds), 28);
+    draw_button(btn_size19, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_size19.bounds), 28);
 }
 
 void UI::draw_ending(const Board &board) {
