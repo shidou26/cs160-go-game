@@ -143,6 +143,14 @@ void Board::toggle_turn() {
 }
 
 void Board::pass_turn() {
+    move_list.push_back(Move(
+        -1, 
+        -1,
+        StoneType::EMPTY,
+        pass,
+        hash_table.current_hash
+    ));
+    clear_undo_list();
     pass++;
 }
 
@@ -184,6 +192,15 @@ void Board::undo_move(bool by_player) {
     Move last_move = move_list.back();
     move_list.pop_back();
 
+    if (last_move.pos_x == -1 && last_move.pos_y == -1) {
+        if (by_player) {
+            undo_list.push_back(last_move);
+            set_pass(last_move.current_pass);
+            toggle_turn();
+        }
+        return;
+    }
+
     update_cell(last_move.pos_x, last_move.pos_y, last_move.stone_type, StoneType::EMPTY);
     StoneType opponent = opposite_stone(last_move.stone_type);
     for (auto [pos_x, pos_y] : last_move.captured_stones) {
@@ -207,6 +224,13 @@ void Board::redo_move() {
 
     Move next_move = undo_list.back();
     undo_list.pop_back();
+
+    if (next_move.pos_x == -1 && next_move.pos_y == -1) {
+        set_pass(next_move.current_pass + 1);
+        toggle_turn();
+        move_list.push_back(next_move);
+        return;
+    }
 
     update_cell(next_move.pos_x, next_move.pos_y, StoneType::EMPTY, next_move.stone_type);
     StoneType opponent = opposite_stone(next_move.stone_type);
