@@ -39,3 +39,6 @@ All usages are listed in the AI Usage Log below.
 | AI28 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how can i create a dropdown for change_music feature | To make a dropdown for music configuration | |
 | AI29 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how can i tackle the autosave, should i put in the exit of the game or after config is open | To autosave configuration | |
 | AI30 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | update the current makefile to suport MacOS | To suport MacOS make | Makefile |
+| AI31 | 2026-11-20 | Doan Nhat Anh | Gemini 4 Hydrogen | changing code | remove everything related to fullscreen feature | to reduce bugs, make the code cleaner | all |
+| AI32 | 2026-11-20 | Doan Nhat Anh | Gemini 4 Hydrogen | asking | tell me which line in which file do I need to change to reposition the board size buttons in the middle, and suggest me the (x,y) cordinate along with the rectangle size | to make the game looks cleaner | all |
+| AI33 | 2026-11-20 | Doan Nhat Anh | Gemini 4 Hydrogen | asking | how do I make button orange when I hover my mouse in the "choose mode" screen | quality of life | ui.cpp |

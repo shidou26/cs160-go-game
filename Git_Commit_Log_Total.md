@@ -1,6 +1,23 @@
 shidou26, Shidou Le, Hong Anh Le: Le Hong Anh - 26125003
 MarioNathanPro: Doan Nhat Anh - 26125002
 
+- **509e2c5** [2026-11-20] *MarioNathanPro*: changing button size, adding hovering effect
+- **b885b87** [2026-11-20] *MarioNathanPro*: remove fullscreen
+- **cad7c42** [2026-11-20] *Shidou Le*: chore: update end sound effect
+- **353c05f** [2026-11-20] *Hong Anh Le*: chore: fix a bug in README.md
+- **d280e94** [2026-11-20] *Hong Anh Le*: chore: update README.md with overview
+- **7780f5a** [2026-11-20] *Shidou Le*: chore: update README.md
+- **243d32a** [2026-11-20] *Shidou Le*: feat: autosave feature for configuration
+- **e83b618** [2026-11-20] *Shidou Le*: refactor: update the pass feature
+- **c766fa0** [2026-11-18] *Shidou Le*: refactor: add waittime for cpu and and fix
+- **41eac14** [2026-11-18] *shidou26*: feat: add sound effect for buttons
+- **6639d38** [2026-11-17] *shidou26*: chore: add ai usage
+- **d1d3fb2** [2026-11-17] *shidou26*: chore: fix bugs in rule and board and collect sfx
+- **2ac756e** [2026-11-17] *shidou26*: feat: add music and sound
+- **6506d05** [2026-11-17] *Shidou Le*: chore: fix README.md
+- **caa4f46** [2026-11-14] *Shidou Le*: refactor: update start menu and fix minor bugs
+- **498829c** [2026-11-14] *shidou26*: chore: center buttons in start menu
+- **c5bb41a** [2026-11-13] *MarioNathanPro*: adding commit log
 - **7c5fc8c** [2026-11-13] *MarioNathanPro*: feat: added game modes, redesign the game, changing how stones and board look, adding fullscreen mode (in setting)
 - **213e4fc** [2026-11-13] *shidou26*: feat: cpu prototype
 - **d1c63a3** [2026-11-13] *shidou26*: feat: add save and load slots
