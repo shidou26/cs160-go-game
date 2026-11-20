@@ -1,9 +1,9 @@
 # CS160 Project: Go game
 
-C++ final project for CS160 - Introduction to Computer Science.
-
 ## Introduction
-This project is the Go game written in C++ language, with usage of Raylib library.
+This is the C++ final project for the course \textbf{CS160 - Introduction to Computer Science}. 
+
+The objective of this project is to recreate the traditional board game Go using C++ and the Raylib library, following the Japanese ruleset. The application aims to provide an intuitive and user-friendly interface for learning, practicing, and enjoying Go. Users can play against another player or a computer with three difficulty levels and choose from different board sizes. The game also allows users to undo and redo moves, save and load games, and customize audio settings.
 
 ## Features
 The game currently supports two modes:
