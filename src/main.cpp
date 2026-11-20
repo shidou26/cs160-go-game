@@ -50,83 +50,90 @@ int main() {
         //Phase handler
         if (phase == GamePhase::SAVING) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                Vector2 mouse_pos = GetMousePosition();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
 
-            user_interface.begin_render();
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
             user_interface.draw_saving();
-            user_interface.end_render();
+            EndDrawing();
         }
         else if(phase == GamePhase::LOADING) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                Vector2 mouse_pos = GetMousePosition();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
 
-            user_interface.begin_render();
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
             user_interface.draw_loading();
-            user_interface.end_render();
+            EndDrawing();
         }
         else if (phase == GamePhase::CONFIG) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                Vector2 mouse_pos = GetMousePosition();
                 if (user_interface.handle_option_click(mouse_pos, phase, board)) {
                     user_interface.save_setting("saves/config.json");
                 }
             }
 
-            user_interface.begin_render();
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
             user_interface.draw_config();
-            user_interface.end_render();
+            EndDrawing();
         } 
         else if (phase == GamePhase::START) {
             if(IsKeyPressed(KEY_H)) {
                 break;
             }
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                Vector2 mouse_pos = GetMousePosition();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
 
-            user_interface.begin_render();
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
             user_interface.draw_starting(board);
-            user_interface.end_render();
+            EndDrawing();
         } 
         else if (phase == GamePhase::CHOOSING_SIZE) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                Vector2 mouse_pos = GetMousePosition();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
 
-            user_interface.begin_render();
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
             user_interface.draw_choosing_board_size(board);
-            user_interface.end_render();
+            EndDrawing();
         }
         else if (phase == GamePhase::MODE) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                Vector2 mouse_pos = GetMousePosition();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
 
-            user_interface.begin_render();
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
             user_interface.draw_mode();
-            user_interface.end_render();
+            EndDrawing();
         }
         else if(phase == GamePhase::DIFFICULTY) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                Vector2 mouse_pos = GetMousePosition();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
 
-            user_interface.begin_render();
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
             user_interface.draw_difficulty();
-            user_interface.end_render();
+            EndDrawing();
         }
         else if(phase == GamePhase::PLAYING) {
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 if (board.is_human_turn()) {
-                    Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                    Vector2 mouse_pos = GetMousePosition();
                     int row, col;
 
                     if (!user_interface.handle_option_click(mouse_pos, phase, board)) {
@@ -160,19 +167,21 @@ int main() {
                 cpu_turn_started = -1.0;
             }
             
-            user_interface.begin_render();
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
             user_interface.draw(board);
-            user_interface.end_render();
+            EndDrawing();
         } 
         else {
             if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                Vector2 mouse_pos = user_interface.get_virtual_mouse();
+                Vector2 mouse_pos = GetMousePosition();
                 user_interface.handle_option_click(mouse_pos, phase, board);
             }
 
-            user_interface.begin_render();
+            BeginDrawing();
+            ClearBackground(user_interface.get_background_color());
             user_interface.draw_ending(board);
-            user_interface.end_render();
+            EndDrawing();
         }
     }
 
