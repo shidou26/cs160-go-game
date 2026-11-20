@@ -38,3 +38,4 @@ All usages are listed in the AI Usage Log below.
 | AI27 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Asking | can you hint me an approach to tackle the problem of cannot undo pass | To handle the problem of cannot undo pass |  |
 | AI28 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how can i create a dropdown for change_music feature | To make a dropdown for music configuration | |
 | AI29 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Asking | how can i tackle the autosave, should i put in the exit of the game or after config is open | To autosave configuration | |
+| AI30 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | update the current makefile to suport MacOS | To suport MacOS make | Makefile |
