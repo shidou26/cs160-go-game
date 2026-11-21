@@ -831,7 +831,6 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                         Audio::play(SFX::CLICK);
                         if (selected_music != i + 1) {
                             selected_music = i + 1;
-                            selected_music = i + 1;
                             Audio::change_music(selected_music);
                         }
                         return true;
