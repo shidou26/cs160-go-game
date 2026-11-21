@@ -16,7 +16,7 @@ int main() {
     SetTargetFPS(60);
 
     //Set game icon
-    Image icon = LoadImage("assets/icon.png");
+    Image icon = LoadImage("assets/images/icon.png");
     SetWindowIcon(icon);
     UnloadImage(icon);
 
@@ -32,9 +32,16 @@ int main() {
     GamePhase phase = GamePhase::START;
     Board board;
     double cpu_turn_started = -1.0;
+    double last_timer = GetTime();
     const double CPU_DELAY = 1.5; // seconds
 
     while (!WindowShouldClose()) {
+        //Timer handler
+        double now_timer = GetTime();
+        if (phase == GamePhase::PLAYING) {
+            board.update_timer(now_timer - last_timer);
+        }
+        last_timer = now_timer;
         if (phase != GamePhase::PLAYING) {
             cpu_turn_started = -1.0;
         }
@@ -94,7 +101,7 @@ int main() {
 
             BeginDrawing();
             ClearBackground(user_interface.get_background_color());
-            user_interface.draw_starting(board);
+            user_interface.draw_starting();
             EndDrawing();
         } 
         else if (phase == GamePhase::CHOOSING_SIZE) {
@@ -146,6 +153,10 @@ int main() {
                 }
             }
 
+            if (phase != GamePhase::PLAYING) {
+                continue;
+            }
+
             if (board.get_pass() == 2) {
                 phase = GamePhase::GAMEOVER;
                 Audio::play(SFX::END);
@@ -153,11 +164,14 @@ int main() {
             }
 
             if (!board.is_human_turn()) {
-                if (cpu_turn_started < 0.0) {
-                    cpu_turn_started = GetTime();
-                }
+                if (cpu_turn_started == -1.0) cpu_turn_started = GetTime();
                 if (GetTime() - cpu_turn_started >= CPU_DELAY) {
                     Move seol = cpu_play(board);
+                    // Count CPU thinking time before placing the stone changes turns.
+                    double finished = GetTime();
+                    board.update_timer(finished - last_timer);
+                    last_timer = finished;
+
                     if (board.place_stone(seol.pos_x, seol.pos_y)) {
                         Audio::play(SFX::STONE);
                     }
@@ -180,9 +194,11 @@ int main() {
 
             BeginDrawing();
             ClearBackground(user_interface.get_background_color());
+            user_interface.draw(board, false);
             user_interface.draw_ending(board);
             EndDrawing();
         }
+
     }
 
     user_interface.unload();

@@ -138,6 +138,10 @@ UI::UI() {
     black_stone_tex = create_hd_stone_texture(true);
     white_stone_tex = create_hd_stone_texture(false);
     wood_board_tex  = create_hd_wood_texture();
+    trophy_tex = LoadTexture("assets/images/golden_trophy.png");
+    if (trophy_tex.id != 0) {
+        SetTextureFilter(trophy_tex, TEXTURE_FILTER_BILINEAR);
+    }
 
     title_font = LoadFontEx("assets/fonts/Cinzel-Bold.ttf", 150, nullptr, 0);
     heading_font = LoadFontEx("assets/fonts/Pretendard-SemiBold.otf", 40, nullptr, 0);
@@ -184,7 +188,8 @@ UI::UI() {
     const float play_button_height = 50.0f;
     const float play_button_step = 64.0f;
     const float play_button_x = GetScreenWidth() - play_button_width - 30.0f;
-    const float play_button_y = GetScreenHeight() - 30.0f
+    // Align the bottom of the last button with the board's outer border.
+    const float play_button_y = start_y + grid_width + padding + 4.0f
                               - play_button_height - 6 * play_button_step;
     btn_pass           = { { play_button_x, play_button_y,                        play_button_width, play_button_height }, "Pass" };
     btn_undo           = { { play_button_x, play_button_y + play_button_step,     play_button_width, play_button_height }, "Undo" };
@@ -225,7 +230,9 @@ UI::UI() {
     btn_back_load = { { 390, 650, 500, 60 }, "Return to title screen" };
 
     //Init option buttons for gameover phase
-    btn_back_from_end = { { (GetScreenWidth() - 360.0f) / 2.0f, 250, 360, 64 }, "Return to title screen"};
+    btn_back_from_end = { { (GetScreenWidth() - 360.0f) / 2.0f,
+                           (GetScreenHeight() - 420.0f) / 2.0f + 324.0f,
+                           360, 64 }, "Return to title screen"};
 }
 
 Color UI::get_background_color() const {
@@ -236,6 +243,7 @@ void UI::unload() {
     UnloadTexture(black_stone_tex);
     UnloadTexture(white_stone_tex);
     UnloadTexture(wood_board_tex);
+    if (trophy_tex.id != 0) UnloadTexture(trophy_tex);
     UnloadFont(title_font);
     UnloadFont(heading_font);
     UnloadFont(button_font);
@@ -248,8 +256,8 @@ int UI::get_cell_size(const Board &board) const {
     return (board_size > 1) ? (grid_width / (board_size - 1)) : grid_width;
 }
 
-void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active, int font_size) const {
-    bool is_hovered = CheckCollisionPointRec(mouse_pos, btn.bounds);
+void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active, int font_size, bool interactive) const {
+    bool is_hovered = interactive && CheckCollisionPointRec(mouse_pos, btn.bounds);
 
     Color fill = is_active
         ? (Color){ 219, 169, 99, 255 }
@@ -272,46 +280,51 @@ void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active,
     );
 }
 
-void UI::draw(Board &board) {
+void UI::draw(Board &board, bool interactive) {
     int board_size = board.get_size();
     int cell_size = get_cell_size(board);
     int actual_grid_width = (board_size - 1) * cell_size;
     Vector2 mouse_pos = GetMousePosition();
 
-    DrawTextEx(
-        label_font, 
-        board.get_turn() == 1 ? "Turn: BLACK" : "Turn: WHITE", 
-        {30, 33}, 
-        24, 
-        1.0f, 
-        RAYWHITE
-    );
+    float sidebar_x = btn_pass.bounds.x;
+    float sidebar_width = btn_pass.bounds.width;
+    float sidebar_top = start_y - padding - 4.0f;
 
-    draw_button(btn_undo,   mouse_pos, false);
-    draw_button(btn_redo,   mouse_pos, false);
-    draw_button(btn_reset,  mouse_pos, false);
-    draw_button(btn_pass,   mouse_pos, false);
-    draw_button(btn_save,   mouse_pos, false);
-    draw_button(btn_back_from_play, mouse_pos, false);
-    draw_button(btn_setting_play, mouse_pos, false);
+    DrawTextEx(heading_font,
+               board.get_turn() == 1 ? "Turn: BLACK" : "Turn: WHITE",
+               {sidebar_x, sidebar_top}, 24, 1.0f, RAYWHITE);
 
-    DrawTextEx(
-        label_font, 
-        TextFormat("Black: %i", board.get_captured(1)), 
-        {1145, 28}, 
-        24, 
-        1.0f,
-        RAYWHITE
-    );
+    for (int player = 0; player < 2; ++player) {
+        Rectangle info_box = {
+            sidebar_x, sidebar_top + 44.0f + player * 162.0f,
+            sidebar_width, 150.0f
+        };
+        Color fill = (Color){25, 30, 42, 255};
+        Color text_color = RAYWHITE;
+        Color border_color = board_wood;
 
-    DrawTextEx(
-        label_font, 
-        TextFormat("White: %i", board.get_captured(0)), 
-        {1145, 62}, 
-        24, 
-        1.0f,
-        RAYWHITE
-    );
+        DrawRectangleRounded(info_box, 0.15f, 16, fill);
+        DrawRectangleRoundedLinesEx(info_box, 0.15f, 16, 2.0f, border_color);
+
+        const float text_x = info_box.x + 16.0f;
+        int seconds = static_cast<int>(board.get_timer(player));
+        DrawTextEx(heading_font, player == 0 ? "BLACK" : "WHITE",
+                   {text_x, info_box.y + 16.0f}, 26, 1.0f, text_color);
+        DrawTextEx(label_font,
+                   TextFormat("Using Time: %02d:%02d", seconds / 60, seconds % 60),
+                   {text_x, info_box.y + 62.0f}, 22, 1.0f, text_color);
+        DrawTextEx(label_font,
+                   TextFormat("Prisoned Stones: %i", board.get_captured(1 - player)),
+                   {text_x, info_box.y + 104.0f}, 22, 1.0f, text_color);
+    }
+
+    draw_button(btn_pass, mouse_pos, false, 18, interactive);
+    draw_button(btn_undo, mouse_pos, false, 18, interactive);
+    draw_button(btn_redo, mouse_pos, false, 18, interactive);
+    draw_button(btn_save, mouse_pos, false, 18, interactive);
+    draw_button(btn_setting_play, mouse_pos, false, 18, interactive);
+    draw_button(btn_reset, mouse_pos, false, 18, interactive);
+    draw_button(btn_back_from_play, mouse_pos, false, 18, interactive);
 
     // 2. [HD UPGRADE]: Draw realistic wooden board (Drop shadow + 3D border + HD wood grain texture)
     Rectangle board_rect = { 
@@ -405,28 +418,31 @@ void UI::draw(Board &board) {
     }
 
     std::pair<int, int> ko_cell = check_ko_rule(board);
-    // Draw hover ghost stone preview
-    int hover_r = -1, hover_c = -1;
-    if (mouse_pos.x >= start_x - cell_size / 2.0f &&
-        mouse_pos.y >= start_y - cell_size / 2.0f &&
-        screen_to_grid(mouse_pos, board, hover_r, hover_c)) {
-        bool is_ko = (hover_r == ko_cell.first && hover_c == ko_cell.second);
-        bool is_human_turn = (board.get_mode() == GameMode::PVP || board.get_turn() == 1);
-        if (is_human_turn && board.get_cell(hover_r, hover_c) == 0 && !is_ko) {
-            float ghost_x = (float)(start_x + hover_c * cell_size);
-            float ghost_y = (float)(start_y + hover_r * cell_size);
-            Texture2D ghost_tex = (board.get_turn() == 1) ? black_stone_tex : white_stone_tex;
-            Rectangle source = { 0.0f, 0.0f, (float)ghost_tex.width, (float)ghost_tex.height };
-            Rectangle dest = {
-                ghost_x - radius,
-                ghost_y - radius,
-                radius * 2.0f,
-                radius * 2.0f
-            };
-            DrawTexturePro(ghost_tex, source, dest, { 0.0f, 0.0f }, 0.0f, Fade(WHITE, 0.45f));
+
+    //Draw hover ghost stone preview
+    if (interactive) {
+        int hover_r = -1, hover_c = -1;
+        if (mouse_pos.x >= start_x - cell_size / 2.0f &&
+            mouse_pos.y >= start_y - cell_size / 2.0f &&
+            screen_to_grid(mouse_pos, board, hover_r, hover_c)) {
+            bool is_ko = (hover_r == ko_cell.first && hover_c == ko_cell.second);
+            bool is_human_turn = (board.get_mode() == GameMode::PVP || board.get_turn() == 1);
+            if (is_human_turn && board.get_cell(hover_r, hover_c) == 0 && !is_ko) {
+                float ghost_x = (float)(start_x + hover_c * cell_size);
+                float ghost_y = (float)(start_y + hover_r * cell_size);
+                Texture2D ghost_tex = (board.get_turn() == 1) ? black_stone_tex : white_stone_tex;
+                Rectangle source = { 0.0f, 0.0f, (float)ghost_tex.width, (float)ghost_tex.height };
+                Rectangle dest = {
+                    ghost_x - radius,
+                    ghost_y - radius,
+                    radius * 2.0f,
+                    radius * 2.0f
+                };
+                DrawTexturePro(ghost_tex, source, dest, { 0.0f, 0.0f }, 0.0f, Fade(WHITE, 0.45f));
+            }
         }
     }
-
+    
     if (board.in_board(ko_cell.first, ko_cell.second)) {
         float center_x = (float)(start_x + ko_cell.second * cell_size);
         float center_y = (float)(start_y + ko_cell.first * cell_size);
@@ -441,7 +457,7 @@ void UI::draw(Board &board) {
     }
 }
 
-void UI::draw_starting(const Board &board) {
+void UI::draw_starting() {
     Vector2 mouse_pos = GetMousePosition();
 
     Vector2 title_size = MeasureTextEx(title_font, TITLE, 150, 1.0f);
@@ -487,19 +503,62 @@ void UI::draw_choosing_board_size(const Board &board) {
 void UI::draw_ending(const Board &board) {
     Vector2 mouse_pos = GetMousePosition();
 
-    std::pair<double, double> final_score = scoring(board);
-    // std::cerr << final_score.first << " " << final_score.second << '\n';
+    //Panel
+    DrawRectangle(
+        0, 0, GetScreenWidth(), GetScreenHeight(),
+        Fade(BLACK, 0.65f)
+    );
+    float panel_start_x = (GetScreenWidth() - 560.0f) / 2.0f;
+    float panel_start_y = (GetScreenHeight() - 420.0f) / 2.0f;
+    Rectangle panel = {
+        panel_start_x,
+        panel_start_y,
+        560.0f,
+        420.0f
+    };
+    DrawRectangleRounded(panel, 0.08f, 16, bg_color);
+    DrawRectangleRoundedLinesEx(panel, 0.08f, 16, 2.0f, board_wood);
 
+    //Trophy
+    if (trophy_tex.id != 0) {
+        const float scale = 120.0f / std::max(trophy_tex.width, trophy_tex.height);
+        const float width = trophy_tex.width * scale;
+        const float height = trophy_tex.height * scale;
+        DrawTexturePro(trophy_tex,
+                       {0, 0, (float)trophy_tex.width, (float)trophy_tex.height},
+                       {panel.x + (panel.width - width) / 2.0f,
+                        panel.y + 24.0f, width, height},
+                       {0, 0}, 0.0f, WHITE);
+    }
+
+    //Final score
+    std::pair<double, double> final_score = scoring(board);
+    auto draw_centered_text = [&](const char *text, float y, float font_size) {
+        Vector2 text_size = MeasureTextEx(heading_font, text, font_size, 1.0f);
+        DrawTextEx(heading_font, text,
+                   {panel.x + (panel.width - text_size.x) / 2.0f, y},
+                   font_size, 1.0f, RAYWHITE);
+    };
     if (final_score.first == final_score.second) {
-        DrawTextEx(heading_font, TextFormat("Tie"), {500, 33}, 28, 1.0f, RAYWHITE);
+        draw_centered_text("Tie", panel.y + 164.0f, 36);
     }
     else if(final_score.first < final_score.second) {
-        DrawTextEx(heading_font, TextFormat("White wins by %.1f", final_score.second - final_score.first), {500, 33}, 28, 1.0f, RAYWHITE);
+        draw_centered_text("White Wins", panel.y + 164.0f, 36);
+        draw_centered_text(TextFormat("by %.1f komi", final_score.second - final_score.first),
+                           panel.y + 220.0f, 28);
     }
     else {
-        DrawTextEx(heading_font, TextFormat("Black wins by %.1f", final_score.first - final_score.second), {500, 33}, 28, 1.0f, RAYWHITE);
+        draw_centered_text("Black Wins", panel.y + 164.0f, 36);
+        draw_centered_text(TextFormat("by %.1f komi", final_score.first - final_score.second),
+                           panel.y + 220.0f, 28);
     }
 
+    //Back
+    btn_back_from_end.bounds = {
+        panel.x + (panel.width - 360.0f) / 2.0f,
+        panel.y + panel.height - 32.0f - 64.0f,
+        360.0f, 64.0f
+    };
     draw_button(btn_back_from_end, mouse_pos, false, 24);
 }
 

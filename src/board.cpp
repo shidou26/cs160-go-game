@@ -60,6 +60,7 @@ void Board::reset(int new_size) {
     move_list.clear();
     undo_list.clear();
     hash_table = ZobristHash();
+    timer[0] = timer[1] = 0.0;
 
     grid.assign(current_size, std::vector<StoneType>(current_size));
     for (int i = 0; i < current_size; i++) {
@@ -160,6 +161,14 @@ void Board::set_pass(int p) {
 
 int Board::get_pass() const {
     return pass;
+}
+
+double Board::get_timer(const int type) const {
+    return timer[type];
+}
+
+void Board::update_timer(double seconds) {
+    timer[turn - 1] += seconds;
 }
 
 void Board::update_cell(const int &pos_x, const int &pos_y, const StoneType &prev_stone_type, const StoneType &new_stone_type) {
@@ -270,6 +279,7 @@ bool Board::save_game(const std::string &path) {
             {"move_list", this->move_list},
             {"undo_list", this->undo_list},
             {"grid", this->grid},
+            {"timer", this->timer}
         };
 
         std::filesystem::create_directories(std::filesystem::path(path).parent_path());
@@ -304,6 +314,7 @@ bool Board::load_game(const std::string &path) {
         data.at("grid").get_to(this->grid);
         data.at("difficulty").get_to(this->difficulty);
         data.at("mode").get_to(this->mode);
+        data.at("timer").get_to(this->timer);
 
         return true;
     }

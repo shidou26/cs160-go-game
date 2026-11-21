@@ -23,6 +23,7 @@ private:
     Texture2D black_stone_tex;
     Texture2D white_stone_tex;
     Texture2D wood_board_tex;
+    Texture2D trophy_tex;
 
     //Font
     Font title_font, heading_font, button_font, label_font, body_font;
@@ -90,8 +91,7 @@ private:
 
 
     int get_cell_size(const Board &board) const;
-    void draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active = false, int font_size = 18) const;
-
+    void draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active = false, int font_size = 18, bool interactive = true) const;
 
 public:
     int sound_volume;
@@ -112,8 +112,8 @@ public:
      * @param board 
      */
     void unload();
-    void draw(Board &board);
-    void draw_starting(const Board &board);
+    void draw(Board &board, bool interactive = true);
+    void draw_starting();
     void draw_ending(const Board &board);
     void draw_config();
     void draw_choosing_board_size(const Board &board);

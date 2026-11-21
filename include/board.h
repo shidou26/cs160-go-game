@@ -37,6 +37,7 @@ private:
     std::vector<std::vector<StoneType>> grid;
     GameMode mode = GameMode::PVP;
     Difficulty difficulty = Difficulty::EASY;
+    std::array<double, 2> timer;
 
 public:
     Board(int size = BOARD_SIZE);
@@ -46,6 +47,7 @@ public:
     int get_cell(int row, int col) const; //(0: Empty, 1: Black, 2: White)
     int get_turn() const; //(1: Black, 2: White)
     int get_captured(const int &type) const; //(0: Dead black, 1: Dead white)
+    double get_timer(const int type) const; //(0: Black, 1: White)
     StoneType get_state(const int &pos_x, const int &pos_y) const;
     GameMode get_mode() const;
     Difficulty get_difficulty() const;
@@ -104,6 +106,13 @@ public:
      * 
      */
     void set_pass(int p);
+
+    /**
+     * @brief Update the timer by the turn
+     * 
+     * @param seconds 
+     */
+    void update_timer(double seconds);
 
     /**
      * @brief Update the cell with new_stone_type
