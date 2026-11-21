@@ -123,7 +123,7 @@ double positional_bonus(int x, int y, int board_size) {
         bonus += 0.5;
     }
 
-    double center = (board_size - 1) / 2.0;
+    double center = (board_size - 1) / 2.0f;
     double dist_center = std::abs(x - center) + std::abs(y - center);
     bonus += std::max(0.0, (board_size - dist_center) * 0.15);
 

@@ -42,5 +42,6 @@ All usages are listed in the AI Usage Log below.
 | AI31 | 2026-11-20 | Doan Nhat Anh | Gemini 4 Hydrogen | changing code | remove everything related to fullscreen feature | to reduce bugs, make the code cleaner | all |
 | AI32 | 2026-11-20 | Doan Nhat Anh | Gemini 4 Hydrogen | asking | tell me which line in which file do I need to change to reposition the board size buttons in the middle, and suggest me the (x,y) cordinate along with the rectangle size | to make the game looks cleaner | all |
 | AI33 | 2026-11-20 | Doan Nhat Anh | Gemini 4 Hydrogen | asking | how do I make button orange when I hover my mouse in the "choose mode" screen | quality of life | ui.cpp |
-| AI31 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | center the title in draw_starting and put the Press H to exit to the right corner | To center the uis | ui.cpp |
-| AI32 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | Reapply the font for text | To apply font on each type of text | ui.cpp | 
+| AI34 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | center the title in draw_starting and put the Press H to exit to the right corner | To center the uis | ui.cpp |
+| AI35 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | Reapply the font for text | To apply font on each type of text | ui.cpp | 
+| AI36 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | move all the buttons of button to right and align it line by line in ui.cpp in the playing phase | To test position for user interface | ui.cpp |  

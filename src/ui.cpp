@@ -22,7 +22,7 @@ Texture2D create_hd_stone_texture(bool is_black) {
     Image img = GenImageColor(tex_size, tex_size, BLANK);
     Color *pixels = (Color *)img.data;
 
-    float center = (tex_size - 1) * 0.5f;
+    float center = (tex_size - 1) / 2.0f;
     float max_r = tex_size * 0.47f;
 
     for (int y = 0; y < tex_size; y++) {
@@ -34,7 +34,7 @@ Texture2D create_hd_stone_texture(bool is_black) {
             if (dist > 1.0f) continue;
 
             // Sub-pixel anti-aliasing along the circle edge for crisp, smooth borders
-            float edge_alpha = std::clamp((1.0f - dist) * (max_r * 0.5f), 0.0f, 1.0f);
+            float edge_alpha = std::clamp((1.0f - dist) * (max_r / 2.0f), 0.0f, 1.0f);
 
             // Compute 3D sphere normal vector
             float nz = std::sqrt(std::max(0.0f, 1.0f - dist * dist));
@@ -149,11 +149,11 @@ UI::UI() {
     SetTextureFilter(button_font.texture, TEXTURE_FILTER_BILINEAR); 
     SetTextureFilter(body_font.texture, TEXTURE_FILTER_BILINEAR);
     SetTextureFilter(label_font.texture, TEXTURE_FILTER_BILINEAR); 
-
-    start_x = START_X;
-    start_y = START_Y;
-    padding = PADDING;
+    
     grid_width = DEFAULT_GRID_WIDTH;
+    start_x = (GetScreenWidth() - grid_width) / 5.0f;
+    start_y = (GetScreenHeight() - grid_width) / 2.0f;
+    padding = PADDING;
 
     bg_color = (Color){ 20, 24, 35, 255 };
     board_wood = (Color){ 219, 169, 99, 255 };
@@ -165,6 +165,11 @@ UI::UI() {
     btn_load_game = {{ 140, 690, 1000, 80 }, "Load Game"};
     btn_config    = {{ 140, 790, 1000, 80 }, "Settings"};
 
+    //Init option buttons for size phase
+    btn_size9  = { { 390, 250, 500, 100 }, "9x9" };
+    btn_size13 = { { 390, 400, 500, 100 }, "13x13" };
+    btn_size19 = { { 390, 550, 500, 100 }, "19x19" };
+
     //Init option buttons for choosing mode
     btn_pvp = { { 390, 250, 500, 100 }, "Play against Friend" };
     btn_pve = { { 390, 400, 500, 100 }, "Play against Seol" };
@@ -175,16 +180,19 @@ UI::UI() {
     btn_hard = { { 390, 550, 500, 100 }, "Hard" };
 
     //Init option buttons for playing phase
-    btn_size9  = { { 390, 250, 500, 100 }, "9x9" };
-    btn_size13 = { { 390, 400, 500, 100 }, "13x13" };
-    btn_size19 = { { 390, 550, 500, 100 }, "19x19" };
-    btn_undo   = { { 554, 25, 88, 40 }, "Undo" };
-    btn_redo   = { { 652, 25, 88, 40 }, "Redo" };
-    btn_reset  = { { 750, 25, 88, 40 }, "Reset" };
-    btn_pass   = { { 848, 25, 88, 40 }, "Pass" };
-    btn_save   = { { 946, 25, 88, 40 }, "Save" };
-    btn_setting_play   = { { 1135, 110, 115, 40 }, "Settings" };
-    btn_back_from_play = { { 1044, 25, 88, 40 }, "Back" };
+    const float play_button_width = 300.0f;
+    const float play_button_height = 50.0f;
+    const float play_button_step = 64.0f;
+    const float play_button_x = GetScreenWidth() - play_button_width - 30.0f;
+    const float play_button_y = GetScreenHeight() - 30.0f
+                              - play_button_height - 6 * play_button_step;
+    btn_pass           = { { play_button_x, play_button_y,                        play_button_width, play_button_height }, "Pass" };
+    btn_undo           = { { play_button_x, play_button_y + play_button_step,     play_button_width, play_button_height }, "Undo" };
+    btn_redo           = { { play_button_x, play_button_y + 2 * play_button_step, play_button_width, play_button_height }, "Redo" };
+    btn_save           = { { play_button_x, play_button_y + 3 * play_button_step, play_button_width, play_button_height }, "Save" };
+    btn_setting_play   = { { play_button_x, play_button_y + 4 * play_button_step, play_button_width, play_button_height }, "Settings" };
+    btn_reset          = { { play_button_x, play_button_y + 5 * play_button_step, play_button_width, play_button_height }, "Reset" };
+    btn_back_from_play = { { play_button_x, play_button_y + 6 * play_button_step, play_button_width, play_button_height }, "Back" };
 
     //Init option buttons for config (Settings) phase
     btn_master_down = { { 560, 240, 60, 50 }, "-" };
@@ -217,7 +225,7 @@ UI::UI() {
     btn_back_load = { { 390, 650, 500, 60 }, "Return to title screen" };
 
     //Init option buttons for gameover phase
-    btn_back_from_end = { { (GetScreenWidth() - 360.0f) * 0.5f, 250, 360, 64 }, "Return to title screen"};
+    btn_back_from_end = { { (GetScreenWidth() - 360.0f) / 2.0f, 250, 360, 64 }, "Return to title screen"};
 }
 
 Color UI::get_background_color() const {
@@ -256,8 +264,8 @@ void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active,
     DrawTextEx(
         button_font,
         btn.label,
-        {btn.bounds.x + (btn.bounds.width - text_size.x) * 0.5f,
-        btn.bounds.y + (btn.bounds.height - text_size.y) * 0.5f},
+        {btn.bounds.x + (btn.bounds.width - text_size.x) / 2.0f,
+        btn.bounds.y + (btn.bounds.height - text_size.y) / 2.0f},
         (float)font_size,
         1.0f,
         text_col
@@ -438,7 +446,7 @@ void UI::draw_starting(const Board &board) {
 
     Vector2 title_size = MeasureTextEx(title_font, TITLE, 150, 1.0f);
     DrawTextEx(title_font, TITLE,
-        {(GetScreenWidth() - title_size.x) * 0.5f, 280},
+        {(GetScreenWidth() - title_size.x) / 2.0f, 280},
         150, 1.0f, RAYWHITE);
 
     const float edge_padding = 20.0f;
