@@ -9,9 +9,9 @@ All usages are listed in the AI Usage Log below.
 | AI01 | 2026-10-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | How to make for both os | To make for both os | Makefile |
 | AI02 | 2026-10-27 | Doan Nhat Anh | Gemini 3.8 Flash | Asking | What did my friend change since the last time I checked, can you summarise what he did | To continue the project |  |
 | AI03 | 2026-10-27 | Doan Nhat Anh | Gemini 3.8 Flash | Asking | Only suggest, don't code. Can you suggest me the functions and codes needed to create interactable buttons to change sizes (9x9, 13x13, 19x19), to redo, undo. | Adding modes and features |  |
-| AI03 | 2026-10-27 | Doan Nhat Anh | Gemini 3.8 Flash | Asking | Explain to me more clearly about Vector2 mouse_pos | Question about library function |  |
-| AI02 | 2026-10-28 | Le Hong Anh | Gemini 3.8 Flash | Checking | identify if the variables in the code base in include and src is all snake_case | To check if the code is formatted | src and include folder |
-| AI03 | 2026-10-28 | Le Hong Anh | Gemini 3.8 Flash | Asking | what option can I use to display captured stones from white and black in raylib | To know how to display |  |
+| AI03a | 2026-10-27 | Doan Nhat Anh | Gemini 3.8 Flash | Asking | Explain to me more clearly about Vector2 mouse_pos | Question about library function |  |
+| AI02a | 2026-10-28 | Le Hong Anh | Gemini 3.8 Flash | Checking | identify if the variables in the code base in include and src is all snake_case | To check if the code is formatted | src and include folder |
+| AI03b | 2026-10-28 | Le Hong Anh | Gemini 3.8 Flash | Asking | what option can I use to display captured stones from white and black in raylib | To know how to display |  |
 | AI04 | 2026-10-28 | Le Hong Anh | Gemini 3.8 Flash | Asking | In a state of a match, only one ko cell can exist, right? | To double checking |  |
 | AI05 | 2026-10-30 | Le Hong Anh | Gemini 3.8 Flash | Asking | only sugestion, don't code: How can I order my code in main.cpp to display a winning/losing menu and a rematch button | To ask |  |
 | AI06 | 2026-11-6 | Le Hong Anh | ChatGPT (GPT-6) | Asking | check out why my set game icon does not work in main.cpp | To know about icon setting |  |
@@ -46,8 +46,7 @@ All usages are listed in the AI Usage Log below.
 | AI35 | 2026-11-20 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | reapply the font for text | To apply font on each type of text | ui.cpp | 
 | AI36 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | move all the buttons of button to right and align it line by line in ui.cpp in the playing phase | To test position for user interface | ui.cpp |  
 | AI37 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Asking | i want to add a using time of each white and black player, how should I do that | To add new timer feature | |
-| AI38 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Asking | 
-is there any formal way that the one-digit is given a zero before in the draw timer | To make the timer better | |
+| AI38 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Asking | is there any formal way that the one-digit is given a zero before in the draw timer | To make the timer better | |
 | AI39 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | encap the information for white and black in seperate boxes | To make boxes for better user experience | ui.cpp | 
 | AI40 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | move the text into the boxes | To move the text into the boxes for better user interface | ui.cpp | 
-| AI41 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | add a trophy image in assest in the top of the panel | To add image | ui.cpp | 
+| AI41 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | add a trophy image in assest in the top of the panel | To add image | ui.cpp |
