@@ -50,3 +50,5 @@ All usages are listed in the AI Usage Log below.
 | AI39 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | encap the information for white and black in seperate boxes | To make boxes for better user experience | ui.cpp | 
 | AI40 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | move the text into the boxes | To move the text into the boxes for better user interface | ui.cpp | 
 | AI41 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | add a trophy image in assest in the top of the panel | To add image | ui.cpp |
+| AI42 | 2026-11-22 | Le Hong Anh | ChatGPT (GPT-6) | Refactoring report structure | in the document folder, in the report folder, split the main.tex into each section.tex, keep the main.tex as the compiler | Split the seven report sections into separate `.tex` files and kept `main.tex` as the compilation entry point; verified the PDF build | docs/report/main.tex; docs/report/sections/*.tex |
+| AI43 | 2026-11-22 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | add a table for me in the testing document | To make a table for tetcase | testing_document.text | 

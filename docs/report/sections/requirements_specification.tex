@@ -1,0 +1,45 @@
+\section{Requirements Specification}
+
+\subsection{Game Modes}
+
+\begin{itemize}
+    \item \textbf{Two-player mode:} Two players compete on the same device.
+    Black moves first, and turns alternate between Black and White after
+    each valid move or pass.
+
+    \item \textbf{Player vs.\ AI mode:} The human player controls Black,
+    while the computer controls White. Before starting the game, the player
+    can choose from three difficulty levels: Easy, Medium, or Hard.
+    The computer responds after each human turn, with an artificial
+    delay of 1500 milliseconds to simulate thinking time.
+\end{itemize}
+
+\subsection{User Interface (UI)}
+
+
+\subsection{Board Representation}
+
+
+
+\subsection{Game Logic}
+
+
+\subsection{AI Opponent}
+
+
+\subsection{Game State Management}
+
+
+\subsection{Saving and Loading}
+
+
+\subsection{Additional Implemented Features}
+
+
+\subsection{Technology Stack}
+
+The game's core logic, AI algorithms, game state management, and graphical user interface (GUI) are implemented in C++. The application uses the Raylib library for graphics rendering, audio playback, and user input handling.
+
+For the player-versus-computer mode, the AI uses the Minimax algorithm to determine moves at Medium and Hard difficulty levels, with Alpha-Beta pruning applied exclusively at the Hard difficulty level to optimize the decision-making process.
+
+The game also supports saving and loading functionality using the JSON format. Game states, including stone positions, turn information, and other relevant data, are serialized into JSON files. These files can later be loaded to restore the game to its previously saved state.

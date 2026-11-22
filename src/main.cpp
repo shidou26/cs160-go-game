@@ -153,10 +153,6 @@ int main() {
                 }
             }
 
-            if (phase != GamePhase::PLAYING) {
-                continue;
-            }
-
             if (board.get_pass() == 2) {
                 phase = GamePhase::GAMEOVER;
                 Audio::play(SFX::END);

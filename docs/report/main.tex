@@ -1,0 +1,60 @@
+\documentclass[11pt]{article}
+\input{premable.cls}
+\input{KhaiBao-Color.cls}
+\input{KhaiBao-tcolorbox.cls}
+
+\fancyfoot[L]{\footnotesize{\sffamily{CS160 -- Final Project Report \\ \textbf{Authors:} Lê Hồng Anh -- Đoàn Nhật Anh}}}
+\fancyfoot[R]{\footnotesize{\sffamily{Page \thepage}}}
+
+%==== MAIN DOCUMENT ====%
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+
+    {\sffamily
+        \Large\textbf{University of Science, VNU-HCM}\\[0.3cm]
+        \Large CS160 -- Introduction to Computer Science
+    }
+
+    \vspace{5cm}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.2]{images/Logo chinh.png}
+    \end{figure}
+
+    {\sffamily\Huge\uline{\textbf{Go Project Report}}}
+
+    \vspace{1cm}
+
+    {\sffamily\large
+        \textbf{Authors:}\\[0.3cm]
+        \makebox[3cm][l]{Đoàn Nhật Anh} 26125002\\
+        \makebox[3cm][l]{Lê Hồng Anh} 26125003\\[0.3cm]
+        \textbf{Date of submission:} November 20, 2026
+    }
+
+\end{titlepage}
+
+\begingroup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=black
+}
+\tableofcontents
+\newpage
+\endgroup
+
+\input{sections/overview.tex}
+\input{sections/requirements_specification.tex}
+\input{sections/design_document.tex}
+\input{sections/tutorial_to_game_development_in_cpp.tex}
+\input{sections/code_modification.tex}
+\input{sections/testing_document.tex}
+\input{sections/future_improvements.tex}
+
+\end{document}
