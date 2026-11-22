@@ -50,3 +50,7 @@ All usages are listed in the AI Usage Log below.
 | AI39 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | encap the information for white and black in seperate boxes | To make boxes for better user experience | ui.cpp | 
 | AI40 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | move the text into the boxes | To move the text into the boxes for better user interface | ui.cpp | 
 | AI41 | 2026-11-21 | Le Hong Anh | ChatGPT (GPT-6) | Generating code | add a trophy image in assest in the top of the panel | To add image | ui.cpp |
+| AI42 | 2026-11-22 | Doan Nhat Anh | Gemini 4 Hydrogen | asking | how to custom button, not just color, I want .png to custom them | theme edit | all |
+| AI43 | 2026-11-22 | Doan Nhat Anh | Gemini 4 Hydrogen | editting code | can you change the "color" option of buttons to ".png" instead, I want to custom | remove color, use .png instead | ui.cpp and ui.h |
+| AI44 | 2026-11-22 | Doan Nhat Anh | Gemini 4 Hydrogen | generating code | can you make it so that when I add the image/sound in assets, it automatically updates in the game | theme edit | ui.cpp |
+| AI45 | 2026-11-22 | Doan Nhat Anh | Gemini 4 Hydrogen | asking | can you suggest me some theme and sound for the game | quality of life | assets |
