@@ -17,6 +17,54 @@
 
 namespace {
 
+const Rectangle PICKER_PANEL_RECT   = { 190.0f, 474.0f, 900.0f, 344.0f };
+const Rectangle PICKER_LIST_RECT    = { 214.0f, 496.0f, 340.0f, 300.0f };
+const Rectangle PICKER_PREVIEW_RECT = { 578.0f, 496.0f, 488.0f, 300.0f };
+const float PICKER_ITEM_H   = 52.0f;
+const float PICKER_ITEM_GAP = 10.0f;
+
+bool is_image_ext(const std::string &ext) {
+    std::string lower = ext;
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+    return (lower == ".png" || lower == ".jpg" || lower == ".jpeg");
+}
+
+Texture2D load_texture_hd(const std::string &path) {
+    if (!std::filesystem::exists(path)) return Texture2D{};
+    Texture2D tex = LoadTexture(path.c_str());
+    if (tex.id != 0) {
+        GenTextureMipmaps(&tex);
+        SetTextureFilter(tex, TEXTURE_FILTER_TRILINEAR);
+    }
+    return tex;
+}
+
+Color parse_json_color(const json &j, const char *key, Color fallback) {
+    if (!j.contains(key) || !j[key].is_array() || j[key].size() < 4) return fallback;
+    return (Color){
+        (unsigned char)std::clamp(j[key][0].get<int>(), 0, 255),
+        (unsigned char)std::clamp(j[key][1].get<int>(), 0, 255),
+        (unsigned char)std::clamp(j[key][2].get<int>(), 0, 255),
+        (unsigned char)std::clamp(j[key][3].get<int>(), 0, 255)
+    };
+}
+
+void load_theme_colors(const std::filesystem::path &dir, ThemeOption &opt) {
+    std::filesystem::path cfg = dir / "colors.json";
+    if (!std::filesystem::exists(cfg)) return;
+    try {
+        std::ifstream f(cfg);
+        json data;
+        f >> data;
+        opt.bg_fallback       = parse_json_color(data, "bg_fallback",       opt.bg_fallback);
+        opt.text_color        = parse_json_color(data, "text_color",        opt.text_color);
+        opt.active_text_color = parse_json_color(data, "active_text_color", opt.active_text_color);
+        opt.accent_color      = parse_json_color(data, "accent_color",      opt.accent_color);
+        opt.line_color        = parse_json_color(data, "line_color",        opt.line_color);
+        opt.board_border      = parse_json_color(data, "board_border",      opt.board_border);
+    } catch (...) {}
+}
+
 Texture2D create_hd_stone_texture(bool is_black) {
     const int tex_size = 512;
     Image img = GenImageColor(tex_size, tex_size, BLANK);
@@ -159,11 +207,6 @@ UI::UI() {
     start_y = (GetScreenHeight() - grid_width) / 2.0f;
     padding = PADDING;
 
-    bg_color = (Color){ 20, 24, 35, 255 };
-    board_wood = (Color){ 219, 169, 99, 255 };
-    line_color = (Color){ 55, 36, 18, 255 };
-    board_border = (Color){ 170, 124, 70, 255 };
-
     //Init option buttons for starting phase
     btn_new_game  = {{ 140, 590, 1000, 80 }, "New Game"};
     btn_load_game = {{ 140, 690, 1000, 80 }, "Load Game"};
@@ -199,21 +242,22 @@ UI::UI() {
     btn_reset          = { { play_button_x, play_button_y + 5 * play_button_step, play_button_width, play_button_height }, "Reset" };
     btn_back_from_play = { { play_button_x, play_button_y + 6 * play_button_step, play_button_width, play_button_height }, "Back" };
 
-    //Init option buttons for config (Settings) phase
-    btn_master_down = { { 560, 240, 60, 50 }, "-" };
-    btn_master_up   = { { 760, 240, 60, 50 }, "+" };
-    btn_master_mute = { { 840, 240, 120, 50 }, "Mute" };
-    btn_music_down  = { { 560, 330, 60, 50 }, "-" };
-    btn_music_up    = { { 760, 330, 60, 50 }, "+" };
-    btn_music_mute  = { { 840, 330, 120, 50 }, "Mute" };
-    btn_sound_down  = { { 560, 420, 60, 50 }, "-" };
-    btn_sound_up    = { { 760, 420, 60, 50 }, "+" };
-    btn_sound_mute  = { { 840, 420, 120, 50 }, "Mute" };
-    btn_change_music = { { 980, 330, 230, 50 }, "Change Music" };
-    opt_music[0] = { { 980, 385, 230, 50 }, "Song 1" };
-    opt_music[1] = { { 980, 435, 230, 50 }, "Song 2" };
-    opt_music[2] = { { 980, 485, 230, 50 }, "Song 3" };
-    btn_back_config = { { 390, 650, 500, 60 }, "Back" };
+    //Init option buttons for config (Settings) phase — centered x=190..1090
+    btn_master_down = { { 430, 146, 60, 44 }, "-" };
+    btn_master_up   = { { 610, 146, 60, 44 }, "+" };
+    btn_master_mute = { { 690, 146, 120, 44 }, "Mute" };
+    btn_music_down  = { { 430, 206, 60, 44 }, "-" };
+    btn_music_up    = { { 610, 206, 60, 44 }, "+" };
+    btn_music_mute  = { { 690, 206, 120, 44 }, "Mute" };
+    btn_sound_down  = { { 430, 266, 60, 44 }, "-" };
+    btn_sound_up    = { { 610, 266, 60, 44 }, "+" };
+    btn_sound_mute  = { { 690, 266, 120, 44 }, "Mute" };
+    btn_music_prev  = { { 430, 326, 60, 44 }, "<" };
+    btn_music_next  = { { 750, 326, 60, 44 }, ">" };
+    btn_tab_theme   = { { 430, 398, 205, 50 }, "Game Theme" };
+    btn_tab_board   = { { 655, 398, 205, 50 }, "Board" };
+    btn_tab_stones  = { { 880, 398, 210, 50 }, "Stones" };
+    btn_back_config = { { 390, 846, 500, 60 }, "Ok" };
 
     //Init option buttons for saving phase
     btn_save_slots[0] = { { 390, 220, 500, 80 }, "Save to Slot 1" };
@@ -233,16 +277,159 @@ UI::UI() {
     btn_back_from_end = { { (GetScreenWidth() - 360.0f) / 2.0f,
                            (GetScreenHeight() - 420.0f) / 2.0f + 324.0f,
                            360, 64 }, "Return to title screen"};
+
+    // Auto-scan custom PNG themes, boards, and stone packs
+    scan_custom_assets();
+    apply_selected_assets();
+}
+
+void UI::scan_custom_assets() {
+    // 1. Game Themes (auto-scanned from assets/themes/; "Classic" placed first)
+    theme_options.clear();
+    const std::string themes_dir = "assets/themes";
+    bool found_classic = false;
+    if (std::filesystem::exists(themes_dir)) {
+        std::vector<std::filesystem::path> dirs;
+        for (const auto &entry : std::filesystem::directory_iterator(themes_dir)) {
+            if (entry.is_directory()) dirs.push_back(entry.path());
+        }
+        std::sort(dirs.begin(), dirs.end(), [](const auto &a, const auto &b) {
+            if (a.filename() == "Classic") return true;
+            if (b.filename() == "Classic") return false;
+            return a.filename() < b.filename();
+        });
+        for (const auto &dir : dirs) {
+            ThemeOption opt;
+            opt.name           = dir.filename().string();
+            opt.bg_tex         = load_texture_hd((dir / "bg.png").string());
+            opt.btn_normal_tex = load_texture_hd((dir / "btn_normal.png").string());
+            opt.btn_hover_tex  = load_texture_hd((dir / "btn_hover.png").string());
+            opt.btn_active_tex = load_texture_hd((dir / "btn_active.png").string());
+            load_theme_colors(dir, opt);
+            if (opt.name == "Classic") found_classic = true;
+            theme_options.push_back(opt);
+        }
+    }
+    if (!found_classic) {
+        ThemeOption fallback;
+        fallback.name = "Classic";
+        theme_options.insert(theme_options.begin(), fallback);
+    }
+
+    // 2. Boards (index 0 = built-in procedural Kaya Wood)
+    board_options.clear();
+    board_options.push_back({ "Kaya Wood", wood_board_tex });
+    const std::string boards_dir = "assets/boards";
+    if (std::filesystem::exists(boards_dir)) {
+        std::vector<std::filesystem::path> files;
+        for (const auto &entry : std::filesystem::directory_iterator(boards_dir)) {
+            if (entry.is_regular_file() && is_image_ext(entry.path().extension().string())) {
+                files.push_back(entry.path());
+            }
+        }
+        std::sort(files.begin(), files.end());
+        for (const auto &file : files) {
+            Texture2D tex = load_texture_hd(file.string());
+            if (tex.id != 0) {
+                board_options.push_back({ file.stem().string(), tex });
+            }
+        }
+    }
+
+    // 3. Stones (index 0 = built-in procedural 3D Glossy)
+    stone_options.clear();
+    stone_options.push_back({ "3D Glossy", black_stone_tex, white_stone_tex });
+    const std::string stones_dir = "assets/stones";
+    if (std::filesystem::exists(stones_dir)) {
+        std::vector<std::filesystem::path> dirs;
+        for (const auto &entry : std::filesystem::directory_iterator(stones_dir)) {
+            if (entry.is_directory()) dirs.push_back(entry.path());
+        }
+        std::sort(dirs.begin(), dirs.end());
+        for (const auto &dir : dirs) {
+            Texture2D b_tex = load_texture_hd((dir / "black.png").string());
+            Texture2D w_tex = load_texture_hd((dir / "white.png").string());
+            if (b_tex.id != 0 && w_tex.id != 0) {
+                stone_options.push_back({ dir.filename().string(), b_tex, w_tex });
+            } else {
+                if (b_tex.id != 0) UnloadTexture(b_tex);
+                if (w_tex.id != 0) UnloadTexture(w_tex);
+            }
+        }
+    }
+}
+
+void UI::apply_selected_assets() {
+    selected_theme_idx = 0;
+    for (int i = 0; i < (int)theme_options.size(); i++) {
+        if (theme_options[i].name == selected_theme) {
+            selected_theme_idx = i;
+            break;
+        }
+    }
+    if (!theme_options.empty()) selected_theme = theme_options[selected_theme_idx].name;
+
+    selected_board_idx = 0;
+    for (int i = 0; i < (int)board_options.size(); i++) {
+        if (board_options[i].name == selected_board) {
+            selected_board_idx = i;
+            break;
+        }
+    }
+    if (!board_options.empty()) {
+        selected_board = board_options[selected_board_idx].name;
+        wood_board_tex = board_options[selected_board_idx].tex;
+    }
+
+    selected_stone_idx = 0;
+    for (int i = 0; i < (int)stone_options.size(); i++) {
+        if (stone_options[i].name == selected_stones) {
+            selected_stone_idx = i;
+            break;
+        }
+    }
+    if (!stone_options.empty()) {
+        selected_stones = stone_options[selected_stone_idx].name;
+        black_stone_tex = stone_options[selected_stone_idx].black_tex;
+        white_stone_tex = stone_options[selected_stone_idx].white_tex;
+    }
+}
+
+const ThemeOption &UI::active_theme() const {
+    static const ThemeOption default_theme{ "Classic" };
+    if (selected_theme_idx >= 0 && selected_theme_idx < (int)theme_options.size()) {
+        return theme_options[selected_theme_idx];
+    }
+    return default_theme;
+}
+
+void UI::draw_background() const {
+    const Texture2D &bg = active_theme().bg_tex;
+    if (bg.id != 0) {
+        Rectangle src = { 0.0f, 0.0f, (float)bg.width, (float)bg.height };
+        Rectangle dst = { 0.0f, 0.0f, (float)GetScreenWidth(), (float)GetScreenHeight() };
+        DrawTexturePro(bg, src, dst, { 0.0f, 0.0f }, 0.0f, WHITE);
+    }
 }
 
 Color UI::get_background_color() const {
-    return bg_color;
+    return active_theme().bg_fallback;
 }
 
 void UI::unload() {
-    UnloadTexture(black_stone_tex);
-    UnloadTexture(white_stone_tex);
-    UnloadTexture(wood_board_tex);
+    for (auto &t : theme_options) {
+        if (t.bg_tex.id != 0) UnloadTexture(t.bg_tex);
+        if (t.btn_normal_tex.id != 0) UnloadTexture(t.btn_normal_tex);
+        if (t.btn_hover_tex.id != 0) UnloadTexture(t.btn_hover_tex);
+        if (t.btn_active_tex.id != 0) UnloadTexture(t.btn_active_tex);
+    }
+    for (auto &b : board_options) {
+        if (b.tex.id != 0) UnloadTexture(b.tex);
+    }
+    for (auto &s : stone_options) {
+        if (s.black_tex.id != 0) UnloadTexture(s.black_tex);
+        if (s.white_tex.id != 0) UnloadTexture(s.white_tex);
+    }
     if (trophy_tex.id != 0) UnloadTexture(trophy_tex);
     UnloadFont(title_font);
     UnloadFont(heading_font);
@@ -258,15 +445,24 @@ int UI::get_cell_size(const Board &board) const {
 
 void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active, int font_size, bool interactive) const {
     bool is_hovered = interactive && CheckCollisionPointRec(mouse_pos, btn.bounds);
+    const ThemeOption &t = active_theme();
 
-    Color fill = is_active
-        ? (Color){ 219, 169, 99, 255 }
-        : (is_hovered ? (Color){ 60, 70, 95, 255 } : (Color){ 35, 42, 60, 255 });
-    Color text_col = is_active ? (Color){ 20, 24, 35, 255 } : RAYWHITE;
-    Color border_col = is_active ? RAYWHITE : (Color){ 100, 115, 140, 255 };
+    Color text_col = is_active ? t.active_text_color : t.text_color;
 
-    DrawRectangleRounded(btn.bounds, 0.28f, 16, fill);
-    DrawRectangleRoundedLinesEx(btn.bounds, 0.28f, 16, 1.5f, border_col);
+    // Draw custom PNG button texture from active theme (fallback to simple rounded box if missing)
+    Texture2D custom_tex{};
+    if (is_active && t.btn_active_tex.id != 0) custom_tex = t.btn_active_tex;
+    else if (is_hovered && t.btn_hover_tex.id != 0) custom_tex = t.btn_hover_tex;
+    else if (t.btn_normal_tex.id != 0) custom_tex = t.btn_normal_tex;
+
+    if (custom_tex.id != 0) {
+        Rectangle src = { 0.0f, 0.0f, (float)custom_tex.width, (float)custom_tex.height };
+        DrawTexturePro(custom_tex, src, btn.bounds, { 0.0f, 0.0f }, 0.0f, WHITE);
+    } else {
+        Color fill = is_active ? t.accent_color : (is_hovered ? (Color){ 60, 70, 95, 255 } : (Color){ 35, 42, 60, 255 });
+        DrawRectangleRounded(btn.bounds, 0.28f, 16, fill);
+        DrawRectangleRoundedLinesEx(btn.bounds, 0.28f, 16, 1.5f, is_active ? RAYWHITE : (Color){ 100, 115, 140, 255 });
+    }
 
     Vector2 text_size = MeasureTextEx(button_font, btn.label, (float)font_size, 1.0f);
     DrawTextEx(
@@ -281,6 +477,7 @@ void UI::draw_button(const OptionButton &btn, Vector2 mouse_pos, bool is_active,
 }
 
 void UI::draw(Board &board, bool interactive) {
+    draw_background();
     int board_size = board.get_size();
     int cell_size = get_cell_size(board);
     int actual_grid_width = (board_size - 1) * cell_size;
@@ -300,8 +497,8 @@ void UI::draw(Board &board, bool interactive) {
             sidebar_width, 150.0f
         };
         Color fill = (Color){25, 30, 42, 255};
-        Color text_color = RAYWHITE;
-        Color border_color = board_wood;
+        Color text_color = active_theme().text_color;
+        Color border_color = active_theme().accent_color;
 
         DrawRectangleRounded(info_box, 0.15f, 16, fill);
         DrawRectangleRoundedLinesEx(info_box, 0.15f, 16, 2.0f, border_color);
@@ -339,15 +536,16 @@ void UI::draw(Board &board, bool interactive) {
     DrawRectangleRounded(board_shadow, 0.05f, 24, (Color){ 0, 0, 0, 110 });
 
     // Darker outer wood border
+    const ThemeOption &theme = active_theme();
     Rectangle outer_border = { board_rect.x - 4.0f, board_rect.y - 4.0f, board_rect.width + 8.0f, board_rect.height + 8.0f };
-    DrawRectangleRounded(outer_border, 0.05f, 24, board_border);
-    DrawRectangleRounded(board_rect, 0.05f, 24, board_wood);
+    DrawRectangleRounded(outer_border, 0.05f, 24, theme.board_border);
+    DrawRectangleRounded(board_rect, 0.05f, 24, theme.accent_color);
 
     // Overlay natural HD wood grain texture onto the board surface
     Rectangle wood_src = { 0.0f, 0.0f, (float)wood_board_tex.width, (float)wood_board_tex.height };
     Rectangle wood_dst = { board_rect.x + 6.0f, board_rect.y + 6.0f, board_rect.width - 12.0f, board_rect.height - 12.0f };
     DrawTexturePro(wood_board_tex, wood_src, wood_dst, { 0.0f, 0.0f }, 0.0f, WHITE);
-    DrawRectangleRoundedLinesEx(board_rect, 0.05f, 24, 4.0f, board_border);
+    DrawRectangleRoundedLinesEx(board_rect, 0.05f, 24, 4.0f, theme.board_border);
 
     // 3. [HD UPGRADE]: Draw grid lines with engraved groove effect (1 highlight line + 1 dark line)
     Color groove_highlight = { 245, 208, 145, 160 };
@@ -360,8 +558,8 @@ void UI::draw(Board &board, bool interactive) {
         DrawLineEx({ (float)start_x, y_pos + 1.2f }, { (float)(start_x + actual_grid_width), y_pos + 1.2f }, 1.2f, groove_highlight);
 
         // Crisp dark main groove line
-        DrawLineEx({ x_pos, (float)start_y }, { x_pos, (float)(start_y + actual_grid_width) }, 1.8f, line_color);
-        DrawLineEx({ (float)start_x, y_pos }, { (float)(start_x + actual_grid_width), y_pos }, 1.8f, line_color);
+        DrawLineEx({ x_pos, (float)start_y }, { x_pos, (float)(start_y + actual_grid_width) }, 1.8f, theme.line_color);
+        DrawLineEx({ (float)start_x, y_pos }, { (float)(start_x + actual_grid_width), y_pos }, 1.8f, theme.line_color);
     }
 
     // 3b. [HD UPGRADE]: Draw standard Star Points (Hoshi) based on board size
@@ -380,7 +578,7 @@ void UI::draw(Board &board, bool interactive) {
                 if (!is_center && !is_corner) continue;
             }
             Vector2 star_pos = { (float)(start_x + sc * cell_size), (float)(start_y + sr * cell_size) };
-            DrawCircleV(star_pos, std::max(4.0f, cell_size * 0.1f), line_color);
+            DrawCircleV(star_pos, std::max(4.0f, cell_size * 0.1f), theme.line_color);
         }
     }
 
@@ -458,6 +656,7 @@ void UI::draw(Board &board, bool interactive) {
 }
 
 void UI::draw_starting() {
+    draw_background();
     Vector2 mouse_pos = GetMousePosition();
 
     Vector2 title_size = MeasureTextEx(title_font, TITLE, 150, 1.0f);
@@ -478,6 +677,7 @@ void UI::draw_starting() {
 }
 
 void UI::draw_mode() {
+    draw_background();
     Vector2 mouse_pos = GetMousePosition();
     DrawTextEx(heading_font, "CHOOSE GAME MODE", {390, 120}, 36, 1.0f, RAYWHITE);
     draw_button(btn_pvp, mouse_pos, CheckCollisionPointRec(mouse_pos, btn_pvp.bounds), 28);
@@ -485,6 +685,7 @@ void UI::draw_mode() {
 }
 
 void UI::draw_difficulty() {
+    draw_background();
     Vector2 mouse_pos = GetMousePosition();
     DrawTextEx(heading_font, "CHOOSE DIFFICULTY", {390, 120}, 36, 1.0f, RAYWHITE);
     draw_button(btn_easy,   mouse_pos, CheckCollisionPointRec(mouse_pos, btn_easy.bounds), 28);
@@ -493,6 +694,7 @@ void UI::draw_difficulty() {
 }
 
 void UI::draw_choosing_board_size(const Board &board) {
+    draw_background();
     Vector2 mouse_pos = GetMousePosition();
     DrawTextEx(heading_font, "CHOOSE BOARD SIZE", {390, 120}, 36, 1.0f, RAYWHITE);
     draw_button(btn_size9,  mouse_pos, CheckCollisionPointRec(mouse_pos, btn_size9.bounds), 28);
@@ -516,8 +718,8 @@ void UI::draw_ending(const Board &board) {
         560.0f,
         420.0f
     };
-    DrawRectangleRounded(panel, 0.08f, 16, bg_color);
-    DrawRectangleRoundedLinesEx(panel, 0.08f, 16, 2.0f, board_wood);
+    DrawRectangleRounded(panel, 0.08f, 16, active_theme().bg_fallback);
+    DrawRectangleRoundedLinesEx(panel, 0.08f, 16, 2.0f, active_theme().accent_color);
 
     //Trophy
     if (trophy_tex.id != 0) {
@@ -562,41 +764,232 @@ void UI::draw_ending(const Board &board) {
     draw_button(btn_back_from_end, mouse_pos, false, 24);
 }
 
-void UI::draw_config() {
-    Vector2 mouse_pos = GetMousePosition();
+void UI::draw_select_preview(Rectangle preview_box) const {
+    DrawRectangleRounded(preview_box, 0.08f, 16, (Color){ 16, 20, 30, 255 });
+    DrawRectangleRoundedLinesEx(preview_box, 0.08f, 16, 1.5f, (Color){ 90, 105, 130, 255 });
 
-    DrawTextEx(heading_font, "SETTINGS", {390, 120}, 40, 1.0f, RAYWHITE);
-
-    //Audio
-    DrawTextEx(label_font, "Master Volume", {320, 250}, 26, 1.0f, RAYWHITE);
-    draw_button(btn_master_down, mouse_pos, false, 24);
-    DrawTextEx(label_font, is_muted_master ? "Muted" : TextFormat("%d%%", master_volume), {660, 252}, 24, 1.0f, is_muted_master ? RED : RAYWHITE);
-    draw_button(btn_master_up, mouse_pos, false, 24);
-    draw_button(btn_master_mute, mouse_pos, is_muted_master, 22);
-
-    DrawTextEx(label_font, "Music Volume", {320, 340}, 26, 1.0f, RAYWHITE);
-    draw_button(btn_music_down, mouse_pos, false, 24);
-    DrawTextEx(label_font, is_muted_music ? "Muted" : TextFormat("%d%%", music_volume), {660, 342}, 24, 1.0f, is_muted_music ? RED : RAYWHITE);
-    draw_button(btn_music_up, mouse_pos, false, 24);
-    draw_button(btn_music_mute, mouse_pos, is_muted_music, 22);
-
-    DrawTextEx(label_font, "Sound Effects", {320, 430}, 26, 1.0f, RAYWHITE);
-    draw_button(btn_sound_down, mouse_pos, false, 24);
-    DrawTextEx(label_font, is_muted_sound ? "Muted" : TextFormat("%d%%", sound_volume), {660, 432}, 24, 1.0f, is_muted_sound ? RED : RAYWHITE);
-    draw_button(btn_sound_up, mouse_pos, false, 24);
-    draw_button(btn_sound_mute, mouse_pos, is_muted_sound, 22);
-
-    draw_button(btn_change_music, mouse_pos, music_dropdown_open, 22);
-    if (music_dropdown_open) {
-        for (int i = 0; i < 3; i++) {
-            draw_button(opt_music[i], mouse_pos, selected_music == i + 1, 22);
-        }
+    std::string header_text = "Preview";
+    if (active_select_tab == 0 && selected_theme_idx < (int)theme_options.size()) {
+        header_text = "Theme: " + theme_options[selected_theme_idx].name;
+    } else if (active_select_tab == 1 && selected_board_idx < (int)board_options.size()) {
+        header_text = "Board: " + board_options[selected_board_idx].name;
+    } else if (active_select_tab == 2 && selected_stone_idx < (int)stone_options.size()) {
+        header_text = "Stones: " + stone_options[selected_stone_idx].name;
     }
 
+    DrawTextEx(label_font, header_text.c_str(), { preview_box.x + 16.0f, preview_box.y + 12.0f }, 20, 1.0f, RAYWHITE);
+
+    Rectangle inner = {
+        preview_box.x + 16.0f,
+        preview_box.y + 46.0f,
+        preview_box.width - 32.0f,
+        preview_box.height - 62.0f
+    };
+
+    const ThemeOption &cur = active_theme();
+
+    if (active_select_tab == 0 && selected_theme_idx < (int)theme_options.size()) {
+        const ThemeOption &t = theme_options[selected_theme_idx];
+        if (t.bg_tex.id != 0) {
+            Rectangle src = { 0, 0, (float)t.bg_tex.width, (float)t.bg_tex.height };
+            DrawTexturePro(t.bg_tex, src, inner, { 0, 0 }, 0.0f, WHITE);
+        } else {
+            DrawRectangleRounded(inner, 0.06f, 12, t.bg_fallback);
+        }
+        DrawRectangleRoundedLinesEx(inner, 0.06f, 12, 1.2f, (Color){ 110, 125, 150, 180 });
+
+        // Mini board on left of theme preview
+        Rectangle mini_board = { inner.x + 18.0f, inner.y + (inner.height - 150.0f) * 0.5f, 150.0f, 150.0f };
+        Rectangle b_src = { 0, 0, (float)wood_board_tex.width, (float)wood_board_tex.height };
+        DrawTexturePro(wood_board_tex, b_src, mini_board, { 0, 0 }, 0.0f, WHITE);
+        for (int i = 0; i < 4; i++) {
+            float p = 24.0f + i * 34.0f;
+            DrawLineEx({ mini_board.x + 24.0f, mini_board.y + p }, { mini_board.x + 126.0f, mini_board.y + p }, 1.5f, t.line_color);
+            DrawLineEx({ mini_board.x + p, mini_board.y + 24.0f }, { mini_board.x + p, mini_board.y + 126.0f }, 1.5f, t.line_color);
+        }
+        Rectangle s_src = { 0, 0, (float)black_stone_tex.width, (float)black_stone_tex.height };
+        DrawTexturePro(black_stone_tex, s_src, { mini_board.x + 44.0f, mini_board.y + 44.0f, 28.0f, 28.0f }, { 0, 0 }, 0.0f, WHITE);
+        DrawTexturePro(white_stone_tex, s_src, { mini_board.x + 78.0f, mini_board.y + 44.0f, 28.0f, 28.0f }, { 0, 0 }, 0.0f, WHITE);
+
+        // Mini Normal / Hover / Active buttons on right of theme preview
+        float bx = inner.x + 190.0f;
+        float bw = inner.width - 208.0f;
+        OptionButton demo_norm = { { bx, inner.y + 34.0f,  bw, 42.0f }, "Normal" };
+        OptionButton demo_hov  = { { bx, inner.y + 92.0f,  bw, 42.0f }, "Hover" };
+        OptionButton demo_act  = { { bx, inner.y + 150.0f, bw, 42.0f }, "Active" };
+        draw_button(demo_norm, { -1, -1 }, false, 18, false);
+        draw_button(demo_hov,  { demo_hov.bounds.x + 5, demo_hov.bounds.y + 5 }, false, 18, true);
+        draw_button(demo_act,  { -1, -1 }, true, 18, false);
+    } else if (active_select_tab == 1 && selected_board_idx < (int)board_options.size()) {
+        DrawRectangleRounded(inner, 0.06f, 12, cur.bg_fallback);
+        float sz = std::min(inner.width, inner.height) - 24.0f;
+        Rectangle mini_board = {
+            inner.x + (inner.width - sz) * 0.5f,
+            inner.y + (inner.height - sz) * 0.5f,
+            sz, sz
+        };
+        const Texture2D &btex = board_options[selected_board_idx].tex;
+        Rectangle src = { 0, 0, (float)btex.width, (float)btex.height };
+        DrawTexturePro(btex, src, mini_board, { 0, 0 }, 0.0f, WHITE);
+        DrawRectangleLinesEx(mini_board, 2.0f, cur.board_border);
+
+        float pad = 24.0f;
+        float step = (sz - pad * 2.0f) / 4.0f;
+        for (int i = 0; i < 5; i++) {
+            float p = pad + i * step;
+            DrawLineEx({ mini_board.x + pad, mini_board.y + p }, { mini_board.x + sz - pad, mini_board.y + p }, 1.6f, cur.line_color);
+            DrawLineEx({ mini_board.x + p, mini_board.y + pad }, { mini_board.x + p, mini_board.y + sz - pad }, 1.6f, cur.line_color);
+        }
+        DrawCircleV({ mini_board.x + pad + 2 * step, mini_board.y + pad + 2 * step }, 4.0f, cur.line_color);
+        float r = step * 0.42f;
+        Rectangle s_src = { 0, 0, (float)black_stone_tex.width, (float)black_stone_tex.height };
+        DrawTexturePro(black_stone_tex, s_src, { mini_board.x + pad + step - r, mini_board.y + pad + step - r, r * 2, r * 2 }, { 0, 0 }, 0.0f, WHITE);
+        DrawTexturePro(white_stone_tex, s_src, { mini_board.x + pad + 3 * step - r, mini_board.y + pad + step - r, r * 2, r * 2 }, { 0, 0 }, 0.0f, WHITE);
+    } else if (active_select_tab == 2 && selected_stone_idx < (int)stone_options.size()) {
+        Rectangle b_src = { 0, 0, (float)wood_board_tex.width, (float)wood_board_tex.height };
+        DrawTexturePro(wood_board_tex, b_src, inner, { 0, 0 }, 0.0f, WHITE);
+        DrawRectangleLinesEx(inner, 2.0f, cur.board_border);
+
+        float cy = inner.y + inner.height * 0.46f;
+        float lx = inner.x + inner.width * 0.30f;
+        float rx = inner.x + inner.width * 0.70f;
+        DrawLineEx({ inner.x, cy }, { inner.x + inner.width, cy }, 2.2f, cur.line_color);
+        DrawLineEx({ lx, inner.y }, { lx, inner.y + inner.height }, 2.2f, cur.line_color);
+        DrawLineEx({ rx, inner.y }, { rx, inner.y + inner.height }, 2.2f, cur.line_color);
+
+        const StoneOption &so = stone_options[selected_stone_idx];
+        float r = 46.0f;
+        Rectangle bsrc = { 0, 0, (float)so.black_tex.width, (float)so.black_tex.height };
+        Rectangle wsrc = { 0, 0, (float)so.white_tex.width, (float)so.white_tex.height };
+        DrawCircleGradient({ lx + 4, cy + 5 }, r * 1.05f, { 0, 0, 0, 120 }, { 0, 0, 0, 0 });
+        DrawTexturePro(so.black_tex, bsrc, { lx - r, cy - r, r * 2, r * 2 }, { 0, 0 }, 0.0f, WHITE);
+        DrawCircleGradient({ rx + 4, cy + 5 }, r * 1.05f, { 0, 0, 0, 120 }, { 0, 0, 0, 0 });
+        DrawTexturePro(so.white_tex, wsrc, { rx - r, cy - r, r * 2, r * 2 }, { 0, 0 }, 0.0f, WHITE);
+
+        Vector2 b_sz = MeasureTextEx(label_font, "Black", 20, 1.0f);
+        Vector2 w_sz = MeasureTextEx(label_font, "White", 20, 1.0f);
+        DrawTextEx(label_font, "Black", { lx - b_sz.x * 0.5f, cy + r + 14.0f }, 20, 1.0f, cur.line_color);
+        DrawTextEx(label_font, "White", { rx - w_sz.x * 0.5f, cy + r + 14.0f }, 20, 1.0f, cur.line_color);
+    }
+}
+
+void UI::draw_config() {
+    draw_background();
+    Vector2 mouse_pos = GetMousePosition();
+
+    // Centered SETTINGS heading
+    Vector2 title_sz = MeasureTextEx(heading_font, "SETTINGS", 42, 1.0f);
+    DrawTextEx(heading_font, "SETTINGS", { (GetScreenWidth() - title_sz.x) * 0.5f, 60.0f }, 42, 1.0f, RAYWHITE);
+
+    // Centered Audio section (x = 190 .. 1090)
+    auto draw_centered_val = [&](const char *txt, float y, Color col) {
+        Vector2 sz = MeasureTextEx(label_font, txt, 22, 1.0f);
+        DrawTextEx(label_font, txt, { 550.0f - sz.x * 0.5f, y }, 22, 1.0f, col);
+    };
+
+    DrawTextEx(label_font, "Master Volume", { 190, 154 }, 24, 1.0f, RAYWHITE);
+    draw_button(btn_master_down, mouse_pos, false, 22);
+    draw_centered_val(is_muted_master ? "Muted" : TextFormat("%d%%", master_volume), 156, is_muted_master ? RED : RAYWHITE);
+    draw_button(btn_master_up, mouse_pos, false, 22);
+    draw_button(btn_master_mute, mouse_pos, is_muted_master, 20);
+
+    DrawTextEx(label_font, "Music Volume", { 190, 214 }, 24, 1.0f, RAYWHITE);
+    draw_button(btn_music_down, mouse_pos, false, 22);
+    draw_centered_val(is_muted_music ? "Muted" : TextFormat("%d%%", music_volume), 216, is_muted_music ? RED : RAYWHITE);
+    draw_button(btn_music_up, mouse_pos, false, 22);
+    draw_button(btn_music_mute, mouse_pos, is_muted_music, 20);
+
+    DrawTextEx(label_font, "Sound Effects", { 190, 274 }, 24, 1.0f, RAYWHITE);
+    draw_button(btn_sound_down, mouse_pos, false, 22);
+    draw_centered_val(is_muted_sound ? "Muted" : TextFormat("%d%%", sound_volume), 276, is_muted_sound ? RED : RAYWHITE);
+    draw_button(btn_sound_up, mouse_pos, false, 22);
+    draw_button(btn_sound_mute, mouse_pos, is_muted_sound, 20);
+
+    // Music Track selector with < and > arrows (supports unlimited tracks in assets/soundtrack/)
+    DrawTextEx(label_font, "Music Track", { 190, 334 }, 24, 1.0f, RAYWHITE);
+    draw_button(btn_music_prev, mouse_pos, false, 24);
+    std::string track_name = Audio::get_music_name(selected_music);
+    Vector2 track_sz = MeasureTextEx(label_font, track_name.c_str(), 22, 1.0f);
+    DrawTextEx(label_font, track_name.c_str(), { 620.0f - track_sz.x * 0.5f, 336.0f }, 22, 1.0f, active_theme().accent_color);
+    draw_button(btn_music_next, mouse_pos, false, 24);
+
+    // Subtle divider
+    DrawLineEx({ 190.0f, 384.0f }, { 1090.0f, 384.0f }, 1.0f, (Color){ 148, 163, 184, 70 });
+
+    // Select tabs: Game Theme / Board / Stones
+    DrawTextEx(label_font, "Select", { 190, 410 }, 24, 1.0f, RAYWHITE);
+    draw_button(btn_tab_theme,  mouse_pos, active_select_tab == 0, 21);
+    draw_button(btn_tab_board,  mouse_pos, active_select_tab == 1, 21);
+    draw_button(btn_tab_stones, mouse_pos, active_select_tab == 2, 21);
+
+    // Picker Panel container
+    DrawRectangleRounded(PICKER_PANEL_RECT, 0.06f, 16, (Color){ 26, 32, 47, 240 });
+    DrawRectangleRoundedLinesEx(PICKER_PANEL_RECT, 0.06f, 16, 1.5f, (Color){ 100, 115, 140, 160 });
+
+    // Determine active list count and selected index
+    int item_count = 0;
+    int selected_idx = 0;
+    if (active_select_tab == 0) {
+        item_count = (int)theme_options.size();
+        selected_idx = selected_theme_idx;
+    } else if (active_select_tab == 1) {
+        item_count = (int)board_options.size();
+        selected_idx = selected_board_idx;
+    } else {
+        item_count = (int)stone_options.size();
+        selected_idx = selected_stone_idx;
+    }
+
+    float total_h = item_count * (PICKER_ITEM_H + PICKER_ITEM_GAP) - PICKER_ITEM_GAP;
+    float max_scroll = std::max(0.0f, total_h - PICKER_LIST_RECT.height);
+
+    // Mouse wheel scrolling inside the left list area
+    if (CheckCollisionPointRec(mouse_pos, PICKER_LIST_RECT)) {
+        float wheel = GetMouseWheelMove();
+        if (wheel != 0.0f) {
+            select_scroll_offset -= wheel * 36.0f;
+        }
+    }
+    select_scroll_offset = std::clamp(select_scroll_offset, 0.0f, max_scroll);
+
+    // Draw scrollable items clipped inside PICKER_LIST_RECT
+    BeginScissorMode((int)PICKER_LIST_RECT.x, (int)PICKER_LIST_RECT.y, (int)PICKER_LIST_RECT.width, (int)PICKER_LIST_RECT.height);
+    float item_w = PICKER_LIST_RECT.width - 18.0f;
+    for (int i = 0; i < item_count; i++) {
+        float iy = PICKER_LIST_RECT.y + i * (PICKER_ITEM_H + PICKER_ITEM_GAP) - select_scroll_offset;
+        if (iy + PICKER_ITEM_H < PICKER_LIST_RECT.y || iy > PICKER_LIST_RECT.y + PICKER_LIST_RECT.height) continue;
+
+        const char *item_label = "";
+        if (active_select_tab == 0) item_label = theme_options[i].name.c_str();
+        else if (active_select_tab == 1) item_label = board_options[i].name.c_str();
+        else item_label = stone_options[i].name.c_str();
+
+        OptionButton item_btn = { { PICKER_LIST_RECT.x, iy, item_w, PICKER_ITEM_H }, item_label };
+        bool hovered_in_list = CheckCollisionPointRec(mouse_pos, PICKER_LIST_RECT);
+        draw_button(item_btn, hovered_in_list ? mouse_pos : Vector2{ -1, -1 }, i == selected_idx, 20, hovered_in_list);
+    }
+    EndScissorMode();
+
+    // Scrollbar track & thumb
+    float track_x = PICKER_LIST_RECT.x + PICKER_LIST_RECT.width - 8.0f;
+    DrawRectangleRounded({ track_x, PICKER_LIST_RECT.y + 2.0f, 6.0f, PICKER_LIST_RECT.height - 4.0f }, 0.5f, 8, (Color){ 148, 163, 184, 55 });
+    if (max_scroll > 0.0f) {
+        float thumb_h = std::max(36.0f, (PICKER_LIST_RECT.height / total_h) * (PICKER_LIST_RECT.height - 4.0f));
+        float thumb_y = PICKER_LIST_RECT.y + 2.0f + (select_scroll_offset / max_scroll) * ((PICKER_LIST_RECT.height - 4.0f) - thumb_h);
+        DrawRectangleRounded({ track_x, thumb_y, 6.0f, thumb_h }, 0.5f, 8, active_theme().accent_color);
+    } else {
+        DrawRectangleRounded({ track_x, PICKER_LIST_RECT.y + 2.0f, 6.0f, PICKER_LIST_RECT.height - 4.0f }, 0.5f, 8, active_theme().accent_color);
+    }
+
+    // Live Preview panel on right
+    draw_select_preview(PICKER_PREVIEW_RECT);
+
+    // Ok button at bottom
     draw_button(btn_back_config, mouse_pos, false, 26);
 }
 
 void UI::draw_loading() {
+    draw_background();
     Vector2 mouse_pos = GetMousePosition();
 
     DrawTextEx(heading_font, "Choose a slot to load", {390, 120}, 32, 1.0f, RAYWHITE);
@@ -608,6 +1001,7 @@ void UI::draw_loading() {
 }
 
 void UI::draw_saving() {
+    draw_background();
     Vector2 mouse_pos = GetMousePosition();
 
     DrawTextEx(heading_font, "SAVE GAME", {390, 120}, 36, 1.0f, RAYWHITE);
@@ -623,6 +1017,12 @@ void UI::draw_saving() {
         draw_button(btn_save_slots[i], mouse_pos, false, 28);
     }
     draw_button(btn_back_save, mouse_pos, false, 24);
+}
+
+void UI::draw_shop(){
+    Vector2 mouse_pos = GetMousePosition();
+
+
 }
 
 bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const {
@@ -819,24 +1219,59 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
             }
             break;
         case GamePhase::CONFIG:
-            if (CheckCollisionPointRec(mouse_pos, btn_change_music.bounds)) {
+            if (CheckCollisionPointRec(mouse_pos, btn_music_prev.bounds)) {
                 Audio::play(SFX::CLICK);
-                music_dropdown_open = 1 - music_dropdown_open;
+                int count = Audio::get_music_count();
+                if (count > 0) {
+                    selected_music = (selected_music <= 1) ? count : (selected_music - 1);
+                    Audio::change_music(selected_music);
+                }
                 return true;
             }
-            if (music_dropdown_open) {
-                music_dropdown_open = false;
-                for (int i = 0; i < 3; i++) {
-                    if (CheckCollisionPointRec(mouse_pos, opt_music[i].bounds)) {
+            if (CheckCollisionPointRec(mouse_pos, btn_music_next.bounds)) {
+                Audio::play(SFX::CLICK);
+                int count = Audio::get_music_count();
+                if (count > 0) {
+                    selected_music = (selected_music >= count) ? 1 : (selected_music + 1);
+                    Audio::change_music(selected_music);
+                }
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_tab_theme.bounds)) {
+                Audio::play(SFX::CLICK);
+                active_select_tab = 0;
+                select_scroll_offset = 0.0f;
+                return false;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_tab_board.bounds)) {
+                Audio::play(SFX::CLICK);
+                active_select_tab = 1;
+                select_scroll_offset = 0.0f;
+                return false;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_tab_stones.bounds)) {
+                Audio::play(SFX::CLICK);
+                active_select_tab = 2;
+                select_scroll_offset = 0.0f;
+                return false;
+            }
+            if (CheckCollisionPointRec(mouse_pos, PICKER_LIST_RECT)) {
+                int item_count = (active_select_tab == 0) ? (int)theme_options.size()
+                               : (active_select_tab == 1) ? (int)board_options.size()
+                                                          : (int)stone_options.size();
+                float item_w = PICKER_LIST_RECT.width - 18.0f;
+                for (int i = 0; i < item_count; i++) {
+                    float iy = PICKER_LIST_RECT.y + i * (PICKER_ITEM_H + PICKER_ITEM_GAP) - select_scroll_offset;
+                    Rectangle item_rect = { PICKER_LIST_RECT.x, iy, item_w, PICKER_ITEM_H };
+                    if (CheckCollisionPointRec(mouse_pos, item_rect)) {
                         Audio::play(SFX::CLICK);
-                        if (selected_music != i + 1) {
-                            selected_music = i + 1;
-                            Audio::change_music(selected_music);
-                        }
+                        if (active_select_tab == 0) selected_theme = theme_options[i].name;
+                        else if (active_select_tab == 1) selected_board = board_options[i].name;
+                        else selected_stones = stone_options[i].name;
+                        apply_selected_assets();
                         return true;
                     }
                 }
-                return true;
             }
             if (CheckCollisionPointRec(mouse_pos, btn_master_down.bounds)) {
                 Audio::play(SFX::CLICK);
@@ -917,7 +1352,10 @@ bool UI::save_setting(const std::string &path) {
             {"master_volume", this->master_volume},
             {"is_muted_sound", this->is_muted_sound},
             {"is_muted_music", this->is_muted_music},
-            {"is_muted_master", this->is_muted_master}
+            {"is_muted_master", this->is_muted_master},
+            {"selected_theme", this->selected_theme},
+            {"selected_board", this->selected_board},
+            {"selected_stones", this->selected_stones}
         };
         
         std::ofstream stream(path);
@@ -944,7 +1382,10 @@ bool UI::load_setting(const std::string &path) {
                 {"master_volume", 80},
                 {"is_muted_sound", false},
                 {"is_muted_music", false},
-                {"is_muted_master", false}
+                {"is_muted_master", false},
+                {"selected_theme", "Classic"},
+                {"selected_board", "Kaya Wood"},
+                {"selected_stones", "3D Glossy"}
             };
             
             std::ofstream outstream(path);
@@ -966,6 +1407,10 @@ bool UI::load_setting(const std::string &path) {
         data.at("is_muted_sound").get_to(this->is_muted_sound);
         data.at("is_muted_music").get_to(this->is_muted_music);            
         data.at("is_muted_master").get_to(this->is_muted_master);
+        this->selected_theme  = data.value("selected_theme", std::string("Classic"));
+        this->selected_board  = data.value("selected_board", std::string("Kaya Wood"));
+        this->selected_stones = data.value("selected_stones", std::string("3D Glossy"));
+        apply_selected_assets();
 
         return true;
     } 
