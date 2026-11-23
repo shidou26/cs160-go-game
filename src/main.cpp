@@ -145,8 +145,13 @@ int main() {
 
                     if (!user_interface.handle_option_click(mouse_pos, phase, board)) {
                         if (user_interface.screen_to_grid(mouse_pos, board, row, col)) {
+                            int cap_before = board.get_captured(0) + board.get_captured(1);
                             if (board.place_stone(row, col)) {
                                 Audio::play(SFX::STONE);
+                                int cap_after = board.get_captured(0) + board.get_captured(1);
+                                if (cap_after > cap_before) {
+                                    user_interface.notify_stone_captured();
+                                }
                             }
                         }
                     }
