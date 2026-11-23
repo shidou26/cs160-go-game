@@ -1,0 +1,153 @@
+\section{Testing Document}
+
+\subsection{Simple Features}
+
+\subsubsection{S01: New Game and Board Initialization}
+
+\begin{samepage}
+\noindent\textbf{S01-TC01}\par\smallskip
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Test Case ID} & S01-TC01 \\ \hline
+\textbf{Feature Name} & New Game and Board Initialization \\ \hline
+\textbf{Test Objective} & Verify that selecting a 9x9 board initializes an empty 9x9 grid \\ \hline
+\textbf{Initial State} & Title screen \\ \hline
+\textbf{Test Input} & Click New Game, select 9x9, and choose Play against Friend \\ \hline
+\textbf{Expected Result} & An empty 9x9 board displays with 5 star points \\ \hline
+\textbf{Actual Result} & As expected \\ \hline
+\textbf{Test Status} & Pass \\ \hline
+\textbf{Related Function(s)} & Board::reset; UI::draw; UI::get\_cell\_size \\ \hline
+\end{tabularx}
+\end{samepage}
+\medskip
+
+\begin{samepage}
+\noindent\textbf{S01-TC02}\par\smallskip
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Test Case ID} & S01-TC02 \\ \hline
+\textbf{Feature Name} & New Game and Board Initialization \\ \hline
+\textbf{Test Objective} & Verify that selecting a 13x13 board initializes an empty 13x13 grid \\ \hline
+\textbf{Initial State} & Title screen \\ \hline
+\textbf{Test Input} & Click New Game, select 13x13, and choose Play against Friend \\ \hline
+\textbf{Expected Result} & An empty 13x13 board displays with 5 star points \\ \hline
+\textbf{Actual Result} & As expected \\ \hline
+\textbf{Test Status} & Pass \\ \hline
+\textbf{Related Function(s)} & Board::reset; UI::draw; UI::get\_cell\_size \\ \hline
+\end{tabularx}
+\end{samepage}
+\medskip
+
+\begin{samepage}
+\noindent\textbf{S01-TC03}\par\smallskip
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Test Case ID} & S01-TC03 \\ \hline
+\textbf{Feature Name} & New Game and Board Initialization \\ \hline
+\textbf{Test Objective} & Verify that selecting a 19x19 board initializes the standard 19x19 grid \\ \hline
+\textbf{Initial State} & Title screen \\ \hline
+\textbf{Test Input} & Click New Game, select 19x19, and choose Play against Friend \\ \hline
+\textbf{Expected Result} & An empty 19x19 board displays with 9 star points \\ \hline
+\textbf{Actual Result} & As expected \\ \hline
+\textbf{Test Status} & Pass \\ \hline
+\textbf{Related Function(s)} & Board::reset; UI::draw; UI::get\_cell\_size \\ \hline
+\end{tabularx}
+\end{samepage}
+\medskip
+
+\begin{samepage}
+\noindent\textbf{S01-TC04}\par\smallskip
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Test Case ID} & S01-TC04 \\ \hline
+\textbf{Feature Name} & New Game and Board Initialization \\ \hline
+\textbf{Test Objective} & Verify that clicking outside buttons on the Board Size screen does nothing \\ \hline
+\textbf{Initial State} & Board Size selection screen \\ \hline
+\textbf{Test Input} & Click on the blank area outside the 9x9, 13x13, and 19x19 buttons \\ \hline
+\textbf{Expected Result} & The screen remains on Board Size selection without starting a game \\ \hline
+\textbf{Actual Result} & As expected \\ \hline
+\textbf{Test Status} & Pass \\ \hline
+\textbf{Related Function(s)} & UI::handle\_option\_click \\ \hline
+\end{tabularx}
+\end{samepage}
+\medskip
+
+\begin{samepage}
+\noindent\textbf{S01-TC05}\par\smallskip
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Test Case ID} & S01-TC05 \\ \hline
+\textbf{Feature Name} & New Game and Board Initialization \\ \hline
+\textbf{Test Objective} & Verify that a newly started game always begins with Black's turn \\ \hline
+\textbf{Initial State} & Title screen \\ \hline
+\textbf{Test Input} & Start a new game and inspect the turn indicator \\ \hline
+\textbf{Expected Result} & Turn indicator reads "Turn: BLACK" \\ \hline
+\textbf{Actual Result} & As expected \\ \hline
+\textbf{Test Status} & Pass \\ \hline
+\textbf{Related Function(s)} & Board::reset; Board::get\_turn; UI::draw \\ \hline
+\end{tabularx}
+\end{samepage}
+\medskip
+
+\begin{samepage}
+\noindent\textbf{S01-TC06}\par\smallskip
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Test Case ID} & S01-TC06 \\ \hline
+\textbf{Feature Name} & New Game and Board Initialization \\ \hline
+\textbf{Test Objective} & Verify that captured stone counters initialize to zero for both players \\ \hline
+\textbf{Initial State} & Title screen \\ \hline
+\textbf{Test Input} & Start a new game and inspect both player cards \\ \hline
+\textbf{Expected Result} & Both cards display "Prisoned Stones: 0" \\ \hline
+\textbf{Actual Result} & As expected \\ \hline
+\textbf{Test Status} & Pass \\ \hline
+\textbf{Related Function(s)} & Board::reset; Board::get\_captured; UI::draw \\ \hline
+\end{tabularx}
+\end{samepage}
+\medskip
+
+\begin{samepage}
+\noindent\textbf{S01-TC07}\par\smallskip
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Test Case ID} & S01-TC07 \\ \hline
+\textbf{Feature Name} & New Game and Board Initialization \\ \hline
+\textbf{Test Objective} & Verify that player timers initialize to 00:00 \\ \hline
+\textbf{Initial State} & Title screen \\ \hline
+\textbf{Test Input} & Start a new game and inspect the timers immediately \\ \hline
+\textbf{Expected Result} & Both timers start at 00:00; Black timer begins counting up \\ \hline
+\textbf{Actual Result} & As expected \\ \hline
+\textbf{Test Status} & Pass \\ \hline
+\textbf{Related Function(s)} & Board::reset; Board::get\_timer; Board::update\_timer \\ \hline
+\end{tabularx}
+\end{samepage}
+\medskip
+
+\begin{samepage}
+\noindent\textbf{S01-TC08}\par\smallskip
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Test Case ID} & S01-TC08 \\ \hline
+\textbf{Feature Name} & New Game and Board Initialization \\ \hline
+\textbf{Test Objective} & Verify that Undo and Redo are inactive at game start \\ \hline
+\textbf{Initial State} & Freshly started game with an empty board \\ \hline
+\textbf{Test Input} & Click Undo and Redo buttons \\ \hline
+\textbf{Expected Result} & Nothing changes; board remains empty and Black retains the turn \\ \hline
+\textbf{Actual Result} & As expected \\ \hline
+\textbf{Test Status} & Pass \\ \hline
+\textbf{Related Function(s)} & Board::undo\_move; Board::redo\_move; UI::handle\_option\_click \\ \hline
+\end{tabularx}
+\end{samepage}
+\medskip
+
+\subsubsection*{Testing Summary: S01}
+
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Feature Name} & S01: New Game and Board Initialization \\ \hline
+\textbf{Total number of test cases} & 8 \\ \hline
+\textbf{Number of passed test cases} & 8 \\ \hline
+\textbf{Number of failed test cases} & 0 \\ \hline
+\textbf{Known issues or limitations} & None \\ \hline
+\end{tabularx}
+\bigskip
