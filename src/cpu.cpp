@@ -136,6 +136,17 @@ double get_real_score_diff(const Board &current_board, StoneType ai_stone) {
     return (ai_stone == StoneType::BLACKSTONE) ? (sc.first - sc.second) : (sc.second - sc.first);
 }
 
+bool is_endgame(const Board &current_board) {
+    int n = current_board.get_size();
+    int occupied = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (current_board.get_state(i, j) != StoneType::EMPTY) occupied++;
+        }
+    }
+    return occupied >= (int)(n * n * 0.65);
+}
+
 bool should_pass_on_opponent_pass(const Board &current_board, StoneType ai_stone) {
     if (current_board.get_pass() < 1) return false;
     return get_real_score_diff(current_board, ai_stone) > 0.0;
@@ -459,29 +470,31 @@ Move medium_play(Board &board) {
         return Move(-1, -1, ai_stone);
     }
 
-    double pass_eval = evaluate_board(board, ai_stone);
     std::uniform_real_distribution<double> mistake_noise(-8.0, 8.0);
     Move best_move = candidates[0];
-    double best_raw_score = -1e18;
+    double max_raw_score = -1e18;
     double best_noisy_score = -1e18;
 
     for (const Move &m : candidates) {
         if (add_move(board, m) == 0) {
             double raw = minimax(board, 1, false, ai_stone);
             board.undo_move(false);
-            double noisy = raw + mistake_noise(rng);
+            if (raw > max_raw_score) max_raw_score = raw;
 
+            double noisy = raw + mistake_noise(rng);
             if (noisy > best_noisy_score) {
                 best_noisy_score = noisy;
-                best_raw_score = raw;
                 best_move = m;
             }
         }
     }
 
-    // If every available move strictly hurts AI's position compared to passing, pass instead
-    if (best_raw_score < pass_eval - 4.0) {
-        return Move(-1, -1, ai_stone);
+    // Only consider proactive Pass in endgame, comparing fairly (opponent still gets to move after Pass)
+    if (is_endgame(board)) {
+        double pass_after_opp = minimax(board, 1, false, ai_stone);
+        if (max_raw_score < pass_after_opp - 2.0) {
+            return Move(-1, -1, ai_stone);
+        }
     }
 
     return best_move;
@@ -503,7 +516,6 @@ Move hard_play(Board &board) {
     const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(800);
     int search_depth = 3;
 
-    double pass_eval = evaluate_board(board, ai_stone);
     Move best_move = candidates[0];
     double best_score = -1e18;
     double alpha = -1e18;
@@ -523,9 +535,12 @@ Move hard_play(Board &board) {
         }
     }
 
-    // Pass if every move is strictly worse than passing (prevents self-filling own territory)
-    if (best_score < pass_eval - 3.0) {
-        return Move(-1, -1, ai_stone);
+    // Only consider proactive Pass in endgame, comparing fairly (opponent still gets to move after Pass)
+    if (is_endgame(board) && std::chrono::steady_clock::now() < deadline) {
+        double pass_after_opp = minimax_alpha_beta(board, search_depth, -1e18, 1e18, false, ai_stone, deadline);
+        if (best_score < pass_after_opp - 2.0) {
+            return Move(-1, -1, ai_stone);
+        }
     }
 
     return best_move;
