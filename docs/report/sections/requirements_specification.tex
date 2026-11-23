@@ -16,25 +16,98 @@
 
 \subsection{User Interface (UI)}
 
+\begin{itemize}
+    \item A board on which Go stones can be placed.
+    \item Turn indicator showing whether it's white or black's turn.
+    \item Notification for stone captures. Panel for end-game scoring. A red square on board indicating Ko threat.
+    \item Buttons to:
+    \begin{itemize}
+        \item Start a new game.
+        \item Choose game mode (2-player or Player vs AI).
+        \begin{itemize}
+            \item Select AI difficulty level before starting a Player vs AI game.
+        \end{itemize}
+        \item Reset the current game to an empty board.
+        \item Undo the last move.
+        \item Redo the last undone move.
+        \item Save the current game state to a file.
+        \item Load a previously saved game state from a file.
+        \item Adjust game settings, including:
+        \begin{itemize}
+            \item Board Color: Options to select different colors or themes for the Go board.
+            \item Stone Design: Options to change the design or style of the stones.
+            \item Sound Effects: Options to enable or disable sound effects for placing stones, capturing stones, end-game scoring, and background music.
+            \item Background Music: Options to choose background music or disable it. Include a volume control for sound effects and music.
+        \end{itemize}
+        \item Exit the game.
+    \end{itemize}
+\end{itemize}
 
 \subsection{Board Representation}
 
-
+\begin{itemize} 
+    \item Implement a graphical representation of the Go board using Raylib library.
+    \item Players can place stones on the board by clicking on the desired intersection.
+    \item Visual and audio feedback are provided when a stone is placed.
+    \item In \textbf{2-player mode}, alternate turns between players, with the current player's turn indicated on the UI.
+    \item In \textbf{Player vs AI mode}, the human player controls Black, and the computer controls White. The AI responds after each human turn, with an artificial delay of 1500 milliseconds to simulate thinking time.
+\end{itemize}
 
 \subsection{Game Logic}
 
+\begin{itemize}
+    \item Implement the rules of Go:
+    \begin{itemize}
+        \item Stone placement
+        \item Capturing stones
+        \item Ko rule
+        \item Scoring: The game uses simplified Japanese-style scoring based
+        on territory and captured stones, with komi added to White's score.
+        It does not implement a post-game dead-stone removal phase or an
+        algorithm for determining whether a group is alive or dead. 
+    \end{itemize}
+    \item Ensure that the game enforces valid moves and prevents illegal placements.
+    \item Automatically detect and handle end-game conditions of passing two times.
+\end{itemize}
 
 \subsection{AI Opponent}
 
+\begin{itemize}
+    \item Implement three levels of AI difficulty:
+    \begin{itemize}
+        \item \textbf{Easy:} The AI makes quick, random moves without much evaluation.
+        \item \textbf{Medium:} The AI uses the Minimax algorithm with a shallow depth, making reasonable
+        moves with occasional mistakes.
+        \item \textbf{Hard:} The AI uses Minimax with Alpha-Beta pruning, evaluating a deeper move tree to
+        play strategically, reducing mistakes.
+    \end{itemize}
+    \item The AI makes moves efficiently, within a reasonable time frame, even at the Hard difficulty level.
+\end{itemize}
 
 \subsection{Game State Management}
 
+\begin{itemize}
+    \item Track the current state of the board and the game.
+    \item Handle turn management, ensuring proper transitions between the player's turn and the AI's
+turn or between two human players.
+    \item Implement undo and redo functionality, allowing players to revert to previous game states or redo moves.
+    \item Ensure that the game state is accurately updated after each move, including capturing stones and updating scores.
+    \item Provide the ability to reset the game to its initial state at any time.
+\end{itemize}
 
 \subsection{Saving and Loading}
 
+\begin{itemize}
+    \item Implement functionality to save the current game state to a file in JSON format.
+    \item Implement functionality to load a previously saved game state from a JSON file.
+\end{itemize}
 
 \subsection{Additional Implemented Features}
 
+\begin{itemize}
+    \item Selection of $9 \times 9$, $13 \times 13$, and $19 \times 19$ board sizes.
+    \item Save and load with $3$ slots.
+\end{itemize}
 
 \subsection{Technology Stack}
 

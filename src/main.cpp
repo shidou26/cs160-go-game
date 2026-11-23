@@ -168,7 +168,6 @@ int main() {
                 if (cpu_turn_started == -1.0) cpu_turn_started = GetTime();
                 if (GetTime() - cpu_turn_started >= CPU_DELAY) {
                     Move seol = cpu_play(board);
-                    // Count CPU thinking time before placing the stone changes turns.
                     double finished = GetTime();
                     board.update_timer(finished - last_timer);
                     last_timer = finished;

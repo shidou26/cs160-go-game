@@ -762,7 +762,7 @@ void UI::draw_ending(const Board &board) {
     }
     else if(final_score.first < final_score.second) {
         draw_centered_text("White Wins", panel.y + 164.0f, 36);
-        draw_centered_text(TextFormat("by %.1f komi", final_score.second - final_score.first),
+        draw_centered_text(TextFormat("by %.1f points", final_score.second - final_score.first),
                            panel.y + 220.0f, 28);
     }
     else {
