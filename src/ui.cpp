@@ -653,6 +653,22 @@ void UI::draw(Board &board, bool interactive) {
         };
         DrawRectangleLinesEx(rect, 2.5f, RED);
     }
+
+    if (GetTime() < capture_notify_until) {
+        const char *msg = "Stone Captured!";
+        Vector2 sz = MeasureTextEx(heading_font, msg, 28, 1.0f);
+        Rectangle box = {
+            (GetScreenWidth() - (sz.x + 40.0f)) * 0.5f,
+            32.0f,
+            sz.x + 40.0f,
+            52.0f
+        };
+        // Hiệu ứng mờ dần (fade out) trong 0.5 giây cuối
+        float alpha = std::min(1.0f, (float)(capture_notify_until - GetTime()) / 0.5f);
+        DrawRectangleRounded(box, 0.3f, 16, Fade(active_theme().bg_fallback, 0.9f * alpha));
+        DrawRectangleRoundedLinesEx(box, 0.3f, 16, 2.0f, Fade(active_theme().accent_color, alpha));
+        DrawTextEx(heading_font, msg, { box.x + 20.0f, box.y + 12.0f }, 28, 1.0f, Fade(active_theme().accent_color, alpha));
+    }
 }
 
 void UI::draw_starting() {
@@ -1019,10 +1035,8 @@ void UI::draw_saving() {
     draw_button(btn_back_save, mouse_pos, false, 24);
 }
 
-void UI::draw_shop(){
-    Vector2 mouse_pos = GetMousePosition();
-
-
+void UI::notify_stone_captured() {
+    capture_notify_until = GetTime() + 2.0;
 }
 
 bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const {

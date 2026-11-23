@@ -171,10 +171,16 @@ int main() {
                     double finished = GetTime();
                     board.update_timer(finished - last_timer);
                     last_timer = finished;
-
+                    
+                    int cap_before = board.get_captured(0) + board.get_captured(1);
                     if (board.place_stone(seol.pos_x, seol.pos_y)) {
                         Audio::play(SFX::STONE);
+                        int cap_after = board.get_captured(0) + board.get_captured(1);
+                        if (cap_after > cap_before) {
+                            user_interface.notify_stone_captured();
+                        }
                     }
+                    
                     cpu_turn_started = -1.0;
                 }
             } else {
