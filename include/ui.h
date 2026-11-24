@@ -97,6 +97,8 @@ private:
     OptionButton btn_sound_mute;
     OptionButton btn_music_prev;
     OptionButton btn_music_next;
+    OptionButton btn_click_sfx_prev;
+    OptionButton btn_click_sfx_next;
     OptionButton btn_tab_theme;
     OptionButton btn_tab_board;
     OptionButton btn_tab_stones;
@@ -121,7 +123,7 @@ private:
     OptionButton btn_easy;
     OptionButton btn_medium;
     OptionButton btn_hard;
-
+    double capture_notify_until = 0.0;
 
     int get_cell_size(const Board &board) const;
     const ThemeOption &active_theme() const;
@@ -139,6 +141,7 @@ public:
     bool is_muted_music;
     bool is_muted_master;
     int selected_music;
+    int selected_click_sfx = 1;
     std::string selected_theme = "Classic";
     std::string selected_board = "Kaya Wood";
     std::string selected_stones = "3D Glossy";
@@ -164,6 +167,7 @@ public:
     void draw_mode();
     void draw_difficulty();
     void draw_shop();
+    void notify_stone_captured();
 
     //Convert screen mouse coordinates to Board (row, col) position
     bool screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const;

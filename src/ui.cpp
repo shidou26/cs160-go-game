@@ -17,9 +17,9 @@
 
 namespace {
 
-const Rectangle PICKER_PANEL_RECT   = { 190.0f, 474.0f, 900.0f, 344.0f };
-const Rectangle PICKER_LIST_RECT    = { 214.0f, 496.0f, 340.0f, 300.0f };
-const Rectangle PICKER_PREVIEW_RECT = { 578.0f, 496.0f, 488.0f, 300.0f };
+const Rectangle PICKER_PANEL_RECT   = { 190.0f, 492.0f, 900.0f, 332.0f };
+const Rectangle PICKER_LIST_RECT    = { 214.0f, 512.0f, 340.0f, 292.0f };
+const Rectangle PICKER_PREVIEW_RECT = { 578.0f, 512.0f, 488.0f, 292.0f };
 const float PICKER_ITEM_H   = 52.0f;
 const float PICKER_ITEM_GAP = 10.0f;
 
@@ -243,21 +243,23 @@ UI::UI() {
     btn_back_from_play = { { play_button_x, play_button_y + 6 * play_button_step, play_button_width, play_button_height }, "Back" };
 
     //Init option buttons for config (Settings) phase — centered x=190..1090
-    btn_master_down = { { 430, 146, 60, 44 }, "-" };
-    btn_master_up   = { { 610, 146, 60, 44 }, "+" };
-    btn_master_mute = { { 690, 146, 120, 44 }, "Mute" };
-    btn_music_down  = { { 430, 206, 60, 44 }, "-" };
-    btn_music_up    = { { 610, 206, 60, 44 }, "+" };
-    btn_music_mute  = { { 690, 206, 120, 44 }, "Mute" };
-    btn_sound_down  = { { 430, 266, 60, 44 }, "-" };
-    btn_sound_up    = { { 610, 266, 60, 44 }, "+" };
-    btn_sound_mute  = { { 690, 266, 120, 44 }, "Mute" };
-    btn_music_prev  = { { 430, 326, 60, 44 }, "<" };
-    btn_music_next  = { { 750, 326, 60, 44 }, ">" };
-    btn_tab_theme   = { { 430, 398, 205, 50 }, "Game Theme" };
-    btn_tab_board   = { { 655, 398, 205, 50 }, "Board" };
-    btn_tab_stones  = { { 880, 398, 210, 50 }, "Stones" };
-    btn_back_config = { { 390, 846, 500, 60 }, "Ok" };
+    btn_master_down    = { { 430, 116, 60, 42 }, "-" };
+    btn_master_up      = { { 610, 116, 60, 42 }, "+" };
+    btn_master_mute    = { { 690, 116, 120, 42 }, "Mute" };
+    btn_music_down     = { { 430, 174, 60, 42 }, "-" };
+    btn_music_up       = { { 610, 174, 60, 42 }, "+" };
+    btn_music_mute     = { { 690, 174, 120, 42 }, "Mute" };
+    btn_sound_down     = { { 430, 232, 60, 42 }, "-" };
+    btn_sound_up       = { { 610, 232, 60, 42 }, "+" };
+    btn_sound_mute     = { { 690, 232, 120, 42 }, "Mute" };
+    btn_music_prev     = { { 430, 290, 60, 42 }, "<" };
+    btn_music_next     = { { 750, 290, 60, 42 }, ">" };
+    btn_click_sfx_prev = { { 430, 348, 60, 42 }, "<" };
+    btn_click_sfx_next = { { 750, 348, 60, 42 }, ">" };
+    btn_tab_theme      = { { 430, 424, 205, 48 }, "Game Theme" };
+    btn_tab_board      = { { 655, 424, 205, 48 }, "Board" };
+    btn_tab_stones     = { { 880, 424, 210, 48 }, "Stones" };
+    btn_back_config    = { { 390, 850, 500, 60 }, "Ok" };
 
     //Init option buttons for saving phase
     btn_save_slots[0] = { { 390, 220, 500, 80 }, "Save to Slot 1" };
@@ -653,6 +655,22 @@ void UI::draw(Board &board, bool interactive) {
         };
         DrawRectangleLinesEx(rect, 2.5f, RED);
     }
+
+    if (GetTime() < capture_notify_until) {
+        const char *msg = "Stone Captured!";
+        Vector2 sz = MeasureTextEx(heading_font, msg, 28, 1.0f);
+        Rectangle box = {
+            (GetScreenWidth() - (sz.x + 40.0f)) * 0.5f,
+            32.0f,
+            sz.x + 40.0f,
+            52.0f
+        };
+        // Hiệu ứng mờ dần (fade out) trong 0.5 giây cuối
+        float alpha = std::min(1.0f, (float)(capture_notify_until - GetTime()) / 0.5f);
+        DrawRectangleRounded(box, 0.3f, 16, Fade(active_theme().bg_fallback, 0.9f * alpha));
+        DrawRectangleRoundedLinesEx(box, 0.3f, 16, 2.0f, Fade(active_theme().accent_color, alpha));
+        DrawTextEx(heading_font, msg, { box.x + 20.0f, box.y + 12.0f }, 28, 1.0f, Fade(active_theme().accent_color, alpha));
+    }
 }
 
 void UI::draw_starting() {
@@ -746,7 +764,7 @@ void UI::draw_ending(const Board &board) {
     }
     else if(final_score.first < final_score.second) {
         draw_centered_text("White Wins", panel.y + 164.0f, 36);
-        draw_centered_text(TextFormat("by %.1f komi", final_score.second - final_score.first),
+        draw_centered_text(TextFormat("by %.1f points", final_score.second - final_score.first),
                            panel.y + 220.0f, 28);
     }
     else {
@@ -878,8 +896,8 @@ void UI::draw_config() {
     Vector2 mouse_pos = GetMousePosition();
 
     // Centered SETTINGS heading
-    Vector2 title_sz = MeasureTextEx(heading_font, "SETTINGS", 42, 1.0f);
-    DrawTextEx(heading_font, "SETTINGS", { (GetScreenWidth() - title_sz.x) * 0.5f, 60.0f }, 42, 1.0f, RAYWHITE);
+    Vector2 title_sz = MeasureTextEx(heading_font, "SETTINGS", 40, 1.0f);
+    DrawTextEx(heading_font, "SETTINGS", { (GetScreenWidth() - title_sz.x) * 0.5f, 44.0f }, 40, 1.0f, RAYWHITE);
 
     // Centered Audio section (x = 190 .. 1090)
     auto draw_centered_val = [&](const char *txt, float y, Color col) {
@@ -887,37 +905,45 @@ void UI::draw_config() {
         DrawTextEx(label_font, txt, { 550.0f - sz.x * 0.5f, y }, 22, 1.0f, col);
     };
 
-    DrawTextEx(label_font, "Master Volume", { 190, 154 }, 24, 1.0f, RAYWHITE);
+    DrawTextEx(label_font, "Master Volume", { 190, 124 }, 23, 1.0f, RAYWHITE);
     draw_button(btn_master_down, mouse_pos, false, 22);
-    draw_centered_val(is_muted_master ? "Muted" : TextFormat("%d%%", master_volume), 156, is_muted_master ? RED : RAYWHITE);
+    draw_centered_val(is_muted_master ? "Muted" : TextFormat("%d%%", master_volume), 126, is_muted_master ? RED : RAYWHITE);
     draw_button(btn_master_up, mouse_pos, false, 22);
     draw_button(btn_master_mute, mouse_pos, is_muted_master, 20);
 
-    DrawTextEx(label_font, "Music Volume", { 190, 214 }, 24, 1.0f, RAYWHITE);
+    DrawTextEx(label_font, "Music Volume", { 190, 182 }, 23, 1.0f, RAYWHITE);
     draw_button(btn_music_down, mouse_pos, false, 22);
-    draw_centered_val(is_muted_music ? "Muted" : TextFormat("%d%%", music_volume), 216, is_muted_music ? RED : RAYWHITE);
+    draw_centered_val(is_muted_music ? "Muted" : TextFormat("%d%%", music_volume), 184, is_muted_music ? RED : RAYWHITE);
     draw_button(btn_music_up, mouse_pos, false, 22);
     draw_button(btn_music_mute, mouse_pos, is_muted_music, 20);
 
-    DrawTextEx(label_font, "Sound Effects", { 190, 274 }, 24, 1.0f, RAYWHITE);
+    DrawTextEx(label_font, "Sound Effects", { 190, 240 }, 23, 1.0f, RAYWHITE);
     draw_button(btn_sound_down, mouse_pos, false, 22);
-    draw_centered_val(is_muted_sound ? "Muted" : TextFormat("%d%%", sound_volume), 276, is_muted_sound ? RED : RAYWHITE);
+    draw_centered_val(is_muted_sound ? "Muted" : TextFormat("%d%%", sound_volume), 242, is_muted_sound ? RED : RAYWHITE);
     draw_button(btn_sound_up, mouse_pos, false, 22);
     draw_button(btn_sound_mute, mouse_pos, is_muted_sound, 20);
 
-    // Music Track selector with < and > arrows (supports unlimited tracks in assets/soundtrack/)
-    DrawTextEx(label_font, "Music Track", { 190, 334 }, 24, 1.0f, RAYWHITE);
-    draw_button(btn_music_prev, mouse_pos, false, 24);
+    // Music Track selector with < and > arrows (auto-scans assets/soundtrack/)
+    DrawTextEx(label_font, "Music Track", { 190, 298 }, 23, 1.0f, RAYWHITE);
+    draw_button(btn_music_prev, mouse_pos, false, 22);
     std::string track_name = Audio::get_music_name(selected_music);
     Vector2 track_sz = MeasureTextEx(label_font, track_name.c_str(), 22, 1.0f);
-    DrawTextEx(label_font, track_name.c_str(), { 620.0f - track_sz.x * 0.5f, 336.0f }, 22, 1.0f, active_theme().accent_color);
-    draw_button(btn_music_next, mouse_pos, false, 24);
+    DrawTextEx(label_font, track_name.c_str(), { 620.0f - track_sz.x * 0.5f, 300.0f }, 22, 1.0f, active_theme().accent_color);
+    draw_button(btn_music_next, mouse_pos, false, 22);
+
+    // Button SFX selector with < and > arrows (auto-scans assets/sfx/click/)
+    DrawTextEx(label_font, "Button SFX", { 190, 356 }, 23, 1.0f, RAYWHITE);
+    draw_button(btn_click_sfx_prev, mouse_pos, false, 22);
+    std::string sfx_name = Audio::get_click_sfx_name(selected_click_sfx);
+    Vector2 sfx_sz = MeasureTextEx(label_font, sfx_name.c_str(), 22, 1.0f);
+    DrawTextEx(label_font, sfx_name.c_str(), { 620.0f - sfx_sz.x * 0.5f, 358.0f }, 22, 1.0f, active_theme().accent_color);
+    draw_button(btn_click_sfx_next, mouse_pos, false, 22);
 
     // Subtle divider
-    DrawLineEx({ 190.0f, 384.0f }, { 1090.0f, 384.0f }, 1.0f, (Color){ 148, 163, 184, 70 });
+    DrawLineEx({ 190.0f, 408.0f }, { 1090.0f, 408.0f }, 1.0f, (Color){ 148, 163, 184, 70 });
 
     // Select tabs: Game Theme / Board / Stones
-    DrawTextEx(label_font, "Select", { 190, 410 }, 24, 1.0f, RAYWHITE);
+    DrawTextEx(label_font, "Select", { 190, 434 }, 23, 1.0f, RAYWHITE);
     draw_button(btn_tab_theme,  mouse_pos, active_select_tab == 0, 21);
     draw_button(btn_tab_board,  mouse_pos, active_select_tab == 1, 21);
     draw_button(btn_tab_stones, mouse_pos, active_select_tab == 2, 21);
@@ -1019,10 +1045,8 @@ void UI::draw_saving() {
     draw_button(btn_back_save, mouse_pos, false, 24);
 }
 
-void UI::draw_shop(){
-    Vector2 mouse_pos = GetMousePosition();
-
-
+void UI::notify_stone_captured() {
+    capture_notify_until = GetTime() + 2.0;
 }
 
 bool UI::screen_to_grid(Vector2 mouse_pos, const Board &board, int &row, int &col) const {
@@ -1237,6 +1261,24 @@ bool UI::handle_option_click(Vector2 mouse_pos, GamePhase &phase, Board &board) 
                 }
                 return true;
             }
+            if (CheckCollisionPointRec(mouse_pos, btn_click_sfx_prev.bounds)) {
+                int count = Audio::get_click_sfx_count();
+                if (count > 0) {
+                    selected_click_sfx = (selected_click_sfx <= 1) ? count : (selected_click_sfx - 1);
+                    Audio::change_click_sfx(selected_click_sfx);
+                }
+                Audio::play(SFX::CLICK);
+                return true;
+            }
+            if (CheckCollisionPointRec(mouse_pos, btn_click_sfx_next.bounds)) {
+                int count = Audio::get_click_sfx_count();
+                if (count > 0) {
+                    selected_click_sfx = (selected_click_sfx >= count) ? 1 : (selected_click_sfx + 1);
+                    Audio::change_click_sfx(selected_click_sfx);
+                }
+                Audio::play(SFX::CLICK);
+                return true;
+            }
             if (CheckCollisionPointRec(mouse_pos, btn_tab_theme.bounds)) {
                 Audio::play(SFX::CLICK);
                 active_select_tab = 0;
@@ -1347,6 +1389,7 @@ bool UI::save_setting(const std::string &path) {
     try {
         json data = {
             {"selected_music", this->selected_music},
+            {"selected_click_sfx", this->selected_click_sfx},
             {"sound_volume", this->sound_volume},
             {"music_volume", this->music_volume},
             {"master_volume", this->master_volume},
@@ -1377,6 +1420,7 @@ bool UI::load_setting(const std::string &path) {
         if (!stream.is_open()) {
             json default_data = {
                 {"selected_music", 3},
+                {"selected_click_sfx", 1},
                 {"sound_volume", 80},
                 {"music_volume", 50},
                 {"master_volume", 80},
@@ -1401,6 +1445,7 @@ bool UI::load_setting(const std::string &path) {
         stream.close();
         
         data.at("selected_music").get_to(this->selected_music);
+        this->selected_click_sfx = data.value("selected_click_sfx", 1);
         data.at("sound_volume").get_to(this->sound_volume);
         data.at("music_volume").get_to(this->music_volume);
         data.at("master_volume").get_to(this->master_volume);

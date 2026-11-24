@@ -27,6 +27,7 @@ int main() {
     //Set game soundeffect and soundtrack
     Audio::init();
     Audio::change_music(user_interface.selected_music);
+    Audio::change_click_sfx(user_interface.selected_click_sfx);
     
     //Game
     GamePhase phase = GamePhase::START;
@@ -145,8 +146,14 @@ int main() {
 
                     if (!user_interface.handle_option_click(mouse_pos, phase, board)) {
                         if (user_interface.screen_to_grid(mouse_pos, board, row, col)) {
+                            int cap_before = board.get_captured(0) + board.get_captured(1);
                             if (board.place_stone(row, col)) {
                                 Audio::play(SFX::STONE);
+                                int cap_after = board.get_captured(0) + board.get_captured(1);
+                                if (cap_after > cap_before) {
+                                    Audio::play(SFX::CAPTURE);
+                                    user_interface.notify_stone_captured();
+                                }
                             }
                         }
                     }
@@ -163,14 +170,20 @@ int main() {
                 if (cpu_turn_started == -1.0) cpu_turn_started = GetTime();
                 if (GetTime() - cpu_turn_started >= CPU_DELAY) {
                     Move seol = cpu_play(board);
-                    // Count CPU thinking time before placing the stone changes turns.
                     double finished = GetTime();
                     board.update_timer(finished - last_timer);
                     last_timer = finished;
-
+                    
+                    int cap_before = board.get_captured(0) + board.get_captured(1);
                     if (board.place_stone(seol.pos_x, seol.pos_y)) {
                         Audio::play(SFX::STONE);
+                        int cap_after = board.get_captured(0) + board.get_captured(1);
+                        if (cap_after > cap_before) {
+                            Audio::play(SFX::CAPTURE);
+                            user_interface.notify_stone_captured();
+                        }
                     }
+                    
                     cpu_turn_started = -1.0;
                 }
             } else {

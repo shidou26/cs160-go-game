@@ -42,7 +42,8 @@ enum SFX {
     CLICK,
     POSITIVE,
     NEGATIVE,
-    END
+    END,
+    CAPTURE
 };
 
 constexpr int direction_x[4] = {1, 0, -1, 0},
