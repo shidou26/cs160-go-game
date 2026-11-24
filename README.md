@@ -51,9 +51,4 @@ The Makefile creates `Game.exe` on Windows or `Game` on macOS/Linux in the proje
 ## Credit
 - [Raylib](https://github.com/raysan5/raylib)
 - [JSON for Modern C++](https://github.com/nlohmann/json)
-- Background music: 
-    - Song 1: Mizuiro - Go Sakabe
-    - Song 2: Atatakai Hi - Kei Wakakusa
-    - Song 3: Hateshinaki Tabiji - Hideki Taniuchi
-
-The music and imagery displayed in this game are not made or owned by me. All rights are reserved to their respective owners and no copyright infringement is intended.
+Some music and imagery displayed in this game are not made or owned by us. All rights are reserved to their respective owners and no copyright infringement is intended.

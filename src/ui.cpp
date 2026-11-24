@@ -1030,14 +1030,13 @@ void UI::draw_saving() {
     draw_background();
     Vector2 mouse_pos = GetMousePosition();
 
-    DrawTextEx(heading_font, "SAVE GAME", {390, 120}, 36, 1.0f, RAYWHITE);
+    DrawTextEx(heading_font, "Choose a slot to save", {390, 120}, 36, 1.0f, RAYWHITE);
     if (overwrite_slot != -1) {
         DrawTextEx(body_font, TextFormat("Overwrite the saved game in Slot %i?", overwrite_slot + 1), {390, 250}, 24, 1.0f, RAYWHITE);
         draw_button(btn_confirm_overwrite, mouse_pos, false, 24);
         draw_button(btn_cancel_overwrite, mouse_pos, false, 24);
         return;
     }
-    DrawTextEx(body_font, "Choose a slot to save.", {390, 175}, 22, 1.0f, RAYWHITE);
 
     for (int i = 0; i < 3; i++) {
         draw_button(btn_save_slots[i], mouse_pos, false, 28);
@@ -1419,7 +1418,7 @@ bool UI::load_setting(const std::string &path) {
 
         if (!stream.is_open()) {
             json default_data = {
-                {"selected_music", 3},
+                {"selected_music", 10},
                 {"selected_click_sfx", 1},
                 {"sound_volume", 80},
                 {"music_volume", 50},
