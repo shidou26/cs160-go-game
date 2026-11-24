@@ -5,3 +5,19 @@ saves/
 Game
 debug.log
 tmp/
+
+# Document
+docs/report/*
+!docs/report/images/
+!docs/report/sections/
+!docs/report/KhaiBao-Color.cls
+!docs/report/KhaiBao-tcolorbox.cls
+!docs/report/main.tex
+!docs/report/premable.cls
+
+docs/work_division/*
+!docs/work_division/images/
+!docs/work_division/KhaiBao-Color.cls
+!docs/work_division/KhaiBao-tcolorbox.cls
+!docs/work_division/main.tex
+!docs/work_division/premable.cls

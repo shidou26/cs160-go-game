@@ -1,34 +1,46 @@
-\section{Tutorial to Game Development in C++}
+\section{Tutorial on Game Development in C++}
 
-C++ is one of the best programming language for game development. In this tutorial, we will walk you through an introduction to game development in C++ with the usage of Raylib library. 
+\subsection{Introduction}
+
+C++ is one of the best programming languages for game development. In this tutorial, we will introduce the fundamentals of game development in C++ using the Raylib library.
+
+Created and published by Ramon Santamaria in November 2013, Raylib is a simple yet powerful library for game development. It is cross-platform and open-source, making it a great choice for both beginners and experienced developers.
 
 \subsection{Prerequisites}
 
-We will need to install the following:
+Before getting started, you will need to install the following tools:
 \begin{itemize}
     \item Git
-    \item C++ compiler at your choice
+    \item A C++ compiler of your choice
     \item GNU Make
 \end{itemize}
 
-This tutorial assumes that you have installed C++ compiler. To install Git, you can download it from \url{https://git-scm.com/downloads}. To install GNU Make, you can download it using your package manager in Linux or MacOS, or download it \href{https://gnuwin32.sourceforge.net/packages/make.htm}{here} for Windows.
+This tutorial assumes that you already have a C++ compiler installed. You can download Git from \href{https://git-scm.com/downloads}{its official website}. To install GNU Make on Linux or macOS, use your package manager. On Windows, you can download it from \href{https://gnuwin32.sourceforge.net/packages/make.htm}{this page}.
 
-\subsection{Building and installing}
+You can verify that you have installed the prerequisites by running the following commands in your terminal:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{bash}
+git --version
+g++ --version
+make --version
+\end{minted}
+If the tools are installed correctly, each command should display the corresponding version number.
 
-First, let's clone the raylib repository from GitHub:
+\subsection{Building and Installing Raylib}
+
+First, let's clone the Raylib repository from GitHub:
 \begin{minted}[frame=lines, linenos, fontsize=\normalsize]{bash}
 git clone https://github.com/raysan5/raylib.git raylib-installer
 \end{minted}
 
-Next, we will build and install the library:
+Next, we will build the static library:
 \begin{minted}[frame=lines, linenos, fontsize=\normalsize]{bash}
 cd raylib-installer/src
 make PLATFORM=PLATFORM_DESKTOP
 \end{minted}
 
-Once the build is complete, copy the generated static library \texttt{libraylib.a} and the required header files \texttt{raylib.h} to your C++ project directory. Alternatively, specify their locations using the appropriate compiler and linker flags.
+Once the build is complete, copy the generated static library \texttt{libraylib.a} and the required header file \texttt{raylib.h} to your C++ project directory. Alternatively, specify their locations using the appropriate compiler and linker flags.
 
-\subsection{Setting up the project}
+\subsection{Setting Up the Project}
 
 Create a new C++ project directory with the following structure:
 \dirtree{%
@@ -44,23 +56,332 @@ Create a new C++ project directory with the following structure:
 
 The \texttt{src/} directory contains the C++ source files, while the \texttt{assets/} directory contains images, fonts, and audio files. The \texttt{include/} directory contains the header files, and the \texttt{lib/} directory stores the compiled static library. Finally, the \texttt{Makefile} is used to build the project.
 
-Then, let's initialize the Makefile with the following content:
-\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{make}
-CXX ?= g++ # depends on your compiler
+Next, create a Makefile with the following content:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{makefile}
+CXX ?= g++ # Depends on your compiler
 SRC = $(wildcard src/*.cpp)
-CXXFLAGS = -Iinclude -std=c++17 # depends on your compiler flags
+CXXFLAGS = -Iinclude -std=c++17 # Depends on your compiler flags
 
 default:
+    # Keep only the commands for your operating system and remove the others
+
     # For Windows
-	$(CXX) $(SRC) -o Game.exe $(CXXFLAGS) -Llib -lraylib -lopengl32 -lgdi32 -lwinmm
-	Game.exe
+    $(CXX) $(SRC) -o Game.exe $(CXXFLAGS) -Llib -lraylib -lopengl32 -lgdi32 -lwinmm
+    Game.exe
 
     # For Linux
     $(CXX) $(SRC) -o Game $(CXXFLAGS) -Llib -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
     ./Game
 
-    # For MacOS
+    # For macOS
     $(CXX) $(SRC) -o Game $(CXXFLAGS) -Llib -lraylib -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
-	./Game
+    ./Game
 \end{minted}
 
+\subsection{Creating a Simple Game}
+
+It is now time to start coding! We will begin by creating a basic application window. Create a new file named \texttt{src/main.cpp} and add the following code:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+#include "raylib.h"
+
+int main() {
+    // Initialize the window
+    InitWindow(800, 600, "My First Game");
+    SetTargetFPS(60);
+
+    // Main game loop
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+
+        // All drawing happens here!
+        ClearBackground(SKYBLUE);
+        DrawText("Hello World!", 190, 200, 20, RAYWHITE);
+
+        EndDrawing();
+    }
+
+    // Close the window
+    CloseWindow();
+
+    return 0;
+}
+\end{minted}
+
+Notice how straightforward Raylib's syntax is. Now, build and run the project using the Makefile:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{bash}
+make
+\end{minted}
+
+This command should compile the code and launch the application. You should see a window with a blue background and the text "Hello World!" displayed in white.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/tutorial_01.png}
+    \caption{A simple game window created with Raylib}
+\end{figure}
+
+\subsection{Game Loop}
+
+In the previous example, the game continues running until the user closes the window. This behavior is achieved through a game loop, which is a fundamental concept in game development. The game loop continuously updates the game state and renders graphics until the user decides to exit. The general structure of a game loop is as follows:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+while (!WindowShouldClose()) {
+    // Handle user input
+    // Update the game state
+
+    BeginDrawing();
+    // Render the graphics
+    EndDrawing();
+}
+\end{minted}
+
+Two other important concepts in game development are frame rate and delta time. The frame rate is the number of frames rendered per second. Delta time, on the other hand, is the time taken to complete a frame and is usually measured in seconds. Frame rate and delta time are inversely related: as the frame rate increases, delta time decreases, and vice versa. In Raylib, you can set the target frame rate using the \texttt{SetTargetFPS()} function and retrieve the delta time using the \texttt{GetFrameTime()} function:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+SetTargetFPS(60); // Set the target frame rate to 60 FPS
+while (!WindowShouldClose()) {
+    float deltaTime = GetFrameTime(); // Get the delta time in seconds
+    // Handle user input
+    // Update the game state using deltaTime
+
+    BeginDrawing();
+    // Render the graphics
+    EndDrawing();
+}
+\end{minted}
+
+\subsection{Rendering Graphics}
+
+Raylib provides a simple and intuitive way to render graphics. You can use its built-in functions to draw shapes, images, and text. First, let us examine its coordinate system. The origin $(0, 0)$ is located at the top-left corner of the window, with the $x$-coordinate increasing to the right and the $y$-coordinate increasing downward. Coordinates are measured in pixels.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/tutorial_02.png}
+    \caption{The Raylib coordinate system}
+    \small\textit{Source: \href{https://blog.conan.io/cpp/gamedev/clion/conan/raylib/2025/05/13/GameDev-Raylib-CLion.html}{Conan Blog (2025)}}
+\end{figure}
+
+Raylib's drawing functions are straightforward to use. For example, you can draw a rectangle using the \texttt{DrawRectangle()} function:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+// Draw a red rectangle with its top-left corner at (100, 100)
+// and a width of 200 and a height of 150
+DrawRectangle(100, 100, 200, 150, RED);
+\end{minted}
+
+Other shapes, images, and text can be drawn in a similar manner:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+// Draw a blue circle centered at (400, 300) with a radius of 50
+DrawCircle(400, 300, 50, BLUE);
+
+// Draw white text at (190, 200) with a font size of 20
+DrawText("Hello World!", 190, 200, 20, RAYWHITE);
+
+// Draw a texture at (300, 200) with a red tint
+DrawTexture(myTexture, 300, 200, RED);
+\end{minted}
+
+\subsection{Handling User Input}
+
+A game needs to receive and respond to user input. Raylib provides a simple way to handle input from keyboards, mice, and gamepads. You can use the \texttt{IsKeyPressed()} and \texttt{IsKeyReleased()} functions to check whether a key has been pressed or released:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+// Check if the space key is pressed
+if (IsKeyPressed(KEY_SPACE)) {
+    // Perform an action when the space key is pressed (e.g., jump)
+}
+
+// Check if the space key is released
+if (IsKeyReleased(KEY_SPACE)) {
+    // Perform an action when the space key is released (e.g., jump with the accumulated power)
+}
+\end{minted}
+
+Some other useful functions for handling user input are:
+\begin{itemize}
+    \item \texttt{IsKeyDown(KEY\_<NAME>)}: Checks whether a key is currently being held down.
+    \item \texttt{IsMouseButtonPressed(MOUSE\_BUTTON\_<NAME>)}: Checks whether a mouse button has been pressed.
+    \item \texttt{GetMousePosition()}: Returns the current position of the mouse cursor.
+\end{itemize}
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+// Check if the space key is being held down
+if (IsKeyDown(KEY_SPACE)) {
+    // Perform an action while the space key is held down (e.g., increase jump power)
+}
+
+// Check if the left mouse button is pressed
+if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    // Perform an action when the left mouse button is pressed (e.g., shoot)
+}
+
+// Get the current position of the mouse cursor
+Vector2 mousePosition = GetMousePosition();
+// Use the mouse position to perform an action (e.g., aim)
+\end{minted}
+
+\subsection{Managing Game Assets}
+
+Game assets come in various forms: images, fonts, and audio files. Raylib provides a simple way to load and manage these assets. You can load textures using the \texttt{LoadTexture()} function:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+Texture2D texture = LoadTexture("assets/my_image.png");
+
+// Inside the drawing loop
+DrawTexture(texture, 300, 200, RED);
+
+// Unload the texture to prevent memory leaks
+UnloadTexture(texture);
+\end{minted}
+
+In addition, you can load a font using the \texttt{LoadFont()} function:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+Font font = LoadFont("assets/my_font.ttf");
+
+// Inside the drawing loop
+DrawTextEx(font, "Hello World!", {190, 200}, 20, 2, RAYWHITE);
+
+// Unload
+UnloadFont(font);
+\end{minted}
+
+% Audio assets: sound effects and music
+
+Game audio can be divided into two main categories: sound effects and music. Let us start with sound effects. You can load a sound effect using the \texttt{LoadSound()} function:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+Sound sound = LoadSound("assets/my_sound.wav");
+
+// Inside the drawing loop
+if (IsKeyPressed(KEY_SPACE)) {
+    PlaySound(sound);
+}
+
+// Unload
+UnloadSound(sound);
+\end{minted}
+
+Next, you can load a music file using the \texttt{LoadMusicStream()} function:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+Music music = LoadMusicStream("assets/my_music.mp3");
+PlayMusicStream(music); // Play the music stream
+
+// Inside the drawing loop
+UpdateMusicStream(music); // Update the music stream
+
+// Unload
+UnloadMusicStream(music);
+\end{minted}
+
+Remember to initialize the audio device using the \texttt{InitAudioDevice()} function before loading any audio files. After unloading all audio resources, close the audio device using the \texttt{CloseAudioDevice()} function:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+// Initialize the audio device
+InitAudioDevice();
+
+// Implement your game logic here
+
+// Unload audio resources
+UnloadSound(sound);
+UnloadMusicStream(music);
+
+// Close the audio device
+CloseAudioDevice();
+\end{minted}
+
+And that's it! You have learned the basics of game development in C++ using the Raylib library. You can now create your own games and explore Raylib's more advanced features.
+
+To put your newly acquired knowledge into practice, try this small challenge: recreate the classic Dinosaur Game from Google Chrome.
+
+Below is a simple implementation using Raylib that demonstrates player movement, jumping mechanics, obstacle generation, collision detection, and score tracking.
+
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{c++}
+#include "raylib.h"
+#include <vector>
+
+int main() {
+    const int screen_width = 800;
+    const int screen_height = 600;
+    const int ground_y = screen_height - 20;
+
+    const float gravity = 980.0f;
+    const float jump_impulse = -450.0f;
+
+    const float cactus_speed = 300.0f;
+    const int min_width = 40;
+    const int max_width = 120;
+    const float min_spawn = 1.2f;
+    const float max_spawn = 2.0f;
+
+    // Initialize the window
+    InitWindow(screen_width, screen_height, "Not Dinosaur Game");
+    SetTargetFPS(60);
+
+    Rectangle player = {100, screen_height - 80, 40, 60};
+    Vector2 velocity = {0.0f, 0.0f};
+
+    std::vector<Rectangle> cactus;
+    float spawn_timer = 0.0f, spawn_interval = 1.2f;
+
+    int score = 0;
+    bool game_over = false;
+
+    // Main game loop
+    while (!WindowShouldClose()) {
+        const float delta_time = GetFrameTime();
+
+        if (!game_over) {
+            if (IsKeyPressed(KEY_SPACE) && player.y + player.height >= ground_y) {
+                velocity.y = jump_impulse;
+            }
+            velocity.y += gravity * delta_time;
+            player.y += velocity.y * delta_time;
+            if (player.y + player.height > ground_y) {
+                player.y = ground_y - player.height;
+                velocity.y = 0;
+            }
+
+            spawn_timer += delta_time;
+            if (spawn_timer >= spawn_interval) {
+                Rectangle c = {screen_width, ground_y - 40,
+                               GetRandomValue(min_width, max_width) * 1.0f, 40};
+                cactus.push_back(c);
+                spawn_timer -= spawn_interval;
+                spawn_interval = GetRandomValue(int(min_spawn * 100),
+                                                int(max_spawn * 100)) / 100.0f;
+            }
+
+            for (Rectangle &c : cactus) {
+                float before = c.x + c.width;
+                c.x -= cactus_speed * delta_time;
+                if (CheckCollisionRecs(player, c)) {
+                    game_over = true;
+                    break;
+                }
+
+                if (player.x > c.x + c.width && player.x <= before) {
+                    score += 1;
+                }
+            }
+
+            while (!cactus.empty() && cactus.front().x + cactus.front().width < 0) {
+                cactus.erase(cactus.begin());
+            }
+        }
+
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        DrawRectangle(0, ground_y, screen_width, 20, DARKGRAY);
+        DrawRectangleRec(player, BLUE);
+
+        for (Rectangle &c : cactus) {
+            DrawRectangleRec(c, GREEN);
+        }
+
+        DrawText(TextFormat("Score %d", score), 10, 10, 20, BLACK);
+
+        if (game_over) {
+            DrawText("GAME OVER!", 200, screen_height / 2 - 20, 20, MAROON);
+        }
+
+        EndDrawing();
+    }
+
+    // Close the window
+    CloseWindow();
+
+    return 0;
+}
+\end{minted}

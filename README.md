@@ -51,4 +51,5 @@ The Makefile creates `Game.exe` on Windows or `Game` on macOS/Linux in the proje
 ## Credit
 - [Raylib](https://github.com/raysan5/raylib)
 - [JSON for Modern C++](https://github.com/nlohmann/json)
+
 Some music and imagery displayed in this game are not made or owned by us. All rights are reserved to their respective owners and no copyright infringement is intended.
