@@ -97,6 +97,8 @@ private:
     OptionButton btn_sound_mute;
     OptionButton btn_music_prev;
     OptionButton btn_music_next;
+    OptionButton btn_click_sfx_prev;
+    OptionButton btn_click_sfx_next;
     OptionButton btn_tab_theme;
     OptionButton btn_tab_board;
     OptionButton btn_tab_stones;
@@ -139,6 +141,7 @@ public:
     bool is_muted_music;
     bool is_muted_master;
     int selected_music;
+    int selected_click_sfx = 1;
     std::string selected_theme = "Classic";
     std::string selected_board = "Kaya Wood";
     std::string selected_stones = "3D Glossy";

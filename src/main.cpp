@@ -27,6 +27,7 @@ int main() {
     //Set game soundeffect and soundtrack
     Audio::init();
     Audio::change_music(user_interface.selected_music);
+    Audio::change_click_sfx(user_interface.selected_click_sfx);
     
     //Game
     GamePhase phase = GamePhase::START;
@@ -150,6 +151,7 @@ int main() {
                                 Audio::play(SFX::STONE);
                                 int cap_after = board.get_captured(0) + board.get_captured(1);
                                 if (cap_after > cap_before) {
+                                    Audio::play(SFX::CAPTURE);
                                     user_interface.notify_stone_captured();
                                 }
                             }
@@ -177,6 +179,7 @@ int main() {
                         Audio::play(SFX::STONE);
                         int cap_after = board.get_captured(0) + board.get_captured(1);
                         if (cap_after > cap_before) {
+                            Audio::play(SFX::CAPTURE);
                             user_interface.notify_stone_captured();
                         }
                     }
