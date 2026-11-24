@@ -2,14 +2,65 @@
 
 C++ is one of the best programming language for game development. In this tutorial, we will walk you through an introduction to game development in C++ with the usage of Raylib library. 
 
-\subsection{Development Environment and Project Setup}
-% Give the compiler, C++ version, build tool, folder structure, and setup steps.
+\subsection{Prerequisites}
 
-\subsection{Useful Libraries and How to Apply Them}
-% Introduce raylib and any other libraries used by the starter project.
+We will need to install the following:
+\begin{itemize}
+    \item Git
+    \item C++ compiler at your choice
+    \item GNU Make
+\end{itemize}
 
-\subsection{Starter Code with Step-by-Step Explanation}
-% Include a small working GUI example and explain its main C++ statements in detail.
+This tutorial assumes that you have installed C++ compiler. To install Git, you can download it from \url{https://git-scm.com/downloads}. To install GNU Make, you can download it using your package manager in Linux or MacOS, or download it \href{https://gnuwin32.sourceforge.net/packages/make.htm}{here} for Windows.
 
-\subsection{Compile and Run the Starter Project}
-% Show the exact build command and explain the compiler flags and linked libraries.
+\subsection{Building and installing}
+
+First, let's clone the raylib repository from GitHub:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{bash}
+git clone https://github.com/raysan5/raylib.git raylib-installer
+\end{minted}
+
+Next, we will build and install the library:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{bash}
+cd raylib-installer/src
+make PLATFORM=PLATFORM_DESKTOP
+\end{minted}
+
+Once the build is complete, copy the generated static library \texttt{libraylib.a} and the required header files \texttt{raylib.h} to your C++ project directory. Alternatively, specify their locations using the appropriate compiler and linker flags.
+
+\subsection{Setting up the project}
+
+Create a new C++ project directory with the following structure:
+\dirtree{%
+.1 your-project-name/.
+.2 src/.
+.2 assets/.
+.2 include/.
+.3 raylib.h.
+.2 lib/.
+.3 libraylib.a.
+.2 Makefile.
+}
+
+The \texttt{src/} directory contains the C++ source files, while the \texttt{assets/} directory contains images, fonts, and audio files. The \texttt{include/} directory contains the header files, and the \texttt{lib/} directory stores the compiled static library. Finally, the \texttt{Makefile} is used to build the project.
+
+Then, let's initialize the Makefile with the following content:
+\begin{minted}[frame=lines, linenos, fontsize=\normalsize]{make}
+CXX ?= g++ # depends on your compiler
+SRC = $(wildcard src/*.cpp)
+CXXFLAGS = -Iinclude -std=c++17 # depends on your compiler flags
+
+default:
+    # For Windows
+	$(CXX) $(SRC) -o Game.exe $(CXXFLAGS) -Llib -lraylib -lopengl32 -lgdi32 -lwinmm
+	Game.exe
+
+    # For Linux
+    $(CXX) $(SRC) -o Game $(CXXFLAGS) -Llib -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+    ./Game
+
+    # For MacOS
+    $(CXX) $(SRC) -o Game $(CXXFLAGS) -Llib -lraylib -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
+	./Game
+\end{minted}
+

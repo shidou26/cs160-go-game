@@ -19,6 +19,7 @@
 \usepackage{ulem}
 \usepackage{amssymb}
 \usepackage{minted}
+\usepackage{dirtree}
 \usemintedstyle{arduino}
 \renewcommand{\ULdepth}{8pt}
 \renewcommand{\arraystretch}{1.15}

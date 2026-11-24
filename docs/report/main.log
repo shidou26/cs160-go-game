@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.2)  22 NOV 2026 21:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.2)  24 NOV 2026 16:51
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -810,18 +810,40 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 runsystem(if not exist _minted-main mkdir _minted-main)...executed.
 
 
+(c:/texlive/2024/texmf-dist/tex/generic/dirtree/dirtree.sty
+Package: dirtree 2012/12/11 v0.32 package wrapper for dirtree
+
+(c:/texlive/2024/texmf-dist/tex/generic/dirtree/dirtree.tex
+`dirtree' v0.32, 2012/12/11 (jcc)
+\DT@offset=\dimen295
+\DT@width=\dimen296
+\DT@sep=\dimen297
+\DT@all=\dimen298
+\DT@rulewidth=\dimen299
+\DT@dotwidth=\dimen300
+\DTbaselineskip=\dimen301
+\DT@counti=\count363
+\DT@countii=\count364
+\DT@countiii=\count365
+\DT@countiv=\count366
+\DT@indent=\dimen302
+\DT@parskip=\dimen303
+\DT@baselineskip=\dimen304
+)
+File: dirtree.tex 2012/12/11 v0.32 `dirtree' (jcc)
+)
 (c:/texlive/2024/texmf-dist/tex/latex/base/fontenc.sty
 Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
 )
 (c:/texlive/2024/texmf-dist/tex/generic/babel/babel.sty
 Package: babel 2024/02/07 v24.2 The Babel package
-\babel@savecnt=\count363
-\U@D=\dimen295
+\babel@savecnt=\count367
+\U@D=\dimen305
 \l@unhyphenated=\language89
 
 (c:/texlive/2024/texmf-dist/tex/generic/babel/txtbabel.def)
 \bbl@readstream=\read6
-\bbl@dirlevel=\count364
+\bbl@dirlevel=\count368
 
 (c:/texlive/2024/texmf-dist/tex/generic/babel-vietnamese/vietnamese.ldf
 Language: vietnamese 
@@ -1003,7 +1025,7 @@ MM)
 
 (c:/texlive/2024/texmf-dist/tex/latex/lastpage/lastpagemodern.sty
 Package: lastpagemodern 2023-10-14 v2.0e Refers to last page's name (HMM; JPG)
-\c@lastpagecount=\count365
+\c@lastpagecount=\count369
 ) 
 )) (c:/texlive/2024/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
@@ -1018,7 +1040,7 @@ Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
 \f@nch@O@olf=\skip72
 \f@nch@O@orf=\skip73
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 52.
+Package hyperref Info: Option `colorlinks' set `true' on input line 53.
 
 (c:/texlive/2024/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2024/02/21 1.10 listings language file
@@ -1032,10 +1054,10 @@ File: lstmisc.sty 2024/02/21 1.10 (Carsten Heinz)
 (./KhaiBao-Color.cls) (./KhaiBao-tcolorbox.cls
 (c:/texlive/2024/texmf-dist/tex/latex/tcolorbox/tcbraster.code.tex
 Library (tcolorbox): 'tcbraster.code.tex' version '6.2.0'
-\c@tcbrastercolumn=\count366
-\c@tcbrasterrow=\count367
-\c@tcbrasternum=\count368
-\c@tcbraster=\count369
+\c@tcbrastercolumn=\count370
+\c@tcbrasterrow=\count371
+\c@tcbrasternum=\count372
+\c@tcbraster=\count373
 ) (c:/texlive/2024/texmf-dist/tex/latex/tcolorbox/tcbskins.code.tex
 Library (tcolorbox): 'tcbskins.code.tex' version '6.2.0'
 (c:/texlive/2024/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
@@ -1046,8 +1068,8 @@ Library (tcolorbox): 'tcbskins.code.tex' version '6.2.0'
 (c:/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex))
 (c:/texlive/2024/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
 Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
-\pgffor@iter=\dimen296
-\pgffor@skip=\dimen297
+\pgffor@iter=\dimen306
+\pgffor@skip=\dimen307
 \pgffor@stack=\toks48
 \pgffor@toks=\toks49
 ))
@@ -1057,33 +1079,33 @@ Package: tikz 2023-01-15 v3.1.10 (3.1.10)
 (c:/texlive/2024/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothandlers.co
 de.tex
 File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@plot@mark@count=\count370
-\pgfplotmarksize=\dimen298
+\pgf@plot@mark@count=\count374
+\pgfplotmarksize=\dimen308
 )
-\tikz@lastx=\dimen299
-\tikz@lasty=\dimen300
-\tikz@lastxsaved=\dimen301
-\tikz@lastysaved=\dimen302
-\tikz@lastmovetox=\dimen303
-\tikz@lastmovetoy=\dimen304
-\tikzleveldistance=\dimen305
-\tikzsiblingdistance=\dimen306
+\tikz@lastx=\dimen309
+\tikz@lasty=\dimen310
+\tikz@lastxsaved=\dimen311
+\tikz@lastysaved=\dimen312
+\tikz@lastmovetox=\dimen313
+\tikz@lastmovetoy=\dimen314
+\tikzleveldistance=\dimen315
+\tikzsiblingdistance=\dimen316
 \tikz@figbox=\box92
 \tikz@figbox@bg=\box93
 \tikz@tempbox=\box94
 \tikz@tempbox@bg=\box95
-\tikztreelevel=\count371
-\tikznumberofchildren=\count372
-\tikznumberofcurrentchild=\count373
-\tikz@fig@count=\count374
+\tikztreelevel=\count375
+\tikznumberofchildren=\count376
+\tikznumberofcurrentchild=\count377
+\tikz@fig@count=\count378
 
 (c:/texlive/2024/texmf-dist/tex/generic/pgf/modules/pgfmodulematrix.code.tex
 File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfmatrixcurrentrow=\count375
-\pgfmatrixcurrentcolumn=\count376
-\pgf@matrix@numberofcolumns=\count377
+\pgfmatrixcurrentrow=\count379
+\pgfmatrixcurrentcolumn=\count380
+\pgf@matrix@numberofcolumns=\count381
 )
-\tikz@expandcount=\count378
+\tikz@expandcount=\count382
 
 (c:/texlive/2024/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzli
 brarytopaths.code.tex
@@ -1116,10 +1138,10 @@ Library (tcolorbox): 'tcbhooks.code.tex' version '6.2.0'
 Library (tcolorbox): 'tcbtheorems.code.tex' version '6.2.0'
 ) (c:/texlive/2024/texmf-dist/tex/latex/tcolorbox/tcbfitting.code.tex
 Library (tcolorbox): 'tcbfitting.code.tex' version '6.2.0'
-\tcbfitdim=\dimen307
-\tcb@lowerfitdim=\dimen308
-\tcb@upperfitdim=\dimen309
-\tcb@cur@hbadness=\count379
+\tcbfitdim=\dimen317
+\tcb@lowerfitdim=\dimen318
+\tcb@upperfitdim=\dimen319
+\tcb@cur@hbadness=\count383
 ) (c:/texlive/2024/texmf-dist/tex/latex/tcolorbox/tcblistingsutf8.code.tex
 Library (tcolorbox): 'tcblistingsutf8.code.tex' version '6.2.0'
 (c:/texlive/2024/texmf-dist/tex/latex/tcolorbox/tcblistings.code.tex
@@ -1129,7 +1151,7 @@ Library (tcolorbox): 'tcblistingscore.code.tex' version '6.2.0'
 (c:/texlive/2024/texmf-dist/tex/latex/tcolorbox/tcbprocessing.code.tex
 Library (tcolorbox): 'tcbprocessing.code.tex' version '6.2.0'
 )
-\c@tcblisting=\count380
+\c@tcblisting=\count384
 )) (c:/texlive/2024/texmf-dist/tex/latex/listingsutf8/listingsutf8.sty
 Package: listingsutf8 2019-12-10 v1.5 Allow UTF-8 in listings input (HO)
 
@@ -1173,7 +1195,7 @@ Package: xkeyval 2022/06/16 v2.9 package option processing (HA)
 \XKV@toks=\toks50
 \XKV@tempa@toks=\toks51
 )
-\XKV@depth=\count381
+\XKV@depth=\count385
 File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
 ))
 \bc@invboxh=\skip74
@@ -1193,14 +1215,14 @@ Package zref Info: New property list: main on input line 767.
 Package zref Info: New property: default on input line 768.
 Package zref Info: New property: page on input line 769.
 )
-\c@abspage=\count382
+\c@abspage=\count386
 Package zref Info: New property: abspage on input line 67.
 )
 (c:/texlive/2024/texmf-dist/tex/latex/needspace/needspace.sty
 Package: needspace 2010/09/12 v1.3d reserve vertical space
 )
 \mdf@templength=\skip78
-\c@mdf@globalstyle@cnt=\count383
+\c@mdf@globalstyle@cnt=\count387
 \mdf@skipabove@length=\skip79
 \mdf@skipbelow@length=\skip80
 \mdf@leftmargin@length=\skip81
@@ -1276,16 +1298,16 @@ File: md-frame-1.mdf 2013/07/01\ 1.9b: md-frame-1
 \mdf@horizontalspaceofbox=\skip142
 \mdfsubtitleheight=\skip143
 \mdfsubsubtitleheight=\skip144
-\c@mdfcountframes=\count384
+\c@mdfcountframes=\count388
 
 ****** mdframed patching \endmdf@trivlist
 
 ****** -- success******
 
-\mdf@envdepth=\count385
-\c@mdf@env@i=\count386
-\c@mdf@env@ii=\count387
-\c@mdf@zref@counter=\count388
+\mdf@envdepth=\count389
+\c@mdf@env@i=\count390
+\c@mdf@env@ii=\count391
+\c@mdf@zref@counter=\count392
 Package zref Info: New property: mdf@pagevalue on input line 895.
 )
 (c:/texlive/2024/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzli
@@ -1298,14 +1320,14 @@ brarydecorations.pathmorphing.code.tex
 brarydecorations.code.tex
 (c:/texlive/2024/texmf-dist/tex/generic/pgf/modules/pgfmoduledecorations.code.t
 ex
-\pgfdecoratedcompleteddistance=\dimen310
-\pgfdecoratedremainingdistance=\dimen311
-\pgfdecoratedinputsegmentcompleteddistance=\dimen312
-\pgfdecoratedinputsegmentremainingdistance=\dimen313
-\pgf@decorate@distancetomove=\dimen314
-\pgf@decorate@repeatstate=\count389
-\pgfdecorationsegmentamplitude=\dimen315
-\pgfdecorationsegmentlength=\dimen316
+\pgfdecoratedcompleteddistance=\dimen320
+\pgfdecoratedremainingdistance=\dimen321
+\pgfdecoratedinputsegmentcompleteddistance=\dimen322
+\pgfdecoratedinputsegmentremainingdistance=\dimen323
+\pgf@decorate@distancetomove=\dimen324
+\pgf@decorate@repeatstate=\count393
+\pgfdecorationsegmentamplitude=\dimen325
+\pgfdecorationsegmentlength=\dimen326
 )
 \tikz@lib@dec@box=\box105
 )
@@ -1314,7 +1336,7 @@ orations.pathmorphing.code.tex))
 (c:/texlive/2024/texmf-dist/tex/generic/iftex/ifpdf.sty
 Package: ifpdf 2019/10/25 v3.4 ifpdf legacy package. Use iftex instead.
 )
-\c@bclogocompteur=\count390
+\c@bclogocompteur=\count394
 \bcval@epBarre=\skip145
 \bcval@framesep=\skip146
 \bcval@tailleOndu=\skip147
@@ -1326,9 +1348,9 @@ Package: ifpdf 2019/10/25 v3.4 ifpdf legacy package. Use iftex instead.
 (c:/texlive/2024/texmf-dist/tex/latex/varwidth/varwidth.sty
 Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \@vwid@box=\box107
-\sift@deathcycles=\count391
-\@vwid@loff=\dimen317
-\@vwid@roff=\dimen318
+\sift@deathcycles=\count395
+\@vwid@loff=\dimen327
+\@vwid@roff=\dimen328
 )
 (c:/texlive/2024/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzli
 brarycalc.code.tex
@@ -1418,9 +1440,9 @@ File: pgflibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
 )))
 (c:/texlive/2024/texmf-dist/tex/latex/pgf-blur/tikzlibraryshadows.blur.code.tex
  v1.02, 2012/12/09
-\pgfbs@fading@count=\count392
+\pgfbs@fading@count=\count396
 )
-\c@tcb@cnt@tcbcounterone=\count393
+\c@tcb@cnt@tcbcounterone=\count397
 )
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... found 'babel' package.
@@ -1471,16 +1493,16 @@ LaTeX Font Info:    ... okay on input line 10.
 
 (c:/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count394
-\scratchdimen=\dimen319
+\scratchcounter=\count398
+\scratchdimen=\dimen329
 \scratchbox=\box130
-\nofMPsegments=\count395
-\nofMParguments=\count396
+\nofMPsegments=\count399
+\nofMParguments=\count400
 \everyMPshowfont=\toks52
-\MPscratchCnt=\count397
-\MPscratchDim=\dimen320
-\MPnumerator=\count398
-\makeMPintoPDFobject=\count399
+\MPscratchCnt=\count401
+\MPscratchDim=\dimen330
+\MPnumerator=\count402
+\makeMPintoPDFobject=\count403
 \everyMPtoPDFconversion=\toks53
 ) (c:/texlive/2024/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -1525,7 +1547,7 @@ e
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-\c@lstlisting=\count400
+\c@lstlisting=\count404
 \symgns@font=\mathgroup6
 LaTeX Font Info:    Overwriting symbol font `gns@font' in version `bold'
 (Font)                  TS1/cmr/m/n --> TS1/cmr/b/n on input line 10.
@@ -1554,7 +1576,7 @@ LaTeX Font Info:    Trying to load font information for T5+cmss on input line 1
 (c:/texlive/2024/texmf-dist/tex/latex/vntex/t5cmss.fd
 File: t5cmss.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-<images/Logo chinh.png, id=131, 1196.0685pt x 979.9812pt>
+<images/Logo chinh.png, id=127, 1196.0685pt x 979.9812pt>
 File: images/Logo chinh.png Graphic file (type png)
 <use images/Logo chinh.png>
 Package pdftex.def Info: images/Logo chinh.png  used on input line 25.
@@ -1589,10 +1611,35 @@ l.49 \newpage
               [1] (./sections/overview.tex)
 (./sections/requirements_specification.tex) (./sections/design_document.tex)
 (./sections/tutorial_to_game_development_in_cpp.tex [2{c:/texlive/2024/texmf-di
-st/fonts/enc/dvips/cm-super/cm-super-ts1.enc}])
-(./sections/code_modification.tex) (./sections/testing_document.tex [3]
-[4]) (./sections/future_improvements.tex [5]) [6]
+st/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
+LaTeX Font Info:    Trying to load font information for T5+cmtt on input line 1
+4.
 
+(c:/texlive/2024/texmf-dist/tex/latex/vntex/t5cmtt.fd
+File: t5cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+\openout4 = `main.pyg'.
+
+
+(./_minted-main/arduino.pygstyle)
+(./_minted-main/2C44E477288C75F711CEB375A786E8903BD8A5E412CEFD84C8457880BF3010D
+3.pygtex)
+\openout4 = `main.pyg'.
+
+
+(./_minted-main/4A70074CB3A2F1A5CA41FFA10DEEC07B3BD8A5E412CEFD84C8457880BF3010D
+3.pygtex)
+\openout4 = `main.pyg'.
+
+runsystem(pygmentize -l "make" -f latex -P commandprefix=PYG -F tokenmerge -P s
+tripnl="False" -o _minted-main/4DF5B0B40F6DE0907321CB7238A46658DBF0765E2F7EBD63
+7982E9B30FD39E2D.pygtex main.pyg)...executed.
+
+
+(./_minted-main/4DF5B0B40F6DE0907321CB7238A46658DBF0765E2F7EBD637982E9B30FD39E2
+D.pygtex [3])) (./sections/code_modification.tex)
+(./sections/testing_document.tex [4] [5]) (./sections/future_improvements.tex)
+[6] 
 enddocument/afterlastpage: lastpage setting LastPage.
 (./main.aux)
  ***********
@@ -1600,25 +1647,29 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: FA0A27B3737B8B0CF8A2030DF2C3FFC7;3834.
+(rerunfilecheck)             Checksum: 37F60C29B6AD755A97FAE2E6F78208FF;3244.
+runsystem(del main.pyg)...executed.
+
  ) 
 Here is how much of TeX's memory you used:
- 40677 strings out of 474116
- 829066 string characters out of 5747718
- 1950190 words of memory out of 5000000
- 62249 multiletter control sequences out of 15000+600000
- 581812 words of font info for 77 fonts, out of 8000000 for 9000
+ 40913 strings out of 474116
+ 833985 string characters out of 5747718
+ 1948190 words of memory out of 5000000
+ 62459 multiletter control sequences out of 15000+600000
+ 583063 words of font info for 79 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 88i,11n,90p,1193b,615s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 88i,11n,90p,1193b,940s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb><c:/texl
 ive/2024/texmf-dist/fonts/type1/vntex/vnr/vnbx10.pfb><c:/texlive/2024/texmf-dis
 t/fonts/type1/vntex/vnr/vnr10.pfb><c:/texlive/2024/texmf-dist/fonts/type1/vntex
-/vnr/vnss12.pfb><c:/texlive/2024/texmf-dist/fonts/type1/vntex/vnr/vnss9.pfb><c:
-/texlive/2024/texmf-dist/fonts/type1/vntex/vnr/vnssbx10.pfb>
-Output written on main.pdf (7 pages, 377706 bytes).
+/vnr/vnss12.pfb><c:/texlive/2024/texmf-dist/fonts/type1/vntex/vnr/vnss8.pfb><c:
+/texlive/2024/texmf-dist/fonts/type1/vntex/vnr/vnss9.pfb><c:/texlive/2024/texmf
+-dist/fonts/type1/vntex/vnr/vnssbx10.pfb><c:/texlive/2024/texmf-dist/fonts/type
+1/vntex/vnr/vntt10.pfb>
+Output written on main.pdf (7 pages, 398487 bytes).
 PDF statistics:
- 231 PDF objects out of 1000 (max. 8388607)
- 182 compressed objects within 2 object streams
- 31 named destinations out of 1000 (max. 500000)
- 338 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 237 PDF objects out of 1000 (max. 8388607)
+ 184 compressed objects within 2 object streams
+ 30 named destinations out of 1000 (max. 500000)
+ 330 words of extra memory for PDF output out of 10000 (max. 10000000)
 

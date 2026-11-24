@@ -1,0 +1,4 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nb}{cd}\PYG{+w}{ }raylib\PYGZhy{}installer/src
+make\PYG{+w}{ }\PYG{n+nv}{PLATFORM}\PYG{o}{=}PLATFORM\PYGZus{}DESKTOP
+\end{Verbatim}

@@ -12,12 +12,11 @@
 \contentsline {subsection}{\numberline {2.9}Technology Stack}{2}{subsection.2.9}%
 \contentsline {section}{\numberline {3}Design Document}{2}{section.3}%
 \contentsline {section}{\numberline {4}Tutorial to Game Development in C++}{3}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Development Environment and Project Setup}{3}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Useful Libraries and How to Apply Them}{3}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Starter Code with Step-by-Step Explanation}{3}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Compile and Run the Starter Project}{3}{subsection.4.4}%
-\contentsline {section}{\numberline {5}Code Modification}{3}{section.5}%
-\contentsline {section}{\numberline {6}Testing Document}{3}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Simple Features}{3}{subsection.6.1}%
-\contentsline {subsubsection}{\numberline {6.1.1}S01: New Game and Board Initialization}{3}{subsubsection.6.1.1}%
+\contentsline {subsection}{\numberline {4.1}Prerequisites}{3}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Building and installing}{3}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Setting up the project}{3}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Code Modification}{4}{section.5}%
+\contentsline {section}{\numberline {6}Testing Document}{4}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Simple Features}{4}{subsection.6.1}%
+\contentsline {subsubsection}{\numberline {6.1.1}S01: New Game and Board Initialization}{4}{subsubsection.6.1.1}%
 \contentsline {section}{\numberline {7}Future Improvements}{6}{section.7}%

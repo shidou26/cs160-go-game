@@ -1,0 +1,3 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+git\PYG{+w}{ }clone\PYG{+w}{ }https://github.com/raysan5/raylib.git\PYG{+w}{ }raylib\PYGZhy{}installer
+\end{Verbatim}
