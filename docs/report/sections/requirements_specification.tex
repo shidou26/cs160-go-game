@@ -4,14 +4,14 @@
 
 \begin{itemize}
     \item \textbf{Two-player mode:} Two players compete on the same device.
-    Black moves first, and turns alternate between Black and White after
+    black moves first, and turns alternate between black and white after
     each valid move or pass.
 
-    \item \textbf{Player vs.\ AI mode:} The human player controls Black,
-    while the computer controls White. Before starting the game, the player
+    \item \textbf{Player vs.\ AI mode:} The human player controls black,
+    while the computer controls white. Before starting the game, the player
     can choose from three difficulty levels: Easy, Medium, or Hard.
-    The computer responds after each human turn, with an artificial
-    delay of 1500 milliseconds to simulate thinking time.
+    After each human turn, the computer waits 1.5 seconds before computing
+    its move. The total response time includes this delay and the computation time.
 \end{itemize}
 
 \subsection{User Interface (UI)}
@@ -19,7 +19,7 @@
 \begin{itemize}
     \item A board on which Go stones can be placed.
     \item Turn indicator showing whether it's white or black's turn.
-    \item Notification for stone captures. Panel for end-game scoring. A red square on board indicating Ko threat.
+    \item Notification for stone captures. Panel for end-game scoring. A red square on the board marking an intersection where a move is prohibited by the Ko rule.
     \item Buttons to:
     \begin{itemize}
         \item Start a new game.
@@ -28,19 +28,23 @@
             \item Select AI difficulty level before starting a Player vs AI game.
         \end{itemize}
         \item Reset the current game to an empty board.
-        \item Undo the last move.
-        \item Redo the last undone move.
+        \item Pass the current turn.
+        \item Return to the title screen.
+        \item Undo moves according to the selected game mode.
+        \item Redo undone moves according to the selected game mode.
         \item Save the current game state to a file.
         \item Load a previously saved game state from a file.
         \item Adjust game settings, including:
         \begin{itemize}
-            \item Board Color: Options to select different colors or themes for the Go board.
-            \item Stone Design: Options to change the design or style of the stones.
-            \item Sound Effects: Options to enable or disable sound effects for placing stones, capturing stones, end-game scoring, and background music.
-            \item Background Music: Options to choose background music or disable it. Include a volume control for sound effects and music.
+            \item Game Theme: Select the appearance of the game interface.
+            \item Board Appearance: Select the visual style of the Go board.
+            \item Stone Design: Select the visual style of the black and white stones.
+            \item Audio Controls: Adjust volume and toggle mute separately for master audio, background music, and sound effects. The sound-effects control applies to all gameplay and button-click sounds together.
+            \item Background Music: Select a background music track.
+            \item Click Sound: Select the sound effect used for button clicks.
         \end{itemize}
-        \item Exit the game.
     \end{itemize}
+    \item Press \texttt{H} on the title screen or close the window to exit the game.
 \end{itemize}
 
 \subsection{Board Representation}
@@ -50,7 +54,8 @@
     \item Players can place stones on the board by clicking on the desired intersection.
     \item Visual and audio feedback are provided when a stone is placed.
     \item In \textbf{2-player mode}, alternate turns between players, with the current player's turn indicated on the UI.
-    \item In \textbf{Player vs AI mode}, the human player controls Black, and the computer controls White. The AI responds after each human turn, with an artificial delay of 1500 milliseconds to simulate thinking time.
+    \item In \textbf{Player vs AI mode}, the human player controls black, and the computer controls white. After each human turn, the computer waits 1.5 seconds before computing
+    its move. The total response time includes this delay and the computation time.
 \end{itemize}
 
 \subsection{Game Logic}
@@ -59,15 +64,18 @@
     \item Implement the rules of Go:
     \begin{itemize}
         \item Stone placement
+        \item Connected-group detection: Identify groups of same-color stones connected horizontally or vertically.
+        \item Liberties: Identify empty intersections adjacent horizontally or vertically to a group; count each distinct liberty once when evaluating groups for the AI.
         \item Capturing stones
+        \item Suicide prevention: Reject moves that leave the placed stone's group without liberties, unless capturing opposing stones creates liberties.
         \item Ko rule
         \item Scoring: The game uses simplified Japanese-style scoring based
-        on territory and captured stones, with komi added to White's score.
+        on territory and captured stones, with 6.5 points of komi added to white's score.
         It does not implement a post-game dead-stone removal phase or an
         algorithm for determining whether a group is alive or dead. 
     \end{itemize}
     \item Ensure that the game enforces valid moves and prevents illegal placements.
-    \item Automatically detect and handle end-game conditions of passing two times.
+    \item End the game after two consecutive passes. A valid stone placement resets the consecutive-pass counter.
 \end{itemize}
 
 \subsection{AI Opponent}
@@ -75,13 +83,11 @@
 \begin{itemize}
     \item Implement three levels of AI difficulty:
     \begin{itemize}
-        \item \textbf{Easy:} The AI makes quick, random moves without much evaluation.
-        \item \textbf{Medium:} The AI uses the Minimax algorithm with a shallow depth, making reasonable
-        moves with occasional mistakes.
+        \item \textbf{Easy:} The AI randomly selects legal moves with basic safety checks, avoiding its own eyes and preferring moves that leave its group with more than one liberty.
+        \item \textbf{Medium:} The AI uses the Minimax algorithm with a shallow depth, making reasonable moves with occasional mistakes.
         \item \textbf{Hard:} The AI uses Minimax with Alpha-Beta pruning, evaluating a deeper move tree to
         play strategically, reducing mistakes.
     \end{itemize}
-    \item The AI makes moves efficiently, within a reasonable time frame, even at the Hard difficulty level.
 \end{itemize}
 
 \subsection{Game State Management}
@@ -90,23 +96,24 @@
     \item Track the current state of the board and the game.
     \item Handle turn management, ensuring proper transitions between the player's turn and the AI's
 turn or between two human players.
-    \item Implement undo and redo functionality, allowing players to revert to previous game states or redo moves.
-    \item Ensure that the game state is accurately updated after each move, including capturing stones and updating scores.
-    \item Provide the ability to reset the game to its initial state at any time.
+    \item Undo or redo one move per click in two-player mode. In Player vs.\ AI mode, undo or redo up to two moves per click to cover the human--AI move pair, depending on the available history.
+    \item Update the board state, turn, consecutive-pass counter, and capture counts after moves; display final scores at game end.
+    \item Allow resetting during active play when human controls are available. Reset clears stones, capture counts, move and undo history, consecutive passes, and timers, and restores black's turn while preserving board size, game mode, and AI difficulty.
 \end{itemize}
 
 \subsection{Saving and Loading}
 
 \begin{itemize}
-    \item Implement functionality to save the current game state to a file in JSON format.
-    \item Implement functionality to load a previously saved game state from a JSON file.
+    \item Save and load games in JSON format using three save slots.
+    \item Request confirmation before overwriting an occupied save slot, with options to confirm or cancel.
 \end{itemize}
 
 \subsection{Additional Implemented Features}
 
 \begin{itemize}
     \item Selection of $9 \times 9$, $13 \times 13$, and $19 \times 19$ board sizes.
-    \item Save and load with three slots.
+    \item Display separate elapsed-time counters for black and white. Only the current player's counter advances during active play; both counters pause outside the playing screen.
+    \item Automatically save changes to appearance and audio settings and restore them on subsequent launches.
 \end{itemize}
 
 \subsection{Technology Stack}
