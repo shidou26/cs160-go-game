@@ -156,4 +156,30 @@
 
 \subsubsection*{Bug Report: B01}
 
+The bug B01 was found during playtesting of the game in the PVE mode. After the player makes a move, instead of removing the stone by the player, nothing happens.
+
+The bug can be reproduced by following these steps:
+\begin{enumerate}
+    \item Start a new game in PVE mode.
+    \item Player places a stone on the board.
+    \item The AI makes a move.
+    \item Player places another stone on the board.
+    \item The player tries to remove the stone by clicking undo.
+    \item The stone is not removed, and the game continues as if nothing happened.
+\end{enumerate}
+
+The function that is responsible for this bug is \texttt{UI::handle\_option\_click} in the switch case for the undo button. The function first remove the stone from the board, then the AI immediately makes a move, which causes the stone to be placed back on the board. Thus nothing is actually undone. 
+
+The bug can be fixed relatively simple by adding if statements to check if the game is in PVE mode, and if so, making two calls to the undo function, one for the player and one for the AI. This will ensure that both the player's and AI's moves are undone when the undo button is clicked.
+
+Verification of the bug fix can be done by following these steps:
+\begin{enumerate}
+    \item Start a new game in PVE mode.
+    \item Player places a stone on the board.
+    \item The AI makes a move.
+    \item Player places another stone on the board.
+    \item The player clicks undo.
+    \item The last two moves (the player's and the AI's) are undone, and the board returns to the state before the last two moves were made.
+\end{enumerate}
+
 \subsubsection*{Bug Report: B02}
