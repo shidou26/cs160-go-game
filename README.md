@@ -18,11 +18,9 @@ Notable features include:
 - Saving and loading games
 - Settings
 - Autosave current settings
-- and many more!
+and many more!
 
 ## Dependencies
-
-### Applications
 - C++ 17 (GNU GCC 14.2.0)
 - GNU Make
 - [Raylib](https://github.com/raysan5/raylib)
