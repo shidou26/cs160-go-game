@@ -1,7 +1,38 @@
 shidou26, Shidou Le, Hong Anh Le: Le Hong Anh - 26125003
 MarioNathanPro: Doan Nhat Anh - 26125002
 
+- **c7b0808** [2026-11-27] *Shidou Le*: chore: update testing document
+- **24c6856** [2026-11-26] *Shidou Le*: chore: update requirements
+- **b509c4a** [2026-11-26] *Shidou Le*: chore: add bug analysis 1
+- **ec24217** [2026-11-26] *Shidou Le*: chore: init bug anaylysis
+- **842caa5** [2026-11-24] *Shidou Le*: chore: apply .gitignore rules to untracked files
+- **504e356** [2026-11-24] *Shidou Le*: chore: update gitignore
+- **de09af2** [2026-11-24] *Shidou Le*: chore: add tutorial
+- **7a9278e** [2026-11-24] *Shidou Le*: minor fixes in ui
+- **9dad6df** [2026-11-24] *Shidou Le*: Merge branch 'main' of https://github.com/shidou26/cs160-go-game
+- **7dc4bfe** [2026-11-24] *Shidou Le*: chore: init tutorial
+- **bc1b90e** [2026-11-24] *MarioNathanPro*: feat: added sfx selection and sfx when capturing stones
+- **73dc2e3** [2026-11-23] *shidou26*: chore: update requirements
+- **29d64f9** [2026-11-23] *MarioNathanPro*: AI rework
+- **fd7ccde** [2026-11-23] *MarioNathanPro*: stone captured notification
+- **7659a4e** [2026-11-23] *MarioNathanPro*: Merge branch 'main' of https://github.com/shidou26/cs160-go-game
+- **ebd4c9d** [2026-11-23] *MarioNathanPro*: stone captured notification
+- **26c77fd** [2026-11-22] *Shidou Le*: Merge branch 'main' of https://github.com/shidou26/cs160-go-game
+- **3247da8** [2026-11-22] *Shidou Le*: chore: add report documents
+- **78e58bd** [2026-11-22] *MarioNathanPro*: adding AI declaration
+- **e5a5691** [2026-11-22] *MarioNathanPro*: theme name change
+- **f467181** [2026-11-22] *MarioNathanPro*: adding theme/board/stone selection option, adding new music
+- **f5ae6d8** [2026-11-21] *Shidou Le*: chore: update readme.md
+- **0ededf0** [2026-11-21] *Shidou Le*: chore: update ai usage
+- **6b95fe7** [2026-11-21] *Shidou Le*: chore: remove redudant line
+- **747820e** [2026-11-21] *Shidou Le*: refactor: update ui for the game
+- **8dbf7cd** [2026-11-21] *shidou26*: chore: update position of buttons in playing phase
+- **93298c6** [2026-11-20] *Shidou Le*: Merge branch 'main' of https://github.com/shidou26/cs160-go-game
+- **7510f29** [2026-11-20] *Shidou Le*: refactor: update font
+- **dac0fe6** [2026-11-20] *MarioNathanPro*: adding AI usage and git commit log
 - **509e2c5** [2026-11-20] *MarioNathanPro*: changing button size, adding hovering effect
+- **4fb33b7** [2026-11-20] *Shidou Le*: Merge branch 'main' of https://github.com/shidou26/cs160-go-game
+- **1e593a5** [2026-11-20] *Shidou Le*: chore: remove score logging
 - **b885b87** [2026-11-20] *MarioNathanPro*: remove fullscreen
 - **cad7c42** [2026-11-20] *Shidou Le*: chore: update end sound effect
 - **353c05f** [2026-11-20] *Hong Anh Le*: chore: fix a bug in README.md
